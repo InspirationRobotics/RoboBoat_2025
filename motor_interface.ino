@@ -4,7 +4,7 @@
 // NOTES: This code is currently untested. It requires double-checking of servo pins.
 
 
-# include <Servo.h>
+#include <Servo.h>
 
 // Define the servo pins. Please note that this may change based on the hardware.
 // If referencing motor_mix.ino (RoboBoat 2024), 
@@ -91,6 +91,8 @@ void loop(){
         receivedData = Serial.readStringUntil('\n');
         parseData(receivedData);
         debugDisplay();
-        delay(250);
     }
+
+    sendMotorCommands()
+    delay(100);
 }
