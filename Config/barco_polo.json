@@ -1,0 +1,8 @@
+{
+    "boat": "Barco Polo",
+    "arduino_port": "/dev/tty/ACM0",
+    "gps_port": "filler_space",
+    "camera_port": "filler_space",
+    "camera_mxid": "filler_space",
+    "camera_focal_length": "filler_space"
+}
