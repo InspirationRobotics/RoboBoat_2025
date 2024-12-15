@@ -104,9 +104,9 @@ class T200(Arduino):
             with self.lock:
                 motor_speeds = [self.stern_port_speed, self.stern_starboard_speed, self.aft_port_speed, self.aft_starboard_speed]
                 
-                for i in motor_speeds:
+                for index, value in enumerate(motor_speeds):
                     # First calculate motor speeds
-                    list_value = motor_speeds[i]
+                    list_value = value
                     PWM_value = int(1500 + list_value * 300)
 
                     # Handling cases where PWM value is in the set [1460, 1540] but is not 1500
@@ -118,7 +118,7 @@ class T200(Arduino):
                               PWM_value = 1540
 
                     # Change the value at the right index
-                    self.motor_PWM_list[i] = PWM_value
+                    self.motor_PWM_list[index] = PWM_value
 
             self.send_PWM(self.motor_PWM_list)
             time.sleep(0.1)
