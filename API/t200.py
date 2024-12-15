@@ -28,7 +28,10 @@ class Arduino:
         Args:
             command (list): List of PWMs to send.
         """
-        self.arduino.write(str(command).encode())
+        for index, value in enumerate(command):
+            command[index] = str(value)
+        parsed_pwms = ",".join(command)
+        self.arduino.write(parsed_pwms.encode())
 
 class T200(Arduino):
     """
