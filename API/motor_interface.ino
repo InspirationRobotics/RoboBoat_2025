@@ -13,10 +13,10 @@
 // [servo3, (probably) servo1]: port
 // [servo4, (probably) servo2]: starboard
 
-byte servoPin_stern_port = 3;
-byte servoPin_stern_starboard = 5;
+byte servoPin_stern_port = 9;
+byte servoPin_stern_starboard = 3;
 byte servoPin_aft_port = 6;
-byte servoPin_aft_starboard = 9;
+byte servoPin_aft_starboard = 5;
 
 // Define servo objects.
 Servo servo_stern_port;
