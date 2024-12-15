@@ -38,11 +38,11 @@ class T200(Arduino):
     Class to set the PWM values for each motor. Inherits from the Arduino class.
 
     Args:
-        port (str): Port to initiate serial connection with. Defaults to "/dev/tty/ACM0"
+        port (str): Port to initiate serial connection with. Defaults to "/dev/ttyACM0"
         debug (bool): Mode of whether or not to execute functions or not (debug = no execution). Defaults to false.
     """
 
-    def __init__(self, port = "/dev/tty/ACM0", debug = False):
+    def __init__(self, port = "/dev/ttyACM0", debug = False):
         self.debug = debug
 
         if not debug:
