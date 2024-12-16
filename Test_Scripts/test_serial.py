@@ -18,34 +18,41 @@ connection.write(command.encode())
 print("First command complete (neutral commands).")
 time.sleep(5)
 
-command = "1575,1500,1500,1500"
+command = "1550,1500,1500,1500"
 connection.write(command.encode())
 
-print("Second command complete (stern port).")
+print("First real command complete (primer command - stern port).")
 time.sleep(5)
 
-command = "1500,1575,1500,1500"
-connection.write(command.encode())
+for i in range(2):
+    command = "1575,1500,1500,1500"
+    connection.write(command.encode())
 
-print("Third command complete (stern starboard).")
-time.sleep(5)
+    print("Second command complete (stern port).")
+    time.sleep(5)
 
-command = "1500,1500,1575,1500"
-connection.write(command.encode())
+    command = "1500,1575,1500,1500"
+    connection.write(command.encode())
 
-print("Fourth command complete (aft port).")
-time.sleep(5)
+    print("Third command complete (stern starboard).")
+    time.sleep(5)
 
-command = "1500,1500,1500,1575"
-connection.write(command.encode())
+    command = "1500,1500,1575,1500"
+    connection.write(command.encode())
 
-print("Fifth command complete (aft starboard).")
-time.sleep(5)
+    print("Fourth command complete (aft port).")
+    time.sleep(5)
 
-command = "1500,1500,1500,1500"
-connection.write(command.encode())
+    command = "1500,1500,1500,1575"
+    connection.write(command.encode())
 
-print("Going back to neutral, last command complete.")
-time.sleep(5)
+    print("Fifth command complete (aft starboard).")
+    time.sleep(5)
+
+    command = "1500,1500,1500,1500"
+    connection.write(command.encode())
+
+    print("Going back to neutral, last command complete.")
+    time.sleep(5)
 
 connection.close()
