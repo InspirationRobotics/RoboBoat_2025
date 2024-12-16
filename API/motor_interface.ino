@@ -87,12 +87,12 @@ void loop(){
     // Check for serial commands and write those commands to the servo.
     // The commands should be in the form of a list: [stern_port, stern_starboard, aft_port, aft_starboard]
     
-    if (Serial.available){
-        receivedData = Serial.readStringUntil('\n');
+    if (Serial.available() > 0){
+        String receivedData = Serial.readStringUntil('\n');
         parseData(receivedData);
         debugDisplay();
     }
 
-    sendMotorCommands()
+    sendMotorCommands();
     delay(100);
 }
