@@ -1,6 +1,6 @@
 {
     "boat": "Barco Polo",
-    "arduino_port": "/dev/tty/ACM0",
+    "arduino_port": "platform-3610000.xhci-usb-0:2.2:1.0",
     "gps_port": "filler_space",
     "camera_port": "filler_space",
     "camera_mxid": "filler_space",
