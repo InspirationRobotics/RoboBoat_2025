@@ -16,36 +16,36 @@ command = "1500,1500,1500,1500"
 connection.write(command.encode())
 
 print("First command complete (neutral commands).")
-time.sleep(1)
+time.sleep(3)
 
 command = "1575,1500,1500,1500"
 connection.write(command.encode())
 
 print("Second command complete (stern port).")
-time.sleep(1)
+time.sleep(3)
 
 command = "1500,1575,1500,1500"
 connection.write(command.encode())
 
 print("Third command complete (stern starboard).")
-time.sleep(1)
+time.sleep(3)
 
 command = "1500,1500,1575,1500"
 connection.write(command.encode())
 
 print("Fourth command complete (aft port).")
-time.sleep(1)
+time.sleep(3)
 
 command = "1500,1500,1500,1575"
 connection.write(command.encode())
 
 print("Fifth command complete (aft port).")
-time.sleep(1)
+time.sleep(3)
 
 command = "1500,1500,1500,1500"
 connection.write(command.encode())
 
 print("Going back to neutral, last command complete.")
-time.sleep(1)
+time.sleep(3)
 
 connection.close()
