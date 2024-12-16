@@ -31,6 +31,7 @@ class Arduino:
         for index, value in enumerate(command):
             command[index] = str(value)
         parsed_pwms = ",".join(command) + '\n'
+        print(parsed_pwms)
         self.arduino.write(parsed_pwms.encode())
 
 class T200(Arduino):
