@@ -7,7 +7,10 @@ This serves the dual purpose of testing port connectivity and verifying that the
 import serial
 import time
 
+time_before_connection = time.time()
 connection = serial.Serial(port = "/dev/ttyACM0", baudrate = 9600, timeout = 0.1)
+print(f"Time it took to make the serial connection: {time.time() - time_before_connection}")
+
 time.sleep(1)
 
 print("Starting test.")
