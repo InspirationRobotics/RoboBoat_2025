@@ -9,13 +9,13 @@ from API import t200
 motors = t200.T200()
 
 # Run each thruster slowly forward for 5 secs
-motors.set_thrusters(0.16, 0, 0, 0)
+motors.set_thrusters(0.2, 0, 0, 0)
 time.sleep(5)
-motors.set_thrusters(0, 0.16, 0, 0)
+motors.set_thrusters(0, 0.2, 0, 0)
 time.sleep(5)
-motors.set_thrusters(0, 0, 0.16, 0)
+motors.set_thrusters(0, 0, 0.2, 0)
 time.sleep(5)
-motors.set_thrusters(0, 0, 0, 0.16)
+motors.set_thrusters(0, 0, 0, 0.2)
 time.sleep(5)
 
 motors.stop_thrusters()
