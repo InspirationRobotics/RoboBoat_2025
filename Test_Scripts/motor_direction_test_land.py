@@ -8,14 +8,14 @@ from API import t200
 # Double-check to see if the hardcoded port /tty/ACM0 is correct
 motors = t200.T200()
 
-# Run each thruster slowly forward for 1.5 secs
+# Run each thruster slowly forward for 5 secs
 motors.set_thrusters(0.16, 0, 0, 0)
-time.sleep(1.5)
+time.sleep(5)
 motors.set_thrusters(0, 0.16, 0, 0)
-time.sleep(1.5)
+time.sleep(5)
 motors.set_thrusters(0, 0, 0.16, 0)
-time.sleep(1.5)
+time.sleep(5)
 motors.set_thrusters(0, 0, 0, 0.16)
-time.sleep(1.5)
+time.sleep(5)
 
 motors.stop_thrusters()
