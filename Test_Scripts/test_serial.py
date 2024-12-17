@@ -7,10 +7,7 @@ This serves the dual purpose of testing port connectivity and verifying that the
 import serial
 import time
 
-time_before_connection = time.time()
 connection = serial.Serial(port = "/dev/ttyACM0", baudrate = 9600, timeout = 0.1)
-print(f"Time it took to make the serial connection: {time.time() - time_before_connection}")
-
 time.sleep(1)
 
 print("Starting test.")
@@ -21,41 +18,64 @@ connection.write(command.encode())
 print("First command complete (neutral commands).")
 time.sleep(5)
 
-command = "1550,1500,1500,1500"
+# command = "1550,1500,1500,1500"
+# connection.write(command.encode())
+
+# print("First real command complete (primer command - stern port).")
+# time.sleep(5)
+
+command = "1575,1500,1500,1500"
 connection.write(command.encode())
 
-print("First real command complete (primer command - stern port).")
+print("Second command complete (stern port).")
 time.sleep(5)
 
-for i in range(2):
-    command = "1575,1500,1500,1500"
-    connection.write(command.encode())
+command = "1500,1575,1500,1500"
+connection.write(command.encode())
 
-    print("Second command complete (stern port).")
-    time.sleep(5)
+print("Third command complete (stern starboard).")
+time.sleep(5)
 
-    command = "1500,1575,1500,1500"
-    connection.write(command.encode())
+command = "1575,1500,1500,1500"
+connection.write(command.encode())
+time.sleep(5)
 
-    print("Third command complete (stern starboard).")
-    time.sleep(5)
+command = "1500,1500,1500,1500"
+connection.write(command.encode())
 
-    command = "1500,1500,1575,1500"
-    connection.write(command.encode())
+print("Going back to neutral, last command complete.")
+time.sleep(5)
 
-    print("Fourth command complete (aft port).")
-    time.sleep(5)
 
-    command = "1500,1500,1500,1575"
-    connection.write(command.encode())
+# for i in range(2):
+#     command = "1575,1500,1500,1500"
+#     connection.write(command.encode())
 
-    print("Fifth command complete (aft starboard).")
-    time.sleep(5)
+#     print("Second command complete (stern port).")
+#     time.sleep(5)
 
-    command = "1500,1500,1500,1500"
-    connection.write(command.encode())
+#     command = "1500,1575,1500,1500"
+#     connection.write(command.encode())
 
-    print("Going back to neutral, last command complete.")
-    time.sleep(5)
+#     print("Third command complete (stern starboard).")
+#     time.sleep(5)
+
+#     command = "1500,1500,1575,1500"
+#     connection.write(command.encode())
+
+#     print("Fourth command complete (aft port).")
+#     time.sleep(5)
+
+#     command = "1500,1500,1500,1575"
+#     connection.write(command.encode())
+
+#     print("Fifth command complete (aft starboard).")
+#     time.sleep(5)
+
+#     command = "1500,1500,1500,1500"
+#     connection.write(command.encode())
+
+#     print("Going back to neutral, last command complete.")
+#     time.sleep(5)
 
 connection.close()
