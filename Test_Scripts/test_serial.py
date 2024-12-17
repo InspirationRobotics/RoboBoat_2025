@@ -24,20 +24,22 @@ time.sleep(5)
 # print("First real command complete (primer command - stern port).")
 # time.sleep(5)
 
+command = "1500,1575,1500,1500"
+connection.write(command.encode())
+
+print("Command complete (stern starboard).")
+time.sleep(5)
+
 command = "1575,1500,1500,1500"
 connection.write(command.encode())
 
-print("Second command complete (stern port).")
+print("Command complete (stern port).")
 time.sleep(5)
 
 command = "1500,1575,1500,1500"
 connection.write(command.encode())
 
-print("Third command complete (stern starboard).")
-time.sleep(5)
-
-command = "1575,1500,1500,1500"
-connection.write(command.encode())
+print("Command complete (stern starboard).")
 time.sleep(5)
 
 command = "1500,1500,1500,1500"
