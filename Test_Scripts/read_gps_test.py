@@ -1,3 +1,10 @@
+"""
+Test script to test GPS functionality.
+This includes connectivity and data parsing into a readable format.
+Either puts data into a log or prints parsed data directly on the screen.
+"""
+
+
 from API.gps_api import GPS, GPSData
 
 import time
@@ -34,4 +41,9 @@ def print_gps():
     del gps
 
 if __name__ == "__main__":
-    print_gps()
+    # To test print ability
+    # print_gps()
+
+    
+    # To test log ability
+    log_gps()
