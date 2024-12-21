@@ -6,6 +6,12 @@ from serial import Serial
 from threading import Thread, Lock
 from pynmeagps import NMEAReader, NMEAMessage
 
+
+"""
+https://www.qso.com.ar/datasheets/Receptores%20GNSS-GPS/NMEA_Format_v0.1.pdf
+Specs : GNGGA
+"""
+
 class GPSData:
     """
     Class to handle the return of various GPS data.
