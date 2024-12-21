@@ -9,8 +9,13 @@ import time
 from . import t200
 
 class MotorCore():
-    def __init__(self, port = "/dev/tty/ACM0"):
-        self.t200 = t200(port="dev/tty/ACM0")
+    def __init__(self, port = "/dev/ttyACM0"):
+        self.t200 = t200(port="/dev/ttyACM0")
+    
+    # TODO: Water test the basic movement functions (forward, lateral, yaw)
+    def forward(self, magnitude):
+        """Makes the boat move forward by the specified magnitude."""
+        self.t200.set_thrusters(magnitude, magnitude, -magnitude, magnitude)
 
 
     
