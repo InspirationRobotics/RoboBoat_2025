@@ -135,6 +135,7 @@ class T200(Arduino):
         self.active = False
         self.send_thread.join(2)
         self.arduino.close()
+        print("Thrusters stopped")
 
     # NOTE: This might be dangerous.
     def __del__(self):
