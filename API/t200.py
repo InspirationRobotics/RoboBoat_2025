@@ -2,8 +2,6 @@
 Classes to handle sending PWM values to the Arduino via serial connection.
 """
 
-# TODO: Check code, test.
-
 import time
 import serial
 from threading import Thread, Lock

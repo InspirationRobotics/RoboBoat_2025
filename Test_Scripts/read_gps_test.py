@@ -4,8 +4,7 @@ This includes connectivity and data parsing into a readable format.
 Either puts data into a log or prints parsed data directly on the screen.
 """
 
-
-from API.gps_api import GPS, GPSData
+from API.GPS.gps_api import GPS, GPSData
 
 import time
 

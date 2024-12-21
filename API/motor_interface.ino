@@ -1,17 +1,7 @@
 // Code to go on Barco Polo's Arduino. Gets PWM values for each motor from a serial connection.
 // Writes the PWM value to each motor accordingly.
 
-// NOTES: This code is currently untested. It requires double-checking of servo pins.
-
-
 #include <Servo.h>
-
-// Define the servo pins. Please note that this may change based on the hardware.
-// If referencing motor_mix.ino (RoboBoat 2024), 
-// [servo1, servo 2]: stern
-// [servo3, servo4]: aft
-// [servo3, (probably) servo1]: port
-// [servo4, (probably) servo2]: starboard
 
 byte servoPin_stern_port = 9;
 byte servoPin_stern_starboard = 3;
