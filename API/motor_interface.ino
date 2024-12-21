@@ -94,5 +94,6 @@ void loop(){
     }
 
     sendMotorCommands();
-    delay(100);
+    // Make a shorter delay time to prevent Arduino from being overloaded
+    delay(25);
 }
