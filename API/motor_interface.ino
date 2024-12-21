@@ -32,7 +32,7 @@ int aft_starboard_PWM = 1500;
 // Setup function (runs during initialization)
 void setup(){
     // Initialize Serial Communication at 9600 Baud Rate
-    Serial.begin(9600);
+    Serial.begin(115200);
 
     // Attach the right servo object to the right pin
     servo_stern_port.attach(servoPin_stern_port);
@@ -90,7 +90,7 @@ void loop(){
     if (Serial.available() > 0){
         String receivedData = Serial.readStringUntil('\n');
         parseData(receivedData);
-        debugDisplay();
+        // debugDisplay();
         sendMotorCommands();
     }
 

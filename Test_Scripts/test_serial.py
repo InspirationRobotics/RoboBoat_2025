@@ -7,7 +7,7 @@ This serves the dual purpose of testing port connectivity and verifying that the
 import serial
 import time
 
-connection = serial.Serial(port = "/dev/ttyACM0", baudrate = 9600, timeout = 0.1)
+connection = serial.Serial(port = "/dev/ttyACM0", baudrate = 115200, timeout = 0.1)
 time.sleep(1)
 
 print("Starting test.")
