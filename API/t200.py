@@ -123,7 +123,7 @@ class T200(Arduino):
                     self.motor_PWM_list[index] = PWM_value
 
             self.send_PWM(self.motor_PWM_list)
-            time.sleep(0.05)
+            time.sleep(1.5)
     
     @debug_decorator
     def stop_thrusters(self):
@@ -131,7 +131,7 @@ class T200(Arduino):
         Kills thrusters, closes serial connection.
         """
         self.set_thrusters(0, 0, 0, 0)
-        time.sleep(1)
+        time.sleep(5)
         self.active = False
         self.send_thread.join(2)
         self.arduino.close()
