@@ -10,7 +10,7 @@ from API.gps_api import GPS, GPSData
 import time
 
 def log_gps():
-    log = open(f'Logs/GPSlog_{int(time.time())}.txt', "w")
+    log = open(f'logs/GPSlog_{int(time.time())}.txt', "w")
 
     def callback(data : GPSData):
         log.write(str(data) + '\n')
