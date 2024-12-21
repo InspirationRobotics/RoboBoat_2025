@@ -91,9 +91,10 @@ void loop(){
         String receivedData = Serial.readStringUntil('\n');
         parseData(receivedData);
         debugDisplay();
+        sendMotorCommands();
     }
 
-    sendMotorCommands();
+
     // Make a shorter delay time to prevent Arduino from being overloaded
-    delay(25);
+    delay(10);
 }
