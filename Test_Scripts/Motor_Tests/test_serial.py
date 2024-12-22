@@ -13,8 +13,11 @@ This should be a continuous sequence.
 
 import serial
 import time
+from API.Util import device_helper
 
-connection = serial.Serial(port = "/dev/ttyACM0", baudrate = 9600, timeout = 0.1)
+arduino_port = device_helper.dataFromConfig("arduino_port")
+
+connection = serial.Serial(port = arduino_port, baudrate = 9600, timeout = 0.1)
 time.sleep(1)
 
 print("Starting test.")
