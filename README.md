@@ -41,12 +41,27 @@ RoboBoat_2025
 |   | -- # Logs that give detailed diagnostics of the system (for debug purposes).
 ```
 
+### Miscellaneous Files
+- There are "__pycache__" folders littered throughout the code base. These are not actual files, but instead files compiled by the python editor in order to be run by the computer. It is easier to upload these with our scripts than to try and clean them out; doing so generally results in convoluted merge conflicts.
+
+- There should be "__init__" files located in each folder in our repositoy. This is because our (python) scripts are run as modules.
+
+
 Note that this is a "grand plan" for the software architecture. For this season's competition, it remains to be seen how much will be able to be accomplished.
 
 ## Hardware Prerequisites
 
-We utilize a Jetson Xavier NX, an arduino, and various hardware. Ubuntu version is currently unknown. As the architecture develops, a clearer understanding of 
-system specifications will crystallize. 
+Our current electrical diagram can be found here: https://drive.google.com/file/d/1p00fLm1HOUzSkRoLzEd6WDd1H0qSmS08/view?usp=drive_link
+
+## Running the system
+
+Scripts should be run as modules from the root directory (i.e. inside RoboBoat_2025, but not in any folder within RoboBoat_2025). 
+Here is an example to run the test_serial script inside Test_Scripts:
+
+```bash
+git pull
+python3 -m Test_Scripts.test_serial
+```
 
 ## Format
 The goal is to keep our code well-documented and well-organized. To ensure this, please:

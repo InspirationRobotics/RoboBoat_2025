@@ -1,7 +1,11 @@
 """
-Test script to test GPS functionality.
-This includes connectivity and data parsing into a readable format.
+Test script to test GPS functionality. This includes connectivity and data parsing into a readable format.
 Either puts data into a log or prints parsed data directly on the screen.
+
+This test is considered successful when the GPS is connected either to a personal user's computer or to the Jetson on the ASV, and either:
+- Prints the data from the GPS quickly (> 3 Hz) on terminal.
+- Creates a log (.txt) file in the directory RoboBoat_2025/Logs.
+The data should be in the form of: ["Lat: {latitude}, Lon: {longitude}, Heading: {heading}"]
 """
 
 from API.GPS.gps_api import GPS, GPSData

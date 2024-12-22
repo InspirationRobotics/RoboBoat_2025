@@ -14,8 +14,15 @@ Specs : GNGGA
 
 class GPSData:
     """
-    Class to handle the return of various GPS data.
+    Class to handle the parsing of GPS data in a much more convenient way.
+
+    Args:
+        self.lat (float) : GPS-based latitude
+        self.lon (float) : GPS-based longitude
+        self.headt (float) : GPS-based absolute heading
     """
+    # NOTE: Check to make sure that the GPS heading is actually an absolute, not relative heading.
+
     def __init__(self, lat : float, lon : float, headt : float):
         self.lat = lat
         self.lon = lon
@@ -55,6 +62,7 @@ class GPS:
         threaded (bool): Whether or not to create a GPS thread (defaults to True)
         offset (float): Keyword argument, whether or not to take into account any sort of offset for the GPS
     """
+
     def __init__(self, serialport : str, baudrate : int = 115200, callback = None, threaded : bool = True, *, offset : float = None):
         stream = Serial(serialport, baudrate, timeout=3)
         self.nmr = NMEAReader(stream)

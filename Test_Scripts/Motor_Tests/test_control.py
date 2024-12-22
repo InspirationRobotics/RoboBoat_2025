@@ -1,5 +1,6 @@
 """
 File with code taken from motor_core.py in order to test motor_core.py.
+This serves absolutely no purpose at present.
 """
 # NOTE: Simply put in a rudimentary process function.
 import serial

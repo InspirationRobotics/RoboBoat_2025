@@ -1,6 +1,15 @@
-"""This is a motor direction test. It will run each of the motors at a moderate forward speed for 4 seconds each.
-It is meant to distinguish which argument maps to which thruster and the directionalities of the thrusters for forward
-power (forwards or backwards). This an in-water test!"""
+"""
+This is a motor direction test. It will run each of the motors at a moderate forward speed for 4 seconds each.
+It is meant to testdirectionalities of the thrusters for when the thrusters are firing "forward". This is a WATER test.
+
+The test is considered successful when:
+- The stern port thruster runs for 4 seconds
+- The stern starboard thruster runs for 4 seconds
+- The aft port thruster runs for 4 seconds
+- The aft starboard thruster runs for 4 seconds
+- The thrusters stop moving.
+This should be a continuous sequence. The way that the ASV moves should be documented.
+"""
 
 import time
 from API.Motors import t200

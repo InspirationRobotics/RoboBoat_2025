@@ -1,6 +1,15 @@
-"""This is a motor direction test. It will run each of the motors at a slow forward speed for 1.5 seconds each.
-It is meant to distinguish which argument maps to which thruster and the directionalities of the thrusters for forward
-power (forwards or backwards). This a land test!"""
+"""
+This is a motor direction test. It will run each of the motors at a slow forward speed for 1.5 seconds each.
+It is meant to test the t200 API's functionality. This is a BENCH test.
+
+The test is considered successful when:
+- The stern port thruster runs for 5 seconds
+- The stern starboard thruster runs for 5 seconds
+- The aft port thruster runs for 5 seconds
+- The aft starboard thruster runs for 5 seconds
+- The thrusters stop moving.
+This should be a continuous sequence.
+"""
 
 import time
 from API.Motors import t200

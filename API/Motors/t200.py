@@ -12,9 +12,10 @@ class Arduino:
 
     Args:
         port (str): Port to initiate serial connection with. Defaults to "/dev/tty/ACM0".
+        baudrate (int): Baudrate to set serial connection to. Defaults to 115200.
     """
-    def __init__(self, port="/dev/ttyACM0"):
-        self.arduino = serial.Serial(port=port, baudrate = 115200, timeout = 0.1)
+    def __init__(self, port="/dev/ttyACM0", baudrate=115200):
+        self.arduino = serial.Serial(port=port, baudrate=baudrate, timeout = 0.1)
 
         self.send_PWM([1500] * 4)
         time.sleep(1)
