@@ -3,7 +3,7 @@ It is meant to distinguish which argument maps to which thruster and the directi
 power (forwards or backwards). This an in-water test!"""
 
 import time
-from API import t200
+from API.Motors import t200
 
 # Double-check to see if the hardcoded port /tty/ACM0 is correct
 motors = t200.T200()

@@ -2,13 +2,17 @@
 Team Inspiration's Codebase for the 2025 RoboBoat Competition. We utilize a single ASV (autonomous surface vessel). See [Hardware Prerequisites](#hardware-prerequisites) for a more detailed specification of our current system.
 
 ## Structure
-As of right now, the repository will utilize the following format in order to organize effectively.
+As of right now (12/21/2024), the repository will utilize the following format in order to organize effectively.
 
 ```bash
 RoboBoat_2025
 |-- API
-|    | -- # Everything to do with low-level sensor interfaces should be here
-|    | -- # This shold include GPS, LIDAR, Motors, etc.
+|    | -- GPS
+|    |     | -- # Here are all of the low-level GPS functionalities.
+|    | -- Motors
+|    |     | -- # Here is all of the low-level motor code.
+|    | -- Util
+|    |     | -- # Here is all of the low-level functionality used across multiple sensors/devices.
 |    
 |-- Navigation
 |   | -- # Will take low-level sensor data and calculate waypoints
@@ -25,8 +29,10 @@ RoboBoat_2025
 |   | -- # This will include higher-level mission logic, and will weigh perception and navigation data to generate actuation.
 |   
 |-- Test_Scripts
-|   | -- # Methodical sequence of scripts in order to test each sensor/navigation/perception capability.
-|   | -- # Once these scripts have been run, and capabilities confirmed, then we can run real missions.
+|   | -- GPS_Tests
+|   |     | -- # All tests to confirm low-level GPS capabilities.
+|   | -- Motor_Tests
+|   |     | -- # All tests to confirm low-level motor capabilities.
 |
 |-- Setup
 |   | -- # Shell scripts to install all necessary functionalities given the right hardware

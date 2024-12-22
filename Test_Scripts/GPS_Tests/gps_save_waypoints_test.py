@@ -1,3 +1,7 @@
+"""
+Code to test whether we can save GPS data (latitude, longitude, heading), in a given path.
+"""
+
 from API.GPS.gps_api import GPS, GPSData
 
 def callback(data : GPSData):
