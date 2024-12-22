@@ -110,7 +110,7 @@ class GPS:
             return self.__get_single_data()
     
     def load_heading_offset(self):
-        curr_path = Path(__file__).parent.absolute()
+        curr_path = Path("Test_Scripts/GPS_Tests")
         config_path = curr_path / "config"
         if not config_path.exists():
             os.mkdir(config_path)
@@ -137,7 +137,7 @@ class GPS:
         print(f"Offset: {offset}")
         data = input("Save offset? (y/n): ")
         if data.lower() == "y":
-            curr_path = Path(__file__).parent.absolute()
+            curr_path = Path("Test_Scripts/GPS_Tests")
             config_path = curr_path / "config"
             if not config_path.exists():
                 os.mkdir(config_path)
@@ -156,7 +156,7 @@ class GPS:
         name = input("Enter the name for the file: ")
         auto = True if input("Auto log waypoints at 2hz? (y/n)").lower() == "y" else False
         input("Press any key to begin logging waypoints")
-        curr_path = Path(__file__).parent.absolute()
+        curr_path = Path("Test_Scripts/GPS_Tests")
         missions_path = curr_path / "missions"
         if not missions_path.exists():
             os.mkdir(missions_path)
@@ -192,7 +192,7 @@ class GPS:
         '''
         if filename is None:
             return None
-        curr_path = Path(__file__).parent.absolute()
+        curr_path = Path("Test_Scripts/GPS_Tests")
         missions_path = curr_path / "missions"
         if not missions_path.exists():
             os.mkdir(missions_path)
