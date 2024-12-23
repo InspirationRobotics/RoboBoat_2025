@@ -79,6 +79,10 @@ class GPS:
             self.gps_thread.start()
 
     def __del__(self):
+        """
+        Function to delete the thread for the GPS.
+        """
+        
         if self.threaded:
             self.active = False
             self.gps_thread.join(2)
@@ -96,6 +100,10 @@ class GPS:
             pass
 
     def __gps_thread(self):
+        """
+        Function that continually runs while the GPS thread remains in existence.
+        Parses the data, and updates the data.
+        """
         parsed_data : NMEAMessage
         while self.active:
             raw_data, parsed_data = self.nmr.read() # Blocking
@@ -111,6 +119,9 @@ class GPS:
         return self.data
 
     def get_data(self) -> GPSData:
+        """
+        Returns GPS data -- data is of the type GPSData (lat, lon, heading).
+        """
         if self.threaded:
             with self.lock:
                 return self.data
@@ -183,7 +194,8 @@ class GPS:
                     if key.lower() == "q":
                         break
                     data = self.get_data()
-                    log.write(f"{data.lat} % {data.lon} % {data.heading}\n")
+                    rounded_time = int(time.time())
+                    log.write(f"{rounded_time} % {data.lat} % {data.lon} % {data.heading}\n")
                     print(f"Waypoint {cnt} saved")
                     cnt+=1
                 else:
