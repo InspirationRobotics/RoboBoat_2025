@@ -1,4 +1,10 @@
-import smopy
+"""
+File to handle the visualization of GPS data. 
+Remember that all files are run as modules: run "python3 -m API.GPS.gps_visualizer" in the RoboBoat_2025 root directory to get good results.
+"""
+# NOTE: This file stil needs to be documented.
+
+import smopy # Need to import this locally onto host via "pip install smopy" before running the file.
 import cv2
 import numpy as np
 from pathlib import Path
@@ -106,8 +112,6 @@ class GPSVisualizer:
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    # file_path = "logs_6_06_24/GPSlog_1717697944.txt"
-    # file_path = "logs_6_06_24/GPSlog_1717701866.txt"
     file_path = r'Test_Scripts/GPS_Tests/missions/GPS_Parser_Test.txt'
     visualizer = GPSVisualizer(file_path, playback_speed=0.5, frame_size=900, zoom=17)
     visualizer.draw()

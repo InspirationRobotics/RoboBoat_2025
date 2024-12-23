@@ -4,9 +4,10 @@ To test motor movements (surge sway yaw).
 The test is considered successful if:
 - The ASV moves forward for 7.5 seconds.
 - The ASV moves backwards for 7.5 seconds.
+- The ASV strafes (moves laterally) right for 7.5 seconds.
+- The ASV strafes left for 7.5 seconds.
 - The ASV yaws clockwise for 7.5 seconds.
 - The ASV yaws counterclockwise for 7.5 seconds.
-- 
 """
 import time
 from API import motor_core
