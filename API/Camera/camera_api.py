@@ -64,9 +64,21 @@ class Camera:
         self.model_lock = Lock()
         
     def _error(self, message : str):
+        """
+        Utility function to print out the error message of a specific camera.
+
+        Args:
+            message (str): Message to print out to terminal.
+        """
         print(f"{self.camera_name} Error: {message}")
 
     def _info(self, message : str):
+        """
+        Utility function to notify the user of information pertaining to a specific camera.
+
+        Args:
+            message (str): Message to print out to terminal.
+        """
         print(f"{self.camera_name} Info: {message}")
 
     def _init_camera_path(self, camera_id : int, bus_addr : Tuple[int, int]):
@@ -87,6 +99,12 @@ class Camera:
         self.undistorted_frame = UndistortedFrame(int_calibration_path, dist_calibration_path, self.resolution)
 
     def load_model_object(self, model_object : ML_Model):
+        """
+        Passes a ML model object into an attribute of the Camera class.
+
+        Args:
+            model_object (ML_Model): ML model object to be loaded into the camera.
+        """
         if not isinstance(model_object, ML_Model):
             self._error("Must be of ML_Model type")
             return
@@ -128,15 +146,24 @@ class Camera:
             self.model.switch_model(model_path, model_type, half_precision=half_precision)
 
     def start(self):
+        """
+        Starting the camera stream, and the model to run on the stream, if applicable.
+        """
         self.start_stream()
         if self.model:
             self.start_model()
 
     def stop(self):
+        """
+        Stopping the camera stream, and the YOLO model, if necessary.
+        """
         self.stop_model()
         self.stop_stream()
 
     def start_model(self):
+        """
+        Starts the YOLO model by initiating a thread to continually pass in a frame and get back results.
+        """
         if not self.stream:
             self._error("Stream not started, cannot start model thread")
             return
@@ -152,6 +179,9 @@ class Camera:
         self._info("Model thread started")
 
     def stop_model(self):
+        """
+        Stops YOLO model by ending model thread.
+        """
         self.run_model = False
         try:
             self.model_thread.join()
@@ -174,6 +204,9 @@ class Camera:
         self._info("Stream started")
 
     def stop_stream(self):
+        """
+        Stops the camera stream by joining the camera stream thread.
+        """
         self.stream = False
         self.done_init = False
         try:
@@ -246,6 +279,11 @@ class Camera:
         return frame
     
     def _model_background_thread(self):
+        """
+        Callback function to run on a camera stream.
+        Passes in the raw camera frame for the model, and gets back the results.
+        Stores the model's predictions (results) in an attribute of the Camera class.
+        """
         while self.run_model:
             with self.camera_lock:
                 frame = self.frame
