@@ -79,6 +79,16 @@ class IMUData:
         self.__dict__[name] = value
         self.__dict__["timestamp"] = time.time()
 
+    def __str__(self) -> str:
+        """
+        Returns f-string of all attributes of the IMUData object.
+        """
+        return f"Time: {self.timestamp}, Acceleration: {self.accel}, Gyroscopic rotation: {self.gyro}\n 
+                Magnetic field strength: {self.mag}, Quaternion: {self.quat}, Euler: {self.euler}"
+    
+    def __repr__(self) -> str:
+        return self.__str__()
+
 
 class IMU:
     """

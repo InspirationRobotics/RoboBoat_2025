@@ -4,7 +4,7 @@ Either puts data into a log or prints parsed data directly on the screen.
 
 This test is considered successful when the GPS is connected either to a personal user's computer or to the Jetson on the ASV, and either:
 - Prints the data from the GPS quickly (> 3 Hz) on terminal.
-- Creates a log (.txt) file in the directory RoboBoat_2025/Logs.
+- Creates a log (.txt) file in the directory RoboBoat_2025/Test_Scripts/GPS_Tests/GPSLogs.
 The data should be in the form of: ["Lat: {latitude}, Lon: {longitude}, Heading: {heading}"]
 """
 
@@ -13,7 +13,7 @@ from API.GPS.gps_api import GPS, GPSData
 import time
 
 def log_gps():
-    log = open(f'Logs/GPSlog_{int(time.time())}.txt', "w")
+    log = open(f'Test_Scripts/GPS_Tests/GPSLogs/GPSlog_{int(time.time())}.txt', "w")
 
     def callback(data : GPSData):
         log.write(str(data) + '\n')
