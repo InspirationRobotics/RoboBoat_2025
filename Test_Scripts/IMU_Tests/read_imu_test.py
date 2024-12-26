@@ -1,11 +1,13 @@
 """
-Test script to test GPS functionality. This includes connectivity and data parsing into a readable format.
+Test script to test IMU functionality. This includes connectivity and data parsing into a readable format.
 Either puts data into a log or prints parsed data directly on the screen.
 
-This test is considered successful when the GPS is connected either to a personal user's computer or to the Jetson on the ASV, and either:
+This test is considered successful when the IMU is connected either to a personal user's computer or to the Jetson on the ASV, and either:
 - Prints the data from the GPS quickly (> 3 Hz) on terminal.
-- Creates a log (.txt) file in the directory RoboBoat_2025/Test_Scripts/GPS_Tests/GPSLogs.
-The data should be in the form of: ["Lat: {latitude}, Lon: {longitude}, Heading: {heading}"]
+- Creates a log (.txt) file in the directory RoboBoat_2025/Test_Scripts/IMU_Tests/IMULogs.
+The data should be in the form of: 
+    "Time: {self.timestamp}, Acceleration: {self.accel}, Gyroscopic rotation: {self.gyro}\n 
+    Magnetic field strength: {self.mag}, Quaternion: {self.quat}, Euler: {self.euler}"
 """
 
 import time

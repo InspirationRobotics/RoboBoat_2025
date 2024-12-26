@@ -1,5 +1,13 @@
 """
-NOTE: This code has not yet been reviewed. There is no test script to verify its functionality, as well as the associated hardware setup.
+File that handles all low-level functionality of the camera.
+"""
+
+"""
+NOTE: This code has not yet been tested. After running tests on the whole camera codebase, the documentation for arguments will have to be 
+updated meticulously.
+"""
+"""
+NOTE: This code (and therefore essentially the entire perception core) will not be ready to run until the hardware setup for the cameras is fully known.
 """
 
 import cv2
@@ -82,6 +90,15 @@ class Camera:
         print(f"{self.camera_name} Info: {message}")
 
     def _init_camera_path(self, camera_id : int, bus_addr : Tuple[int, int]):
+        """
+        Loads the path for a particular video device, given the camera ID and bus address.
+        Puts this camera path in an attribute of the Camera class (Camera.camera_path).
+
+        Args:
+            camera_id (int) : Camera ID.
+            bus_addr (tuple): Address of the bus, in the format (int, int).
+        """
+
         if bus_addr is not None:
             fc = FindCamera()
             self.camera_path = fc.find_cam(bus_addr[0], bus_addr[1])
@@ -91,6 +108,14 @@ class Camera:
             self.camera_path = f'/dev/video{camera_id}'
     
     def _load_calibration(self, camera_type : str):
+        """
+        Initializes the distortion and intrinsic matrices for a particular camera, given where the camera is on the ASV.
+        Also undistorts the frame based on the matrices loaded. Stores this frame (UndistoredFrame-type object) in an
+        attribute of the Camera class (Camera.undistorted_frame).
+
+        Args:
+            camera_type (str): Camera to load the calibration for ("port", "starboard", "wide").
+        """
         pre_path = Path(__file__).parent.absolute() / "config"
         if not (pre_path / camera_type).exists():
             camera_type = "port"
