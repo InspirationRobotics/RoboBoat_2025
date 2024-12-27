@@ -137,10 +137,13 @@ class Camera:
             self.model = model_object
 
     def load_model(self, model_path : str | Path, model_type : str = "YOLO", *, half_precision: bool = False):
+        """
+        
+        """
         if not isinstance(model_path, Path):
             model_path = Path(model_path)
         if not model_path.exists():
-            pre_path = Path(__file__).parent.absolute() / "models"
+            pre_path = Path(__file__).parent.absolute() / "Models"
             model_path = pre_path / model_path
             if not model_path.exists():
                 self._error("Model path does not exist")

@@ -1,5 +1,5 @@
 """
-NOTE: This code has not yet been reviewed. There is no test script to verify its functionality, as well as the associated hardware setup.
+File that defines the class ML_Model, which handles the running of a YOLO model or TensorRT model (only for NVIDIA GPUs) on a camera stream.
 """
 
 import cv2
@@ -11,19 +11,45 @@ from threading import Thread, Lock
 from ultralytics import YOLO
 from ultralytics.engine.results import Results
 
+# NOTE: Unsure whether the TensorRT methods have been tested yet.
 
 class ML_Model:
 
     def __init__(self, model_path: str | Path, model_type: str = "YOLO", *, half_precision: bool = False):
         self._set_params(model_path, model_type, half_precision=half_precision)
 
+    """
+    Half-precision means that the model uses FP16 (16-bit floating point numbers) rather than FP32 (32-bit) to store numbers.
+    This makes models much less computationally expensive, but also runs the risk of numerical instability due to rounding issues.
+    """
+
     def switch_model(self, model_path: str | Path, model_type: str = "YOLO", *, half_precision: bool = False):
+        """
+        Switches current instance of ML_Model to a different model (different weights to use). Resets the model and then uploads the new file.
+
+        Args:
+            model_path (str): Model weights to upload (.engine or .pt).
+            model_type (str): Model type (TensorRT or YOLO).
+            half_precision (kwarg, bool): Whether or not to store model with half precision. Defaults to False.
+        """
+
         self._reset_params()
         self._set_params(model_path, model_type, half_precision=half_precision)
         print(f'Model switched successfully to: {model_type} \n \
               With weights: {model_path}')
 
     def _set_params(self, model_path: str | Path, model_type: str, *, half_precision):
+        """
+        Sets the parameters of the ML model by finding the name of the model (either 'YOLO' or 'tensorrt') and the path 
+        to the model's parameters. It then stores these as attributes of the ML_Model class (ML_Model.model_path, ML_Model_type, 
+        ML_model.half_precision).
+
+        Args:
+            model_path (str): Path directory to the .pt file (YOLO) or .engine file (tensorrt).
+            model_type (str): Type of model to run.
+            half_precision (kwarg, bool): Whether or not to run the model at half precision (saves memory footprint/allows for larger training size).
+        """
+
         if not isinstance(model_path, Path):
             model_path = Path(model_path)
         self.model_path = model_path
@@ -33,11 +59,22 @@ class ML_Model:
         self._async_init_model()
 
     def _async_init_model(self):
+        """
+        Asynchronously initializes ML model.
+        What this really means is that when this function is called, it starts and then stops a thread whose target is _init_model().
+        This enables the initialization of the ML model independent of when the ML model needs to start predicting/returning results.
+        """
         init_thread = Thread(target=self._init_model)
         init_thread.start()
         init_thread.join()
 
     def _init_model(self):
+        """
+        Initializes the ML model, by making an instance of the YOLO class. If the file is for the TensorRT model, it will 
+        nonetheless run the model by creating an instance of the YOLO class.
+        Configures the ML model's task (detect), along with other settings.
+        """
+
         if self.model_type == "yolo":
             if self.model_path.suffix != ".pt":
                 raise ValueError("Model path must be a .pt file for YOLO models")
@@ -52,16 +89,34 @@ class ML_Model:
         print(f"Model initialized successfully: {self.model_type}")
 
     def _reset_params(self):
+        """
+        Deletes the model, and stores None in the attribute in which the YOLO model was saved (ML_Model.model). 
+        """
         del self.model
         self.model = None
 
     def predict(self, frame: np.ndarray) -> list[Results]:
+        """
+        Passes in a frame to the ML model and gets back the results.
+
+        Args:
+            frame (np.ndarray): Raw frame to run inference on.
+
+        Returns:
+            results (list[Results]): A list of the results (a custom class created by YOLO) returned by the model.
+        """
         if self.model is None or frame is None:
             return []
         results: list[Results] = self.model(frame, half=self.half_precision)
         return results
 
     def create_tensorrt_model(self, model_path: str | Path = None):
+        """
+        Creates a TensorRT model from a YOLO model (.pt) file, given the model path.
+
+        Args:
+            model_path (str): Path directory to the .pt file to transform.
+        """
         if model_path == None:
             model_path = self.model_path
         print("Creating TensorRT model...please be patient")

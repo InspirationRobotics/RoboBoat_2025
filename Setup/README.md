@@ -4,3 +4,4 @@ This is currently just a list of the things that need to be setup to run all fil
 - pip
 - OpenCV
 - Smopy
+- YOLO/Ultralytics
