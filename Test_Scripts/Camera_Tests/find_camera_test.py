@@ -8,6 +8,6 @@ This test is considered successful when the results is a list of tuples with thr
 
 from API.Camera.find_camera import FindCamera
 
-results = FindCamera.matches
-print(results)
+# results = FindCamera.matches
+# print(results)
 

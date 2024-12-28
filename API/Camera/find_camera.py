@@ -30,6 +30,7 @@ class FindCamera:
     def __init__(self):
         self.matches = [] # A list of devices, with each tuple having all of the information to do with a unique device.
         self.__find_cams()
+        print("Ran init for FindCamera.")
         pass
 
     def __find_cams(self):
