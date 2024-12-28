@@ -6,8 +6,6 @@ This test is considered successful when the results is a list of tuples with thr
 """
 # NOTE: This test is to be done as soon as the cameras are mounted to the ASV.
 
-from API.Camera.find_camera import FindCamera
+from API.Camera import find_camera
 
-# results = FindCamera.matches
-# print(results)
-
+fC = find_camera.FindCamera()

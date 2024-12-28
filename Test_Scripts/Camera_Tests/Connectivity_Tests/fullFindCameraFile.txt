@@ -1,3 +1,11 @@
+Full file for reference with notesOnFindCamera.txt
+This is so that if the file is changed, the documentation will still make sense.
+Usage: navigate to the RoboBoat_2025 directory, then run:
+    python3 -m API.Camera.find_camera
+
+Code:
+
+[START]
 """
 File that contains classes to load and parse data about video devices connected to a host computer (in this case the Jetson).
 """
@@ -22,8 +30,7 @@ class find_class(object):
 class FindCamera:
     """
     Class to find all of the video devices connected to the Jetson.
-    Upon instantiation it loads all of the devices with their associated information into a list. 
-    IMPORTANT: In order to run the __init__ function, the class must be instatiated directly (i.e. not imported via modular import).
+    Upon instantiation it loads all of the devices with their associated information into a list.
     This list is an attribute of the class called "matches", and contains a list of tuples, with each tuple detailing a specific device.
     Format of tuples: (device bus, device address, v4ctl information).
     """
@@ -31,6 +38,7 @@ class FindCamera:
     def __init__(self):
         self.matches = [] # A list of devices, with each tuple having all of the information to do with a unique device.
         self.__find_cams()
+        print("Ran init for FindCamera.")
 
     def __find_cams(self):
         """
@@ -132,6 +140,7 @@ class FindCamera:
         return None
     
 if __name__ == "__main__":
-    # Test script.
     fC = FindCamera()
     print(fC.matches)
+
+[END]
