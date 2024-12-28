@@ -1,5 +1,8 @@
 """
 File that handles all low-level functionality of the camera.
+Defines the class Image, which is an object type to hold the information of the image (actual image, as well as dimensions).
+Defines the class Camera, which handles all low-level functionality for the cameras on the ASV. This includes handling ML models running on 
+camera frames, as well as integration of undistortions and ML model results.
 """
 
 """
@@ -13,7 +16,7 @@ NOTE: This code (and therefore essentially the entire perception core) will not 
 import cv2
 import numpy as np
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from threading import Thread, Lock
 from multiprocessing import Process, Value
 from Perception.YOLO_API.undistort_frame import UndistortedFrame
@@ -43,7 +46,14 @@ class Camera:
     Class to handle low-level functionality of the camera.
 
     Args:
-        
+        camera_id (int, kwarg or positional): Id of the camera to use. Defaults to 0.
+        camera_name (str, kwarg or positional): Name of the camera, defaults to "Unknown Camera".
+        model (ML_Model, kwarg): ML model to use on camera, defaults to None.
+        resolution (Tuple[int, int]): Size of frame of camera, defaults to (1920, 1080).
+        fps (int): Frames per second for camera, defaults to 30.
+        video_path (str): Path directory to a video file (this is probably for diagnostic purposes), defaults to None.
+        camera_type (str): Type of camera (where the camera is located). Defaults to 'port'.
+        bus_addr (Tuple[int, int]): Bus address of camera, defaults to None.
     """
 
     def __init__(self, /, camera_id : int = 0, camera_name : str = "Unknown Camera", *, model : ML_Model = None, 
@@ -138,8 +148,14 @@ class Camera:
 
     def load_model(self, model_path : str | Path, model_type : str = "YOLO", *, half_precision: bool = False):
         """
-        
+        Load a ML model into an attribute of the Camera class (Camera.model), given the model path and type.
+
+        Args:
+            model_path (str): Path directory to the model.
+            model_type (str): Type of model, defaults to 'YOLO'.
+            half_precision (kwarg, bool): Whether or not to set model to half precision, defaults to False.
         """
+
         if not isinstance(model_path, Path):
             model_path = Path(model_path)
         if not model_path.exists():
@@ -152,6 +168,12 @@ class Camera:
             self.model = ML_Model(model_path, model_type, half_precision=half_precision)
 
     def switch_model_object(self, model_object : ML_Model):
+        """
+        Switch the current ML model to a different ML model.
+
+        Args:
+            model_object (ML_model): New ML_Model-type object to laod into the Camera class (Camera.model).
+        """
         if not isinstance(model_object, ML_Model):
             self._error("Must be of ML_Model type")
             return
@@ -159,6 +181,14 @@ class Camera:
             self.model = model_object
 
     def switch_model(self, model_path : str | Path, model_type: str = "YOLO", *, half_precision: bool = False):
+        """
+        Switches the current model weights to a new set of weights.
+
+        Args:
+            model_path (str): Path directory to the file containing the model to switch to.
+            model_type (str): Type of model (YOLO or TensorRT).
+            half_precision (kwarg, bool): Whether to use half-precision or not. Defaults to False.
+        """
         if self.model is None:
             self.load_model(model_path, model_type, half_precision=half_precision)
             return
@@ -244,21 +274,42 @@ class Camera:
         self._info("Stream stopped")
 
     def get_size(self, undistort = True) -> Tuple[int, int]:
+        """
+        Gets the size of the frame -- if the image has been undistorted, returns the ROI, else just returns the resolution (frame size) of raw image.
+
+        Args:
+            undistort (bool): Whether or not to return the undistorted frame size. Defaults to True.
+        Returns:
+            Tuple: The (width, height) in pixels of the frame. Width is x, height is y.
+        """
         if undistort:
             return self.undistorted_frame.get_roi_dimensions()
         return self.resolution
     
     def warmup(self, frame : np.ndarray = None) -> np.ndarray:
         """
-        
+        Warms up both the undistort function and the ML model. Takes a frame, undistorts it, and then runs the model 
+        on the undistorted frame.
+
+        Args:
+            frame (numpy.ndarray): Temporary frame to warm up the undistort functionality, ML model. Defualts to None.
         """
         temp_frame = self._warmup_undistort(frame)
         if self.model is not None:
             self.model.predict(temp_frame)
 
+    # NOTE: Not sure what the point of warming up is -- my guess is that the cameras and all of their functionalities (threads, etc.) should be 
+    # fully up and running before any actual missions start, so no potentially important data is lost.
+
     def _warmup_undistort(self, frame : np.ndarray = None) -> np.ndarray:
         """
-        
+        Warm up the undistort function by sending it a frame. If no frame is passed in, then it automatically creates a garbage frame
+        (frame with randomly chosen pixels). 
+
+        Args:
+            frame (numpy.ndarray): Frame to undistort. Defaults to None.
+        Returns:
+            warmup_frame (numpy.ndarray): Undistorted frame.
         """
         if frame is None:
             # Make a frame with random values
@@ -269,12 +320,23 @@ class Camera:
         self._info("Undistortion warmed up...")
         return warmup_frame
 
-    def get_latest_frame(self, *, undistort = True, with_cuda = True) -> Image:
+    def get_latest_frame(self, *, undistort = True, with_cuda = True) -> Union[Image, None]:
+        """
+        Returns the most recent frame from the camera. Checks if there is a raw frame (Camera.raw_frame) -> if there is, it returns that then resets the raw frame.
+        If not, then checks for a processed frame and returns that (Camera.frame). If there is neither, returns None.
+
+
+        Args:
+            undistort (kwarg, bool): Whether or not to undistort the image before returning, defaults to True.
+            with_cuda (kwarg, bool): Whether or not to use CUDA functionality, defaults to True.
+        Returns:
+            Image: Either None or an Image-type object that contains the latest (raw or processed (undistorted)) frame.
+        """
         with self.camera_lock:
             if not self.done_init:
                 return None
             # If there is a raw frame use that and then reset it. 
-            # Otherwise check if there is a processed frame and use that. If not return None
+            # Otherwise check if there is a processed frame and use that. If not return None.
             if self.raw_frame is not None:
                 frame = self.raw_frame
                 self.raw_frame = None
@@ -288,16 +350,31 @@ class Camera:
         return Image(frame)
     
     def get_latest_model_results(self) -> List:
+        """
+        Returns the Camera.results attribute (list-type), which are the results from the ML model after running on the most recent frame.
+        """
         with self.model_lock:
             return self.results
         
     def draw_model_results(self, frame, results : List[Results] = None, confidence=0.5):
+        """
+        Draw the results from the ML model on the frame.
+
+        Args:
+            frame: Frame to draw on.
+            results (list): Results from ML model, defaults to None.
+            confidence (float): Confidence threshold for drawing items, defaults to 0.5.
+
+        Returns:
+            frame (numpy.ndarray): Modified frame.
+        """
         if results is None:
             results = self.get_latest_model_results()
         for result in results:
             names = result.names
             for box in result.boxes:
                 conf = box.conf.item()
+                # Only draw box around object if the confidence of detection is above the confidence threshold.
                 if conf < confidence:
                     continue
                 x1, y1, x2, y2 = box.xyxy.cpu().numpy().flatten()

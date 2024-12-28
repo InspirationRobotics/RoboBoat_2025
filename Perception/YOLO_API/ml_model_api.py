@@ -14,6 +14,14 @@ from ultralytics.engine.results import Results
 # NOTE: Unsure whether the TensorRT methods have been tested yet.
 
 class ML_Model:
+    """
+    Class that handels the loading and running of ML models on frames (either TensorRT or YOLO).
+
+    Args:
+        model_path (str): Path directory to the model.
+        model_type (str): Type of model, defaults to 'YOLO'.
+        half_precision (kwarg, bool): Whether or not to set model to half precision, defaults to False.
+    """
 
     def __init__(self, model_path: str | Path, model_type: str = "YOLO", *, half_precision: bool = False):
         self._set_params(model_path, model_type, half_precision=half_precision)
@@ -25,7 +33,7 @@ class ML_Model:
 
     def switch_model(self, model_path: str | Path, model_type: str = "YOLO", *, half_precision: bool = False):
         """
-        Switches current instance of ML_Model to a different model (different weights to use). Resets the model and then uploads the new file.
+        Switches current instance of ML_Model to a different model (different weights to use). Resets the model and then uploads the new weights.
 
         Args:
             model_path (str): Model weights to upload (.engine or .pt).
