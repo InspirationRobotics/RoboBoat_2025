@@ -1,12 +1,11 @@
 """
-To aggregate/integrate the various higher-level files (sensor fusion, perception, etc),
+To aggregate/integrate the various lower-level files (sensor fusion, GPS, IMU),
 and create a single list of values to be sent to the Arduino to actuate the motors.
 """
 
 import serial
 import time
 
-# NOTE: Not sure whether absolute imports will work
 from API.Motors import t200
 
 class MotorCore():
@@ -42,7 +41,4 @@ class MotorCore():
     """
     --------------------------------------------------------
     """
-
-
-
     

@@ -4,4 +4,4 @@ Can be deleted whenever someone feels like cleaning up.
 """
 
 data = [0, 1, 2, 5, 3, 2, 3]
-print(data[0])
+print(data[:2])

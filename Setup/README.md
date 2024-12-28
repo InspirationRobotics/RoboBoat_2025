@@ -5,3 +5,4 @@ This is currently just a list of the things that need to be setup to run all fil
 - OpenCV
 - Smopy
 - YOLO/Ultralytics
+- Filterpy (for sensor fusion)
