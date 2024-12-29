@@ -7,8 +7,14 @@ Can be used to enforce a specific reader implementation
 if multiple are available: 
 e.g. cv2.CAP_MSMF or cv2.CAP_DSHOW.
 '''
-# open video0
-cap = cv2.VideoCapture(0, cv2.CAP_MSMF)
+
+# Use for linux.
+# # open video0
+# cap = cv2.VideoCapture(0, cv2.CAP_MSMF)
+
+# Use video1 for Windows
+cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+
 # set width and height
 # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
@@ -17,7 +23,6 @@ cap = cv2.VideoCapture(0, cv2.CAP_MSMF)
 while(True):
     # Capture frame-by-frame
     ret, frame = cap.read()
-    print(ret)
     # Display the resulting frame
     cv2.imshow('frame', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):

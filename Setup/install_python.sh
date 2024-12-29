@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Bash script to install Python.
+# Not tested yet.
 
 # Function to print in bold green text.
 echo_msg(){
@@ -37,4 +38,41 @@ else
     exit 1
 fi
 
-# TODO: Everything else.
+read -p "Enter the Python version to install (e.g. 3.11.6): " PYTHON_VERSION
+
+if command_exists python3 && [["$(python3 --version)" == *"$PYTHON_VERSION"]]; then
+    echo_msg "Python $PYTHON_VERSION is already installed."
+    exit 0
+fi
+
+# Download and install Python
+echo_msg "Downloading Python $PYTHON_VERSION..."
+wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz -0 /tmp/Python-$PYTHON_VERSION.tgz
+
+echo "Extracting Python $PYTHON_VERSION..."
+cd /tmp && tar -xzf Python-$PYTHON_VERSION.tgz
+
+cd Python-$PYTHON_VERSION
+echo "Configuring Python $PYTHON_VERSION..."
+
+./configure --enable-optimizations
+
+echo_msg "Building and installing $PYTHON_VERSION (this may take a while, please be patient)..."
+make -j$(nproc)
+make altinstall
+
+# Verify installation
+if command_exists python3.$(echo $PYTHON_VERSION | cut -d. -f2); then
+    echo_msg "Python $PYTHON_VERSION installed successfully."
+    python3.$(echo $PYTHON_VERSION | cut -d. -f2) --version
+else
+    echo_msg "Python installation failed."
+    exit 1
+fi
+
+# Cleaning up
+echo "Cleaning up..."
+cd /tmp && rm -rf Python-$PYTHON_VERSION.tgz Python-$PYTHON_VERSION
+
+echo_msg "Python $PYTHON_VERSION installation is complete."
+
