@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Bash script to install Python on Ubuntu, Debian or Red Hat-based systems.
-# Not tested yet.
 
 # Function to print in bold green text.
 echo_msg(){
