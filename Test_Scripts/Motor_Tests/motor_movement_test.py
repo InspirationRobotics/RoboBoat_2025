@@ -11,7 +11,7 @@ The test is considered successful if:
 """
 
 import time
-from GNC import motor_core
+from GNC.Control_Core import motor_core
 
 motors = motor_core.MotorCore("/dev/ttyACM0")
 
