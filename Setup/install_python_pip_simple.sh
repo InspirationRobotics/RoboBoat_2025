@@ -15,3 +15,9 @@ sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt update
 PYTHON_VERSION=3.13
 sudo apt install python${PYTHON_VERSION}
+
+sudo apt install python3-pip
+echo_msg "Verifying that pip has been installed..."
+pip3 --version
+
+echo_msg "Python and pip installed."

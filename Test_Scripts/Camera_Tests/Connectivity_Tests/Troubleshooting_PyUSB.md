@@ -7,7 +7,7 @@ ways to mitigate these problems.
 To install the PyUSB library, it is first necessary to install the libusb library.
 Run the following code to install (this is for a Debian/Ubuntu based system).
 
-```Debian/Ubuntu
+```bash (Debian/Ubuntu)
 sudo apt update
 sudo apt install libusb-1.0-0-dev
 ```

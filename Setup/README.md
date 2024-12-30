@@ -17,4 +17,5 @@ sudo ./[file_name].sh
 - Smopy
 - YOLO/Ultralytics
 - Filterpy (for sensor fusion)
-- PyUSB
+- PyUSB/LibUSB
+- Numpy

@@ -9,3 +9,5 @@ This test is considered successful when the results is a list of tuples with thr
 from API.Camera import find_camera
 
 fC = find_camera.FindCamera()
+result = fC._find_cam(bus = 3, address = 3)
+print(f"Result: {result}")

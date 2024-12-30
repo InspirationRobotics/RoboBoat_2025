@@ -6,15 +6,17 @@ import usb.core
 import usb.util
 import subprocess
 
-# NOTE: Have absolutely no idea what this does.
 class find_class(object):
     def __init__(self, class_):
         self._class = class_
     def __call__(self, device):
         if device.bDeviceClass == self._class:
+            #print(f"[DEBUG find_class] Device.bDeviceClass : {device.bDeviceClass}")
             return True
         for cfg in device:
+            #print(f"[DEBUG find_class] cfg : {cfg}")
             intf = usb.util.find_descriptor(cfg, bInterfaceClass=self._class)
+            #print(f"[DEBUG find_class] intf : {intf}")
             if intf is not None:
                 return True
         return False
@@ -42,7 +44,7 @@ class FindCamera:
         # Find all USB devices with video interface class (14)
         devices = usb.core.find(find_all=True, custom_match=find_class(14))
 
-        # print(f"[DEBUG FindCamera] Devices found : {devices}")
+        print(f"[DEBUG FindCamera] Devices found : {devices}")
 
         # Get the v4l2-ctl data
         v4ctl = subprocess.check_output("v4l2-ctl --list-devices", shell=True).decode("utf-8")
@@ -59,7 +61,7 @@ class FindCamera:
                 # print(f"[DEBUG FindCamera] ID: {id}")   
                  
                 for i in range(len(v4ctl)):
-                    print(f"Looped v4ctl: {v4ctl[i]}")
+                    # print(f"Looped v4ctl: {v4ctl[i]}")
                     if id in v4ctl[i]:
                         self.matches.append((device.bus, device.address, v4ctl[i+1].strip()))
                         # print((device.bus, device.address, v4ctl[i+1].strip()))
@@ -126,7 +128,9 @@ class FindCamera:
             except:
                 pass
         
+        # print(f"Matches: {matches}")
         for match in matches:
+            print(match[0], match[1])
             if match[0] == bus and match[1] == address:
                 return match[2]
         return None
