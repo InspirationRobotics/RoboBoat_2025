@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Bash script to install Python on Ubuntu, Debian or Red Hat-based systems.
+# This is from source -- generally will not be needed -- use install_python_pip_simple.sh first if possible.
 
 # Function to print in bold green text.
 echo_msg(){
@@ -62,7 +63,7 @@ echo "Extracting Python $PYTHON_VERSION..."
 cd /tmp && tar -xzf Python-$PYTHON_VERSION.tgz
 
 cd Python-$PYTHON_VERSION
-echo "Configuring Python $PYTHON_VERSION..."
+echo_msg "Configuring Python $PYTHON_VERSION..."
 ./configure --enable-optimizations
 
 echo_msg "Building and installing $PYTHON_VERSION (this may take a while, please be patient)..."
@@ -70,7 +71,7 @@ make -j$(nproc)
 make altinstall
 
 # Verify installation
-echo "Verifying python installation..."
+echo_msg "Verifying python installation..."
 PYTHON_MINOR_VERSION=$(echo $PYTHON_VERSION | cut -d. -f2)
 if command_exists python3.$PYTHON_MINOR_VERSION; then
     echo_msg "Python $PYTHON_VERSION installed successfully."
@@ -79,5 +80,10 @@ else
     echo_msg "Python installation failed."
     exit 1
 fi
+
+echo_msg "Installing pip..."
+sudo apt install python3-pip
+echo_msg "Verifying that pip has been installed..."
+pip3 --version
 
 echo_msg "Python $PYTHON_VERSION installation is complete."
