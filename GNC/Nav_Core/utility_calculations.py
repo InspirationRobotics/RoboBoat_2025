@@ -6,9 +6,11 @@ find the lat, lon of the object. NOTE: Not sure if this file is the right place 
 - Based on where obstacles are, calculate a path that utilizes straight lines in order to move to a given waypoint.
 """
 
-
-
 from math import *
 
 def calculate_waypoint():
     pass
+
+def calculate_midpoint():
+    pass
+
