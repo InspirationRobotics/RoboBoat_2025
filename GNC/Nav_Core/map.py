@@ -13,6 +13,7 @@ and the other being the one that is created as we come across obstacles via comp
 import json
 from typing import Tuple, Union
 from pathlib import Path
+from GNC.Nav_Core.mapHelper import mapHelper
 import math
 
 class Object:
@@ -22,7 +23,7 @@ class Object:
         self.longitude = longitude
         self.confidence = confidence
 
-class Map:
+class Map(mapHelper):
     def __init__(self):
         # List will be in the form of: [{'object_type': ((lat, lon), confidence)}, {'object_type': ((lat, lon), confidence)}, etc.]
         self.map = []
