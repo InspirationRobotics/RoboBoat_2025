@@ -14,17 +14,34 @@ Next Steps:
 """
 
 class mapVisualizer(mapHelper):
-    def __init__(self, /, map : list = [], scale : float = 1.0, save : bool = False, zoom : int = 19, frame_size : int = 600, *,
-                 path_to_save_image : str | Path):
+    def __init__(self, /, map : list = [], scale : float = 1.0, save : bool = False, zoom : int = 16, frame_size : int = 800, *,
+                 path_to_save_image : str | Path = ''):
         super().__init__()
         self.loaded_map = map
+        self.objects_to_draw = self.loaded_map
+
         self.map_scale = scale
         self.save = save
         self.zoom = zoom
         self.frame_size = frame_size
+
+        self.get_map(save = save)
         
         if path_to_save_image:
             self.image_path = path_to_save_image
+
+    # We need to parse the data of each object
+    # Create a copy of the loaded map, and begin drawing and then deleting the objects one by one
+    # Once all of the objects are drawn, print them on the screen
+
+    def parse_next_object(self) -> Tuple[str, Tuple[float, float]]:
+        object = self.objects_to_draw[0]
+        object_data = list(object.items())[0]
+        object_type, coordinate_confidence_data = object_data[0], object_data[1]
+        object_coordinates = coordinate_confidence_data[0]
+        self.objects_to_draw.pop(0)
+
+        return object_type, object_coordinates
 
     def parse_map_data(self):
         pass
@@ -79,13 +96,20 @@ class mapVisualizer(mapHelper):
                           ]
         
         return scaled_corners
+    
+    def rescale(self, x : int, y : int):
+        size_w = self.map_obj.w
+        size_h = self.map_obj.h
+        x = int(x * self.frame_size / size_w)
+        y = int(y * self.frame_size / size_h)
+        return x, y
         
     def get_map(self, /, save : bool = False):
-        scaled_corners = self.calculate_scaled_map_corners()
-        lat_min = scaled_corners[0][0]
-        lon_min = scaled_corners[0][1]
-        lat_max = scaled_corners[3][0]
-        lon_max = scaled_corners[3][1]
+        self.scaled_corners = self.calculate_scaled_map_corners()
+        lat_min = self.scaled_corners[0][0]
+        lon_min = self.scaled_corners[0][1]
+        lat_max = self.scaled_corners[3][0]
+        lon_max = self.scaled_corners[3][1]
         zoom = self.zoom
         map = smopy.Map((lat_min, lon_min, lat_max, lon_max), z=zoom)
         if save:
@@ -103,5 +127,35 @@ class mapVisualizer(mapHelper):
         self.frame = frame
         return map
     
+    # NOTE: It seems that everything below here is absolute garbage.
+    def draw_test(self):
+        object_type, (lat, lon) = self.parse_next_object()
+        southwest_corner = self.scaled_corners[0]
+        min_x, min_y = self.map_obj.to_pixels(southwest_corner[0], southwest_corner[1])
+        print(f"[Compare] : {lat, lon}")
+        print(f"[Compare] : {southwest_corner[0], southwest_corner[1]}")
+        
+        x, y = self.map_obj.to_pixels(lat, lon)
+        print(f"Initial : {x, y}")
+        print(f"Min: {min_x, min_y}")
+        
+        # # Shift pixel scale
+        
+        
+        # # scale the x,y to the frame size
+        # x -= min_x
+        # y -= min_y
+        # print(f"Min: {min_x, min_y}")
+        # print(f"Debug: {x, y}")
+        # 
+        min_x, min_y = self.rescale(x, y)
+        print(f"Debug min rescale: {min_x, min_y}")
+
+        frame = self.frame.copy()
+        frame = cv2.circle(frame, (min_x, min_y), 5, (0, 0, 255), -1)
+        cv2.imshow("map", frame)
+        cv2.waitKey(0)
+    
     def draw(self):
         pass
+

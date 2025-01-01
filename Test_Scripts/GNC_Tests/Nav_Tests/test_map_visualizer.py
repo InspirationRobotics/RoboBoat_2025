@@ -10,10 +10,13 @@ test_map = map.Map()
 test_preloaded_map = test_map.load_map_config("Test_Scripts/GNC_Tests/Nav_Tests/test_map_config_file.json")
 
 test_map_visualizer = map_visualizer.mapVisualizer(test_preloaded_map, scale=2)
-test_corners = test_map_visualizer.calculate_scaled_map_corners()
-print(test_corners)
-lat_min = test_corners[0][0]
-lon_min = test_corners[0][1]
-lat_max = test_corners[3][0]
-lon_max = test_corners[3][1]
-print(lat_min, lon_min, lat_max, lon_max)
+# test_corners = test_map_visualizer.calculate_scaled_map_corners()
+# print(test_corners)
+# lat_min = test_corners[0][0]
+# lon_min = test_corners[0][1]
+# lat_max = test_corners[3][0]
+# lon_max = test_corners[3][1]
+# print(lat_min, lon_min, lat_max, lon_max)
+
+test_map_visualizer.draw_test()
+#print(results)
