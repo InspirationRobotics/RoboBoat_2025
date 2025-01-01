@@ -11,7 +11,7 @@ from typing import Tuple, Union
 
 class mapHelper:
     def __init__(self):
-        self.R = 631700 # Earth's radius in meters.
+        self.R = 6317000 # Earth's radius in meters.
 
     def calculate_midpoint(self, point1 : Tuple[float, float], point2: Tuple[float , int]) -> Tuple[float, float]:
         """
@@ -67,15 +67,16 @@ class mapHelper:
         waypoint_lat, waypoint_lon = map(math.degrees, [waypoint_lat, waypoint_lon])
         return(waypoint_lat, waypoint_lon)
     
-    def calculate_latitude_distance(self, lat_1 : float, lat_2 : float) -> float:
-        lat1, lat2 = map(math.radians, [lat_1, lat_2])
-        distance_latitude = self.R * abs(lat2 - lat1)
-        return distance_latitude
+    # NOTE: These functions commented are extremely inaccurate.
+    # def calculate_latitude_distance(self, lat_1 : float, lat_2 : float) -> float:
+    #     lat1, lat2 = map(math.radians, [lat_1, lat_2])
+    #     distance_latitude = self.R * abs(lat2 - lat1)
+    #     return distance_latitude
     
-    def calculate_longitude_distance(self, lon_1 : float, lon_2 : float, average_latitude : float) -> float:
-        lon1, lon2, latitude = map(math.radians, [lon_1, lon_2, average_latitude])
-        distance_longitude = self.R * abs(lon2 - lon1) * math.cos(latitude)
-        return distance_longitude
+    # def calculate_longitude_distance(self, lon_1 : float, lon_2 : float, average_latitude : float) -> float:
+    #     lon1, lon2, latitude = map(math.radians, [lon_1, lon_2, average_latitude])
+    #     distance_longitude = self.R * abs(lon2 - lon1) * math.cos(latitude)
+    #     return distance_longitude
     
     def haversine(self, point1 : Tuple[float, float], point2: Tuple[float, float]) -> float:
         """
@@ -84,8 +85,8 @@ class mapHelper:
         Returns distance in meters
         """
         # convert decimal degrees to radians
-        lat1, lon1 = map(math.radians, [point1])
-        lat2, lon2 = map(math.radians, [point2])
+        lat1, lon1 = map(math.radians, point1)
+        lat2, lon2 = map(math.radians, point2)
 
         # haversine formula
         dlon = lon2 - lon1
@@ -94,7 +95,7 @@ class mapHelper:
         c = 2 * math.asin(math.sqrt(a))
         return c * self.R
     
-    def extend_vector(self, vector_tail : Tuple[float, float], curr_vector_head : Tuple[float, float], scale : float):
+    def extend_vector(self, vector_tail : Tuple[float, float], curr_vector_head : Tuple[float, float], scale : float) -> Tuple[float, float]:
         curr_lat, curr_lon = map(math.radians, vector_tail)
         # curr_waypoint_lat, curr_waypoint_lon = map(math.radians, curr_vector_head)
         distance = self.haversine(vector_tail, curr_vector_head)

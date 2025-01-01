@@ -13,7 +13,7 @@ and the other being the one that is created as we come across obstacles via comp
 import json
 from typing import Tuple, Union
 from pathlib import Path
-from GNC.Nav_Core.mapHelper import mapHelper
+from GNC.Nav_Core.map_helper import mapHelper
 import math
 
 class Object:
