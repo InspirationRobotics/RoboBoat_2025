@@ -118,10 +118,3 @@ class mapHelper:
         new_lat, new_lon = map(math.degrees, [new_lat, new_lon])
 
         return (new_lat, new_lon)
-
-
-
-
-
-
-

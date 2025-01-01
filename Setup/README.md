@@ -1,7 +1,33 @@
 # Setup Scripts for RoboBoat 2025 Documentation
 Contained in this folder are all of the scripts to install dependencies that are needed to run the code in this repository.
 This is an ideal situation -- there may be dependencies that need to be installed that have been overlooked/have not been implemented here.
-NOTE: Scripts are meant for use on Ubuntu versions later 20.04 and later.
+NOTE: Scripts are meant for use on Ubuntu versions later 20.04 and later. If you are using Windows, please run
+```Windows terminal
+wsl --install
+```
+if you wish to use bash scripts. You can also use Git Bash (which seems to work better -- not many external management issues). Simply download Git Bash, and open it.
+
+## Setup for WSL
+```bash
+wsl --install
+```
+You will then have to setup some basic account information.
+```bash
+# Enter WSL
+wsl
+# Exit WSL
+exit
+```
+```bash
+# To access documents from C: drive (Windows)
+wsl
+cd /mnt/c/Users/[username]
+```
+To install dos2unix
+```bash
+sudo apt-get update
+sudo apt install dos2unix
+```
 
 ## Usage
 For each file you wish to execute, navigate to the parent folder of the file, then, replacing the "file_name" with the file you wish to execute, run:
@@ -30,7 +56,7 @@ Navigate into the Setup folder, then continue the sequence:
 - python3
 - pip
 - OpenCV
-- Smopy
+- Smopy, ipython
 - YOLO/Ultralytics
 - Filterpy (for sensor fusion)
 - PyUSB/LibUSB
