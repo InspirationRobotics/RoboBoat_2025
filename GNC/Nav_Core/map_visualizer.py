@@ -6,13 +6,11 @@ from typing import Tuple, Union
 from pathlib import Path
 
 """
-We want to:
-- Based on the map and coordinates, visualize a square-shaped map proportional to the distance between the objects
-
-Need to load map data into the visualizer
-Calculate the zoom of the map based on the coordinates
-Based on the lat, lon constraints for the map, show it on the screen.
-Go from there.
+Next Steps:
+- We want to draw each individual object on the map on the map image.
+- Buoys of each color will be their own color circles
+- Boats will be rectangles, the same size or slightly bigger, each with their respective colors.
+- Can handle difference in sizing, signs later.
 """
 
 class mapVisualizer(mapHelper):
@@ -105,7 +103,5 @@ class mapVisualizer(mapHelper):
         self.frame = frame
         return map
     
-
-
-
-            
+    def draw(self):
+        pass
