@@ -4,7 +4,9 @@ Remember that all files are run as modules: run "python3 -m API.GPS.gps_visualiz
 """
 # NOTE: This file stil needs to be documented.
 
-import smopy # Need to import this locally onto host via "pip install smopy" before running the file.
+# Smopy eeds to be imported onto host computer. See Setup/install_smopy.sh to install smopy individually, 
+# if you haven't already setup all necessary dependencies, or just run "pip install smopy" in terminal.
+import smopy 
 import cv2
 import numpy as np
 from pathlib import Path
@@ -12,9 +14,18 @@ from API.GPS.waypoint_data_parser import GPSDataParser
 from datetime import datetime
 
 class GPSVisualizer:
+    """
+    Class to visualize GPS data.
+
+    Args:
+        file_path (str) : Path directory to GPS data file to visualize.
+        zoom (int, kwarg): Zoom magnitude for the Smopy-based image. Defaults to 19.
+        playback_speed (int, kwarg): Speed to play visualization video at. Defaults to 10 (10x speed of normal).
+        frame_size (int, kwarg): Side length of frame in pixels (since frame is a square), defaults to 600.
+        heading_offset (float, kwarg): Heading offset of the GPS to take into account in visualizer, defaults to 0.
+    """
 
     def __init__(self, file_path : Path | str, *, zoom : int = 19, playback_speed : int = 10, frame_size : int = 600, heading_offset : float = 0):
-        
         self.target = {}
         self.position = {}
         self.heading = {}
@@ -113,6 +124,6 @@ class GPSVisualizer:
 
 if __name__ == "__main__":
     # Test for GPSVisualizer.
-    file_path = r'Test_Scripts/API_Tests/GPS_Tests/missions/GPS_Parser_Test.txt'
+    file_path = r'Test_Scripts/API_Tests/GPS_Tests/Missions/GPS_Parser_Test.txt'
     visualizer = GPSVisualizer(file_path, playback_speed=0.5, frame_size=900, zoom=17)
     visualizer.draw()

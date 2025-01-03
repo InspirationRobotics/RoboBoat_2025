@@ -233,7 +233,7 @@ class GPS:
         auto = True if input("Auto log waypoints at 2hz? (y/n)").lower() == "y" else False
         input("Press any key to begin logging waypoints")
         curr_path = Path("Test_Scripts/API_Tests/GPS_Tests")
-        missions_path = curr_path / "missions"
+        missions_path = curr_path / "Missions"
         if not missions_path.exists():
             os.mkdir(missions_path)
         log = open(f'{missions_path}/{name}.txt', "w")
@@ -278,7 +278,7 @@ class GPS:
         if filename is None:
             return None
         curr_path = Path("Test_Scripts/API_Tests/GPS_Tests")
-        missions_path = curr_path / "missions"
+        missions_path = curr_path / "Missions"
         if not missions_path.exists():
             os.mkdir(missions_path)
         file_path = missions_path / filename

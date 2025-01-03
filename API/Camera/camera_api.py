@@ -19,8 +19,8 @@ from pathlib import Path
 from typing import List, Tuple, Union
 from threading import Thread, Lock
 from multiprocessing import Process, Value
-from Perception.YOLO_API.undistort_frame import UndistortedFrame
-from Perception.YOLO_API.ml_model_api import ML_Model, Results
+from Perception.ML_Model_Core.undistort_frame import UndistortedFrame
+from Perception.ML_Model_Core.ml_model_api import ML_Model, Results
 from API.Camera.find_camera import FindCamera
 import time
 
