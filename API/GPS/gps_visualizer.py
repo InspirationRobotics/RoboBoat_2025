@@ -124,6 +124,6 @@ class GPSVisualizer:
 
 if __name__ == "__main__":
     # Test for GPSVisualizer.
-    file_path = r'Test_Scripts/API_Tests/GPS_Tests/Missions/GPS_Parser_Test.txt'
-    visualizer = GPSVisualizer(file_path, playback_speed=0.5, frame_size=900, zoom=17)
+    file_path = r'Test_Scripts/API_Tests/GPS_Tests/Missions/large_gps_parser_test.txt'
+    visualizer = GPSVisualizer(file_path, playback_speed=5, frame_size=900, zoom=17)
     visualizer.draw()
