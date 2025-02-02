@@ -6,11 +6,11 @@ and create a single list of values to be sent to the Arduino to actuate the moto
 import serial
 import time
 
-from API.Motors import t200
+from API.Motors.t200 import T200
 
 class MotorCore():
     def __init__(self, port = "/dev/ttyACM0"):
-        self.t200 = t200(port="/dev/ttyACM0")
+        self.t200 = T200(port="/dev/ttyACM0")
     
 
     """
