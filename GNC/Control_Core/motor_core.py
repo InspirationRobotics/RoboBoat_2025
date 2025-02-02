@@ -10,7 +10,7 @@ from API.Motors import t200
 
 class MotorCore():
     def __init__(self, port = "/dev/ttyACM0"):
-        self.t200 = t200(port="/dev/ttyACM0")
+        self.t200 = t200.T200(port="/dev/ttyACM0")
     
 
     """
