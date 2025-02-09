@@ -31,7 +31,7 @@ while(True):
         print(f"elapsed time: {end - start} ns")
     elif(str(user_input) == "0"):
         start = time.perf_counter_ns()
-        motors.stop_thrusters()
+        motors.set_thrusters(0, 0, 0, 0)
         end = time.perf_counter_ns()
         print(f"elapsed time: {end - start} ns")
 
