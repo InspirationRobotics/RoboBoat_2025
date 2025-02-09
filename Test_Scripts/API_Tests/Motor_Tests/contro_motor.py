@@ -1,6 +1,6 @@
 import time
 from API.Motors import t200
-motors = t200.T200(debug=True)
+motors = t200.T200(debug=False)
 
 
 
