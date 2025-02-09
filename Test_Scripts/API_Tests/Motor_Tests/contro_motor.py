@@ -8,6 +8,7 @@ while(True):
     user_input = input("command>> ")
     if(str(user_input) == "q"):
         print("quiting the code")
+        motors.stop_thrusters()
         break
     elif(str(user_input) == "1"):
         start = time.perf_counter_ns()
