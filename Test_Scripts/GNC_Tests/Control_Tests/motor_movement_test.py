@@ -50,6 +50,49 @@ while(True):
         motors.stay()
         end = time.perf_counter_ns()
         print(f"elapsed time: {end - start} ns")
+    elif(str(user_input) =="square"):
+        def wait():
+            print("Stay for 2 s")
+            motors.stay()
+            time.sleep(2)
+
+        start = time.perf_counter_ns()
+        motors.surge(0.3)
+        time.sleep(4)
+        end = time.perf_counter_ns()
+        print(f"Takes {time.perf_counter_ns()} ns to go forward")
+
+        wait()
+
+        start = time.perf_counter_ns()
+        motors.slide(-0.3)
+        time.sleep(4)
+        end = time.perf_counter_ns()
+        print(f"Takes {time.perf_counter_ns()} ns to slide right")
+
+        wait()
+
+        start = time.perf_counter_ns()
+        motors.surge(-0.3)
+        time.sleep(4)
+        end = time.perf_counter_ns()
+        print(f"Takes {time.perf_counter_ns()} ns to go backward")
+
+        wait()
+
+        start = time.perf_counter_ns()
+        motors.slide(0.3)
+        time.sleep(4)
+        end = time.perf_counter_ns()
+        print(f"Takes {time.perf_counter_ns()} ns to slide left")
+
+        wait()
+
+        print("finished the square")
+
+
+
+
 
 
 
