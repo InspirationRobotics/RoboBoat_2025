@@ -14,8 +14,8 @@ extend vector: (30.200670280916178, -114.42489263022979)
 
 # Assuming mapHelper is defined here or imported.
 def test_map_helper():
-    from GNC.Nav_Core import map_helper
-    mh = map_helper.mapHelper()
+    from GNC.Nav_Core import nav_util_calculations
+    mh = nav_util_calculations.mapHelper()
     
     # Test calculate_midpoint
     point1 = (37.7749, -122.4194)  # San Francisco

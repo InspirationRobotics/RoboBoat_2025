@@ -1,7 +1,7 @@
 import smopy
 import cv2
 import numpy as np
-from GNC.Nav_Core.map_helper import mapHelper
+from GNC.Nav_Core.nav_util_calculations import mapHelper
 from typing import Tuple, Union
 from pathlib import Path
 

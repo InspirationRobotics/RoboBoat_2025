@@ -1,16 +1,11 @@
 """
-To test ability to move in all directions (surge, sway, yaw), as well as conducting autonomous square maneuver.
+To test ability to move in square (surge sway).
 
-This script is considered successful if all of the following keyboard inputs create the expected physical result:
-- 'q' -> Quitting/ending the program
-- 'w' -> Move forward
-- 's' -> Move backward
-- 'a' -> Strafe left (move laterally left)
-- 'd' -> Strafe right (move laterally right)
-- '0' -> Stop thrusters
-- 'c' -> Yaw clockwise (rotate clockwise)
-- 'z' -> Yaw counterclockwise (rotate counterclockwise)
-- 'square' -> Execute square maneuver (forward, move right, backward, move left)
+The test is considered successful if:
+- The ASV moves forward for 4 seconds.
+- The ASV moves backwards for 4 seconds.
+- The ASV strafes (moves laterally) right for 4 seconds.
+- The ASV strafes left for 4 seconds.
 """
 
 import time
@@ -21,6 +16,7 @@ motors = motor_core.MotorCore("/dev/ttyACM0")
 
 while(True):
     user_input = input("command>> ")
+    # To run the square maneuver, just input "square" (see last elif)
     if(str(user_input) == "q"):
         print("quiting the code")
         start = time.perf_counter_ns()
@@ -51,18 +47,6 @@ while(True):
     elif(str(user_input) =="0"):
         start = time.perf_counter_ns()
         motors.stay()
-        end = time.perf_counter_ns()
-        print(f"elapsed time: {end - start} ns")
-    elif(str(user_input) =="c"):
-        # Clockwise
-        start = time.perf_counter_ns()
-        motors.rotate(0.5)
-        end = time.perf_counter_ns()
-        print(f"elapsed time: {end - start} ns")
-    elif(str(user_input) =="z"):
-        # Counterclockwise
-        start = time.perf_counter_ns()
-        motors.rotate(-0.5)
         end = time.perf_counter_ns()
         print(f"elapsed time: {end - start} ns")
     elif(str(user_input) =="square"):
@@ -103,4 +87,4 @@ while(True):
 
         wait()
 
-        print("Finished the square")
+        print("finished the square")

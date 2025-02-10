@@ -2,8 +2,6 @@ import time
 from API.Motors import t200
 motors = t200.T200(debug=False)
 
-
-
 while(True):
     user_input = input("command>> ")
     if(str(user_input) == "q"):
