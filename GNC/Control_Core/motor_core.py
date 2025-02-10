@@ -28,7 +28,7 @@ class MotorCore():
     
     def surge(self, magnitude):
         """Configures for forward (positive magnitude) or backward (negative magnitude) movement"""
-        self.t200.set_thrusters(magnitude, -magnitude, -magnitude, magnitude)
+        self.t200.set_thrusters(-magnitude, -magnitude, magnitude, -magnitude)
 
     def sway(self, magnitude):
         """Configures for right (positive magnitude) or left (negative magnitude) movement"""
@@ -41,4 +41,23 @@ class MotorCore():
     """
     --------------------------------------------------------
     """
+
+
+    def stay(self):
+        """set all motors to 0"""
+        self.t200.set_thrusters(0,0,0,0)
+
+    def stop(self):
+        """stop motors"""
+        self.t200.stop_thrusters()
+
+    def slide(self,magnitude):
+        """sliding in horizontal direction without rotating, positive is left, negative is right"""
+        self.t200.set_thrusters(magnitude,-magnitude,magnitude,magnitude)
+
+    def rotate(self,magnitude):
+        """positive magnitude is clockwise"""
+        self.t200.set_thrusters(-magnitude,magnitude,magnitude,magnitude)
+
+
     
