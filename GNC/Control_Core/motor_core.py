@@ -53,7 +53,11 @@ class MotorCore():
 
     def slide(self,magnitude):
         """sliding in horizontal direction without rotating, positive is left, negative is right"""
-        self.t200.set_thrusters(magnitude,0,magnitude,0)
+        self.t200.set_thrusters(magnitude,-magnitude,magnitude,magnitude)
+
+    def rotate(self,magnitude):
+        """positive magnitude is clockwise"""
+        self.t200.set_thrusters(-magnitude,magnitude,magnitude,magnitude)
 
 
     
