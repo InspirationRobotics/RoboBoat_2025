@@ -2,17 +2,18 @@ import cv2
 
 # create video capture object for camera 
 # 0 means the first camera
-cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
 
 # find all necessary configs
 class cam:
-    width: int = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-    height: int = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    width: int = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height: int = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps: float = cap.get(cv2.CAP_PROP_FPS)
+    size:tuple = (width,height)
 
 # create a video writer
 # params: name:str, output type, fps:float, (width:int,height:int)
-out = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), cam.fps, (cam.width, cam.height))
+out = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), cam.fps, cam.size)
 
 while(True):
 
@@ -27,11 +28,11 @@ while(True):
 
     # save frames
     out.write(frame)
-    if key == ord('q'):
+    if key == ord('q'): 
         print("stop camera")
         cap.release()
         break
-    elif key == ord(" "):
+    elif key == ord(" "): 
         print("stop recording")
         out.release()
 
