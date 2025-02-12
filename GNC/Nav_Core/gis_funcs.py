@@ -95,6 +95,7 @@ def destination_point(lat, lon, bearing, distance) -> Tuple[float, float]:
 """
 ----------------------------- FUNCTIONS THAT REQUIRE CAREFUL PROOF-READING (ARE PROBABLY INACCURATE) ---------------------------------
 """
+# NOTE that these functions may or may not be inaccurate; I put R as the wrong constant when initally testing, have not changed it since (as of 2/11/2025).
 
 def calculate_midpoint(point1 : Tuple[float, float], point2: Tuple[float , int]) -> Tuple[float, float]:
     """
