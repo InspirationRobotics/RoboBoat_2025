@@ -5,6 +5,7 @@ and create a single list of values to be sent to the Arduino to actuate the moto
 
 import serial
 import time
+from GNC.Nav_Core import gis_funcs
 
 from API.Motors import t200
 
@@ -56,10 +57,6 @@ class MotorCore():
     """
     ----------------- FUNCTIONS WITH GPS WAYPOINT NAVIGATION/Kalman Filter/Control Loop [NEEDS TESTING] -----------------
     """
-
-    # The goal is to be able to navigate to a given point, when given either a point in polar or vector form.
-    # Polar can either be (meters, heading/theta)
-    # Vector form can be new (lat, lon) to move to, (meters (x/lateral), meters(y/forward or backward)) to change position by.
 
     def polar_waypoint_navigation(self, distance_theta, heading):
         """
