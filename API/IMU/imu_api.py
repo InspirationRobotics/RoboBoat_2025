@@ -3,6 +3,7 @@ NOTE: This code has not yet been reviewed. There is no test script to verify its
 """
 
 import time
+# Need to download Adafruit-blinka locally before this file will work
 import board
 import busio
 
@@ -83,8 +84,8 @@ class IMUData:
         """
         Returns f-string of all attributes of the IMUData object.
         """
-        return f"Time: {self.timestamp}, Acceleration: {self.accel}, Gyroscopic rotation: {self.gyro}\n 
-                Magnetic field strength: {self.mag}, Quaternion: {self.quat}, Euler: {self.euler}"
+        return f"""Time: {self.timestamp}, Acceleration: {self.accel}, Gyroscopic rotation: {self.gyro},
+                Magnetic field strength: {self.mag}, Quaternion: {self.quat}, Euler: {self.euler}"""
     
     def __repr__(self) -> str:
         return self.__str__()

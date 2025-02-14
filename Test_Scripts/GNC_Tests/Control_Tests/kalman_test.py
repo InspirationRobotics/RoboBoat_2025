@@ -7,18 +7,17 @@ from GNC.Control_Core.sensor_fuse import SensorFuse
 from API.GPS.gps_api import GPSData
 from API.IMU.imu_api import IMUData
 
-# TODO: Look up what the unittest library is. Particularly need to invesigate the patch method, since GPT used it to 
-# avoid hardware initialization errors. This file WILL NOT currently work, since the patchers currently use the wrong path address.
+# TODO: Figure out how to circumvent the "unable to detect board" issue in the IMU API.
 
 class TestSensorFuse(TestCase):
     def setUp(self):
         """Initialize the SensorFuse object with filter enabled while patching GPS and IMU classes."""
         # Patch the GPS and IMU classes to avoid hardware initialization errors.
-        gps_patcher = patch('sensor_fusion.util.gps_api.GPS', autospec=True)
+        gps_patcher = patch('API.GPS.gps_api.GPS', autospec=True)
         self.mock_gps = gps_patcher.start()
         self.addCleanup(gps_patcher.stop)
 
-        imu_patcher = patch('sensor_fusion.util.imu_api.IMU', autospec=True)
+        imu_patcher = patch('API.IMU.imu_api.IMU', autospec=True)
         self.mock_imu = imu_patcher.start()
         self.addCleanup(imu_patcher.stop)
 

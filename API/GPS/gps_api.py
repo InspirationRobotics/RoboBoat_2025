@@ -9,6 +9,8 @@ from typing import Any, List, Tuple
 from pathlib import Path
 from serial import Serial
 from threading import Thread, Lock
+
+# Need to import pynmeagps locally
 from pynmeagps import NMEAReader, NMEAMessage
 
 """
