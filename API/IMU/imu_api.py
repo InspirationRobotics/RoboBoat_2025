@@ -84,9 +84,12 @@ class IMUData:
         """
         Returns f-string of all attributes of the IMUData object.
         """
-        return f""Time: {self.timestamp}, Acceleration: {self.accel}, Gyroscopic rotation: {self.gyro},
-                Magnetic field strength: {self.mag}, Quaternion: {self.quat}, Euler: {self.euler}""
-    
+        return (
+    f"Time: {self.timestamp}, Acceleration: {self.accel}, "
+    f"Gyroscopic rotation: {self.gyro}, Magnetic field: {self.mag}, "
+    f"Quaternion: {self.quat}, Euler: {self.euler}"
+)
+        
     def __repr__(self) -> str:
         return self.__str__()
 
