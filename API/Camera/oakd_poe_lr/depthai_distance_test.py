@@ -2,77 +2,73 @@
 
 import cv2
 import depthai as dai
-import time
+import numpy as np
+import math
 
-found, info = dai.DeviceBootloader.getFirstAvailableDevice()
-"""
-Starting off by debugging OAKD POE LR information and ensuring connection is established
-so we can make a pipeline and then load it with \"nodes\". We will then configure the nodes
-and load the pipeline onto the device. 
-"""
+# Closer-in minimum depth, disparity range is doubled (from 95 to 190):
+extended_disparity = False
+# Better accuracy for longer distance, fractional disparity 32-levels:
+subpixel = True
+# Better handling for occlusions:
+lr_check = True
+
+# Create pipeline
+pipeline = dai.Pipeline()
+
+# creating left and right colorcamera nodes, which will be linked and fed as input to our stereodepth node
+colorLeft = pipeline.create(dai.node.ColorCamera)
+colorRight = pipeline.create(dai.node.ColorCamera)
+stereo = pipeline.create(dai.node.StereoDepth)
+xout = pipeline.create(dai.node.XLinkOut)
+
+xout.setStreamName("disparity")
+
+# Properties
+colorLeft.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1200_P)
+colorLeft.setCamera("left") #refers to cam b
+#setIspScale can take a numerator and denominator as input, so here we are setting output to 2/3rds the original size
+colorLeft.setIspScale(2, 3)
+colorRight.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1200_P)
+colorRight.setCamera("right") #refers to cam c
+colorRight.setIspScale(2,3)
+
+# Create a node that will produce the depth map (using disparity output as it's easier to visualize depth this way)
+stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
+# Options: MEDIAN_OFF, KERNEL_3x3, KERNEL_5x5, KERNEL_7x7 (default)
+stereo.initialConfig.setMedianFilter(dai.MedianFilter.KERNEL_7x7)
+stereo.setLeftRightCheck(lr_check)
+stereo.setExtendedDisparity(extended_disparity)
+stereo.setSubpixel(subpixel)
+
+# Linking, using ISP engine. Must use isp.link for colorcamera nodes. for monocamera we can use *.out.link(nodename)
+colorLeft.isp.link(stereo.left)
+colorRight.isp.link(stereo.right)
+stereo.disparity.link(xout.input)
+
 # Connect to device and start pipeline
-with dai.Device() as device:
-    # Device static IPV4 output
-    if found:
-        print(f'Found device with IP Address: {info.name}')
-    # Device name
-    print('Device name:', device.getDeviceName())
-    # Bootloader version
-    if device.getBootloaderVersion() is not None:
-        print('Bootloader version:', device.getBootloaderVersion())
-    # Print out usb speed if connected to USB
-    print('Usb speed:', device.getUsbSpeed().name)
-    #print out cameras
-    cams = device.getConnectedCameraFeatures()
-    for cam in cams:
-        print(str(cam), str(cam.socket), cam.socket)
-
-    # Create pipeline, now we populate with nodes
-    pipeline = dai.Pipeline()
-    #TODO: define pipeline with attributes to calculate depth
-    #TODO: use https://docs.luxonis.com/hardware/platform/depth/configuring-stereo-depth/#Configuring%20Stereo%20Depth-1.%20Stereo%20Depth%20Basics-How%20baseline%20distance%20and%20focal%20length%20affect%20depth for technical reference
-    pipeline.create(None) #replace None w/ actual parameters
-
-
-    # cams = device.getConnectedCameraFeatures()
-    # streams = []
-    # for cam in cams:
-    #     print(str(cam), str(cam.socket), cam.socket)
-    #     c = pipeline.create(dai.node.Camera)
-    #     x = pipeline.create(dai.node.XLinkOut)
-    #     c.isp.link(x.input)
-    #     c.setBoardSocket(cam.socket)
-    #     stream = str(cam.socket)
-    #     if cam.name:
-    #         stream = f'{cam.name} ({stream})'
-    #     x.setStreamName(stream)
-    #     streams.append(stream)
-
-    # Start pipeline
-    # device.startPipeline(pipeline)
-    # fpsCounter = {}
-    # lastFpsCount = {}
-    # tfps = time.time()
-    # while not device.isClosed():
-    #     queueNames = device.getQueueEvents(streams)
-    #     for stream in queueNames:
-    #         messages = device.getOutputQueue(stream).tryGetAll()
-    #         fpsCounter[stream] = fpsCounter.get(stream, 0.0) + len(messages)
-    #         for message in messages:
-    #             # Display arrived frames
-    #             if type(message) == dai.ImgFrame:
-    #                 # render fps
-    #                 fps = lastFpsCount.get(stream, 0)
-    #                 frame = message.getCvFrame()
-    #                 cv2.putText(frame, "Fps: {:.2f}".format(fps), (10, 10), cv2.FONT_HERSHEY_TRIPLEX, 0.4, (255,255,255))
-    #                 cv2.imshow(stream, frame)
+with dai.Device(pipeline) as device:
+    #focal length measured in pixels can be found at the index below
+    focal_length_in_pixels = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_C)
+    print("Cam C focal length in pixels: ", focal_length_in_pixels[0][0])
+    #TODO: write depth calculation equation and output to stream
+    # depth = device.readCalibration().getCamera
     #
-    #     if time.time() - tfps >= 1.0:
-    #         scale = time.time() - tfps
-    #         for stream in fpsCounter.keys():
-    #             lastFpsCount[stream] = fpsCounter[stream] / scale
-    #         fpsCounter = {}
-    #         tfps = time.time()
-    #
-    #     if cv2.waitKey(1) == ord('q'):
-    #         break
+
+    # Output queue will be used to get the disparity frames from the outputs defined above
+    q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
+
+    while True:
+        inDisparity = q.get()  # blocking call, will wait until a new data has arrived
+        frame = inDisparity.getFrame()
+        # Normalization for better visualization
+        frame = (frame * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
+
+        #for grayscale output
+        #cv2.imshow("disparity", frame)
+
+        # Available color maps: https://docs.opencv.org/3.4/d3/d50/group__imgproc__colormap.html
+        frame = cv2.applyColorMap(frame, cv2.COLORMAP_JET)
+        cv2.imshow("disparity_color", frame)
+
+        if cv2.waitKey(1) == ord('q'):
+            break
