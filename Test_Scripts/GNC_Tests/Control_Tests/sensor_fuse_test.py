@@ -5,7 +5,6 @@ Simple test script for sensor fusion. This test is considered successful if:
 3. Accurate velocity data is printed out rapidly in terminal.
 """
 
-
 from GNC.Control_Core.sensor_fuse import SensorFuse
 import time
 import numpy as np
