@@ -10,7 +10,7 @@ from filterpy.common import Q_discrete_white_noise
 from typing import Union, Tuple
 
 from API.GPS.gps_api import GPS, GPSData
-from API.IMU.imu_api import IMU, IMUData
+# from API.IMU.imu_api import IMU, IMUData
 
 # TODO: Understand calculations better, and update documentation as understanding improves.
 # Reference file: https://github.com/InspirationRobotics/RX24-OCB/blob/main/motor_control/sensor_fuse.py#L140 
