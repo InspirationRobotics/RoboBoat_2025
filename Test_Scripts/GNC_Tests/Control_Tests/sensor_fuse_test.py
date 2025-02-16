@@ -10,6 +10,8 @@ import time
 import numpy as np
 
 sf = SensorFuse(enable_filter=False)
+print("Waiting...")
+time.sleep(5)
 while True:
     lat, lon = sf.get_position()
     heading = sf.get_heading()
