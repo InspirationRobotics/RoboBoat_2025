@@ -17,7 +17,9 @@ from API.GPS.gps_api import GPS, GPSData
 
 class SensorFuse:
     def __init__(self, *, enable_filter = True, gps_port : str = "/dev/ttyUSB0", gps_baudrate : int = 115200, use_imu : bool = False, heading_offset : float = 0):
-
+        
+        self.connected = False  
+        
         if enable_filter:
             self.kf = self.create_filter()
             self.imu_dt = time.time() # Variable to compare previous calculation time to current calculation time -- see _update_IMUfilter()
@@ -25,9 +27,12 @@ class SensorFuse:
         self.raw_data = GPSData(None, None, None)
         self.filter = enable_filter
 
-        self.gps = GPS(gps_port, gps_baudrate, callback = self._gps_callback, offset=heading_offset)
+        self.gps = GPS(gps_port, gps_baudrate, callback=self._gps_callback, offset=heading_offset)
+        self.imu = None  # Ensure this attribute exists even when IMU is disabled
         if use_imu and enable_filter:
-            self.imu = IMU(callback= self._imu_callback)
+            from API.IMU.imu_api import IMU, IMUData
+            self.IMUData = IMUData  # store reference if needed
+            self.imu = IMU(callback=self._imu_callback)
 
     def _gps_callback(self, data : GPSData):
         """
@@ -45,13 +50,17 @@ class SensorFuse:
             else:
                 self.raw_data = data
 
-    def _imu_callback(self, data : IMUData):
-        """
-        Callback for the IMU, usage for Kalman filter. Once data is passed in, callback modifies the data and stores it in the appropriate 
-        places in the Kalman filter.
-        """
+    def _imu_callback(self, data):
+        # If IMU is not used, do nothing
+        if not self.imu:
+            return
+        # If IMU is in use, do your normal logic
         self._update_IMUfilter(data)
 
+    def _update_IMUfilter(self, data):
+        if not self.imu:
+            return
+            
     def get_position(self) -> Union[Tuple[float, float], None]:
         """
         Returns either the lat, lon data stored in the Kalman filter from the GPS, or the actual raw (lat, lon) data from the GPS.
