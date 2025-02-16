@@ -27,7 +27,8 @@ class SensorFuse:
 
         self.gps = GPS(gps_port, gps_baudrate, callback = self._gps_callback, offset=heading_offset)
         if use_imu and enable_filter:
-            self.imu = IMU(callback= self._imu_callback)
+            pass
+            # self.imu = IMU(callback= self._imu_callback)
 
     def _gps_callback(self, data : GPSData):
         """
@@ -45,7 +46,7 @@ class SensorFuse:
             else:
                 self.raw_data = data
 
-    def _imu_callback(self, data : IMUData):
+    def _imu_callback(self, data):
         """
         Callback for the IMU, usage for Kalman filter. Once data is passed in, callback modifies the data and stores it in the appropriate 
         places in the Kalman filter.
@@ -140,7 +141,7 @@ class SensorFuse:
         
         return kf
     
-    def _update_IMUfilter(self, data : IMUData):
+    def _update_IMUfilter(self, data):
         """
         Updates the Kalman filter with the IMU data. Specifically calculates the latitude velocity, longitude velocity, 
         latitude/longitude velocity change in degrees per second, and the yaw of the ASV, all from the IMU data or data already stored in the Kalman filter.

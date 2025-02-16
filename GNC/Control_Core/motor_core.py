@@ -10,7 +10,7 @@ import queue
 import math
 from typing import Tuple, List
 from GNC.Nav_Core import gis_funcs
-from GNC.Control_Core import sensor_fuse, GPS
+from GNC.Control_Core import sensor_fuse
 
 from API.Motors import t200
 
