@@ -30,8 +30,8 @@ class MotorCore():
 
     """
     As of 2/10/2025, Barco Polo's motor configuration is in the following:
-    - Stern port thruster at positive PWM levels will make the boat move counterclockwise.
-    - Stern starboard thruster at positive PWM levels will make the boat move clockwise.
+    - Forward port thruster at positive PWM levels will make the boat move counterclockwise.
+    - Forward starboard thruster at positive PWM levels will make the boat move clockwise.
     - Aft port thruster at positive PWM levels will make the boat move clockwise.
     - Aft starboard at positive PWM levels will make the boat move clockwise.
 
@@ -222,8 +222,8 @@ class MotorCore():
         while not stop_event.is_set():
             try:
                 value = value_queue.get(timeout=send_rate)
-                stern_port, stern_starboard, aft_port, aft_starboard = value[1], value[2], value[3], value[4]
-                self.t200.set_thrusters(stern_port, stern_starboard,aft_port, aft_starboard)
+                forward_port, forward_starboard, aft_port, aft_starboard = value[1], value[2], value[3], value[4]
+                self.t200.set_thrusters(forward_port, forward_starboard,aft_port, aft_starboard)
             except queue.Empty:
                 continue
 

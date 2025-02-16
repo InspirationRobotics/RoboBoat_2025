@@ -50,8 +50,8 @@ class T200(Arduino):
             super().__init__(port)
 
             # These are the variables for motor speed between -1 and 1. Converted to PWM values later.
-            self.stern_port_speed = 0
-            self.stern_starboard_speed = 0
+            self.forward_port_speed = 0
+            self.forward_starboard_speed = 0
             self.aft_port_speed = 0
             self.aft_starboard_speed = 0
 
@@ -76,20 +76,20 @@ class T200(Arduino):
         return wrapper
 
     @debug_decorator
-    def set_thrusters(self, stern_port, stern_starboard, aft_port, aft_starboard):
+    def set_thrusters(self, forward_port, forward_starboard, aft_port, aft_starboard):
         """
         Gets incoming calculated values for each motor (between -1 and 1), and stores them to be calculated into PWM values.
         Forces the values to be in between -1, 1, if not already.
         
         Args:
-            stern_port (float) : Value between -1 and 1  
-            stern_starboard (float) : Value between -1 and 1 
+            forward_port (float) : Value between -1 and 1  
+            forward_starboard (float) : Value between -1 and 1 
             aft_port (float) : Value between -1 and 1 
             aft_starboard (float) : Value between -1 and 1 
         """
         with self.lock:
-            self.stern_port_speed = min(1, max(stern_port, -1))
-            self.stern_starboard_speed = min(1, max(stern_starboard, -1))
+            self.forward_port_speed = min(1, max(forward_port, -1))
+            self.forward_starboard_speed = min(1, max(forward_starboard, -1))
             self.aft_port_speed = min(1, max(aft_port, -1))
             self.aft_starboard_speed = min(1, max(aft_starboard, -1))
 
@@ -103,7 +103,7 @@ class T200(Arduino):
         """
         while self.active:
             with self.lock:
-                motor_speeds = [self.stern_port_speed, self.stern_starboard_speed, self.aft_port_speed, self.aft_starboard_speed]
+                motor_speeds = [self.forward_port_speed, self.forward_starboard_speed, self.aft_port_speed, self.aft_starboard_speed]
                 
                 for index, value in enumerate(motor_speeds):
                     # First calculate motor speeds
