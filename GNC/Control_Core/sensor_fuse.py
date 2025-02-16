@@ -149,7 +149,7 @@ class SensorFuse:
         
         return kf
     
-    def _update_IMUfilter(self, data : IMUData):
+    def _update_IMUfilter(self, data):
         """
         Updates the Kalman filter with the IMU data. Specifically calculates the latitude velocity, longitude velocity, 
         latitude/longitude velocity change in degrees per second, and the yaw of the ASV, all from the IMU data or data already stored in the Kalman filter.
