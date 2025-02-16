@@ -25,6 +25,7 @@ class SensorFuse:
         self.raw_data = GPSData(None, None, None)
         self.filter = enable_filter
 
+        self.connected = False
         self.gps = GPS(gps_port, gps_baudrate, callback = self._gps_callback, offset=heading_offset)
         if use_imu and enable_filter:
             pass
@@ -57,8 +58,8 @@ class SensorFuse:
         """
         Returns either the lat, lon data stored in the Kalman filter from the GPS, or the actual raw (lat, lon) data from the GPS.
         """
-        # if not self.connected:
-        #     return None
+        if not self.connected:
+            return None
         if self.filter:
             # Get lat, lon from Kalman filter
             return tuple(self.kf.x[:2])
@@ -70,7 +71,7 @@ class SensorFuse:
         Returns the latitude change in meters per second and longitude change in meters per second
         based on lat and lon velocity from the Kalman filter.
         """
-        if not self.filter:
+        if not self.connected or not self.filter:
             return None
         global_velocity = tuple(self.kf.x[2:4])
         lat_vel_mps = global_velocity[0] * 111320
@@ -91,8 +92,8 @@ class SensorFuse:
         """
         Returns the heading of the ASV from the Kalman filter.
         """
-        # if not self.connected:
-        #     return None
+        if not self.connected:
+            return None
         if self.filter:
             return float(self.kf.x[4])
         else:
