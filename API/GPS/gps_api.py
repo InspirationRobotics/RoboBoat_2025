@@ -103,11 +103,11 @@ class GPS:
             parsed_data (class): GPS data that was parsed, with data being organized into specific attributes (.lat, .lon, etc).
         """
         try:
-            if parsed_data.msgID == 'GGA':
-                    self.data.lat = parsed_data.lat
-                    self.data.lon = parsed_data.lon
-            elif parsed_data.msgID == 'THS':
-                    self.data.heading = (parsed_data.headt + self.offset) % 360
+            if parsed_data.msgID in ['GGA', 'GNGGA']:
+                self.data.lat = parsed_data.lat
+                self.data.lon = parsed_data.lon
+            elif parsed_data.msgID in ['THS', 'GNTHS']:
+                self.data.heading = (parsed_data.headt + self.offset) % 360
         except Exception as e:
             # print("Error grabbing data")
             # print(e)
