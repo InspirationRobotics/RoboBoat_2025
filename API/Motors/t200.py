@@ -88,10 +88,10 @@ class T200(Arduino):
             aft_starboard (float) : Value between -1 and 1 
         """
         with self.lock:
-            self.forward_port_speed = min(1, max(forward_port, -1))
-            self.forward_starboard_speed = min(1, max(forward_starboard, -1))
-            self.aft_port_speed = min(1, max(aft_port, -1))
-            self.aft_starboard_speed = min(1, max(aft_starboard, -1))
+            self.forward_port_speed = min(0.85, max(forward_port, -0.85))
+            self.forward_starboard_speed = min(0.85, max(forward_starboard, -0.85))
+            self.aft_port_speed = min(0.85, max(aft_port, -0.85))
+            self.aft_starboard_speed = min(0.85, max(aft_starboard, -0.85))
 
     def set_speed_thread(self):
         """

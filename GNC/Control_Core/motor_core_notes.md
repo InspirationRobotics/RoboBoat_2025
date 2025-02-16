@@ -5,7 +5,7 @@ Assumptions: We have the current position (lat, lon), current heading (absoulte 
 ## Steps:
 solve_wp_bearing (current_pos, target_pos) -> target_bearing (absoulte heading in degrees).
 hold_logic (current_pos, current_heading, target_pos, target_bearing) -> target_vector (vx, vy in meters), target_rotation (scaled amount of rotation needed in radians), target_dist (meters from current position)
-calc_motor_power (target_vector, target_rotation) -> motor_power (list of magnitudes between -1 and 1 for all thrusters)
+parse_hold_logic (target_vector, target_rotation) -> motor_power (list of magnitudes between -1 and 1 for all thrusters)
 
 ## Function Specifics:
 Brief summary of each individual function. The variable names are not exactly the same, but signify what the variable represents.
@@ -46,4 +46,8 @@ target_rotation = radians(direction * distance) * 0.5 # This is a scale, don't k
 return target_rotation 
 ```
 
-### calc_motor_power()
+### parse_hold_logic()
+```python
+# Set the value of the forward thrusters to the forward portion (vy) of the target vector, scaled by 0.5, holding to in between -1 and 1.
+# Set the value of the back thrusters to the rotational direction (radians) of the target vector, hoding to in between -1 and 1.
+```

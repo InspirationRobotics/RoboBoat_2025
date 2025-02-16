@@ -143,6 +143,7 @@ class MotorCore():
         cw = (target_heading - current_heading) % 360
         ccw = (current_heading - target_heading) % 360
 
+        # 1 if clockwise, -1 if counterclockwise
         direction = 1 if cw <= ccw else -1
         distance = min(cw, ccw)
 
@@ -171,7 +172,7 @@ class MotorCore():
         # When more than 3 meters away, we go at the target vector, otherwise we slow down
         scale = min(dist/3, 1)
         target_vector = [vx*scale, vy*scale]
-        print(target_vector)
+        print(f"DEBUG MOTOR_CORE: {target_vector}")
         '''
         TEMPORARY =============================
         Turn vector into only magnitude in forward direction by setting lateral to 0
@@ -189,9 +190,25 @@ class MotorCore():
         return target_vector, target_rotation, dist
     
     def parse_hold_logic(self, vector, rotation):
-        # TODO: Need equations and normalization.
-        pass
+        # Pseudocode:
+        # If the target rotation or vector is none, initialize as empty list/value
+        # Forward thrusters will function as the thrusters to move forward -- if there is a y value > 0, then move forward
+        # Back thrusters will be our turning thrusters -- either clockwise or counterclockwise motion.
+        
+        if vector == None:
+            vector = [0, 0]
+        if rotation == None:
+            rotation = 0
+
+        forward_thruster_value = min(max(-1, vector[1] * 0.5), 1)
+        forward_port_value = -(forward_thruster_value)
+        forward_starboard_value = -(forward_thruster_value)
+
+        rotational_thruster_value = min(max(rotation, -1), 1)
+        aft_port_value = rotational_thruster_value
+        aft_starboard_value = rotational_thruster_value
     
+        return [forward_port_value, forward_starboard_value, aft_port_value, aft_starboard_value]
     # ---------------------------------------------------------------------------
 
     def calc_motor_power(self, send_queue, calculate_rate, stop_event):
@@ -209,7 +226,6 @@ class MotorCore():
                 self.desired_position,
                 target_bearing
             )
-            # TODO: Parse hold_logic calculations here.
             motor_values = self.parse_hold_logic(target_vector, target_rotation)
 
             send_queue.put(motor_values)
