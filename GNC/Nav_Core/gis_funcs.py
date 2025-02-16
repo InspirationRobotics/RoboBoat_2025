@@ -53,7 +53,7 @@ def relative_bearing(lat1, lon1, lat2, lon2, current_heading) -> float:
     relative_bearing = abs_bearing - current_heading
     return relative_bearing
 
-def vector_to_target(pos1, pos2, current_heading) -> Tuple[float, float, float]:
+def vector_to_target(pos1 : Tuple, pos2 : Tuple, current_heading) -> Tuple[float, float, float]:
     """
     Calculate the vector to the target point (retuns vx, vy, total distance).
     """

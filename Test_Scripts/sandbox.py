@@ -53,13 +53,17 @@ def main(send_rate, print_rate, duration):
     print_thread_instance.join()
 
 if __name__ == "__main__":
-    # Example configuration
-    send_rate = 1  # Send a value every 1 second
-    print_rate = 0.5  # Print a value every 2 seconds
-    duration = 10  # Run for 10 seconds
+    pos = {"1" : (64, 6), "2" : None}
+    pos["1"][0]
+    print(pos["1"][0], pos["1"][1])
 
-    try:
-        main(send_rate, print_rate, duration)
-    except KeyboardInterrupt:
-        main(0, 0, 0)
+    # # Example configuration
+    # send_rate = 1  # Send a value every 1 second
+    # print_rate = 0.5  # Print a value every 2 seconds
+    # duration = 10  # Run for 10 seconds
+
+    # try:
+    #     main(send_rate, print_rate, duration)
+    # except KeyboardInterrupt:
+    #     main(0, 0, 0)
 

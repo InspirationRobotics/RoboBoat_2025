@@ -4,6 +4,7 @@ and create a single list of values to be sent to the Arduino to actuate the moto
 """
 
 import time
+import numpy as np
 import threading
 import queue
 import math
@@ -16,10 +17,10 @@ class MotorCore():
     def __init__(self, port = "/dev/ttyACM0"):
         self.t200 = t200.T200(port="/dev/ttyACM0")
         # TODO: Put correct heading offset
-        self.sensor_fuse = sensor_fuse.SensorFuse(enable_filter=False, heading_offset=0)
+        self.sensor_fuse = sensor_fuse.SensorFuse(heading_offset=0)
         self.position_data = {'current_position' : None, 'current_heading' : None, 'current_velocity' : None}
 
-        self.desired_position = [None, None] # lat, lon
+        self.desired_position = (None, None) # lat, lon
         self.desired_heading = None # in degrees
     
     """
@@ -118,10 +119,78 @@ class MotorCore():
             'current_velocity' : self.sensor_fuse.get_velocity()
         }
 
+    # ---------------------------------------------------------------------
+    def calc_rotation(self, current_heading : float, target_heading : float):
+        if current_heading is None or target_heading is None:
+            return 0
+        min_power = 0.1
+        cw = (target_heading - current_heading) % 360
+        ccw = (current_heading - target_heading) % 360
+
+        direction = 1 if cw <= ccw else -1
+        distance = min(cw, ccw)
+
+        if distance<7: min_power = 0.15
+        if distance<5: min_power = 0.1
+        if distance<2: return 0 # 2 degree tolerance
+
+        # self.log(f"Current: {current_heading} Target: {target_heading}")
+        # self.log(f"Direction: {'clockwise' if direction==1 else 'counter'}")
+
+        tr = np.radians(direction * distance) * 0.5
+        # self.log(f"Target Rotation: {tr}\n--------")
+        if(abs(tr)<0.1): tr = direction * min_power
+
+        # self.log(f"Normalized Target Rotation: {tr}\n--------")
+        return tr # * distance from center of vehicle
+    
+    def hold_logic(self, curr_pos, curr_heading, target_pos, target_heading):
+        # Returns a vector and rotation to reach the target position and heading
+        if curr_pos is None or curr_heading is None:
+            return [0, 0], 0
+        # vy is forwards
+        # vx is lateral
+        vy, vx, dist = gis_funcs.vector_to_target(curr_pos, target_pos, curr_heading)
+        # Based off the distance, we can scale the target vector (absolute value of components sums to 1). 
+        # When more than 3 meters away, we go at the target vector, otherwise we slow down
+        scale = min(dist/3, 1)
+        target_vector = [vx*scale, vy*scale]
+        print(target_vector)
+        '''
+        TEMPORARY =============================
+        Turn vector into only magnitude in forward direction by setting lateral to 0
+        And also only going forward if positive
+        '''
+        if self.li.mode == WAYPOINT:
+            target_vector = list(target_vector)
+            self.log(f"Raw Target Vector: {target_vector}")
+            target_vector[0] = 0
+            target_vector[1] = target_vector[1]*0.75 if target_vector[1] > 0 else 0
+            self.log(f"Normalized Target Vector: {target_vector}\n--------")
+        if self.li.mode == POSHOLD:
+            self.log(f"Raw Target Vector: {target_vector}")
+            self.log(f"Current Position: {curr_pos}")
+            self.log(f"Target Position: {target_pos}\n--------")
+        '''
+        =======================================
+        '''
+        target_rotation = self._calc_rotation(curr_heading, target_heading)
+        return target_vector, target_rotation, dist
+    
+    # ---------------------------------------------------------------------------
+
     def calc_motor_power(self, send_queue, calculate_rate, stop_event):
         while not stop_event.is_set():
             self.update_position()
             motor_values = [0, 0, 0, 0]
+
+            needed_x_displacement, needed_y_displacement, vector_distance = gis_funcs.vector_to_target(
+                (self.position_data["current_position"][0], self.position_data["current_position"][1]),
+                self.desired_position,
+                self.position_data["current_heading"]
+            )
+
+            vector_heading = None
             # TODO: Calculation logic here
             send_queue.put(motor_values)
             time.sleep(calculate_rate)
