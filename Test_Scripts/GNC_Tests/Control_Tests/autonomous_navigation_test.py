@@ -18,9 +18,9 @@ from GNC.Control_Core import motor_core
 # ==============================
 class PIDController:
     def __init__(self, kp, ki, kd, output_limits=(-0.5, 0.5)):
-        self.kp = kp
-        self.ki = ki
-        self.kd = kd
+        self.kp = 1
+        self.ki = 0.1
+        self.kd = 0.05
         self.integral = 0.0
         self.prev_error = 0.0
         self.last_time = None
