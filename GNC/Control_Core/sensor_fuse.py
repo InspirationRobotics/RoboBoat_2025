@@ -70,7 +70,7 @@ class SensorFuse:
         Returns the latitude change in meters per second and longitude change in meters per second
         based on lat and lon velocity from the Kalman filter.
         """
-        if not self.connected:
+        if not self.filter:
             return None
         global_velocity = tuple(self.kf.x[2:4])
         lat_vel_mps = global_velocity[0] * 111320
