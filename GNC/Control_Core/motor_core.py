@@ -8,6 +8,7 @@ import numpy as np
 import threading
 import queue
 import math
+from typing import Tuple, List
 from GNC.Nav_Core import gis_funcs
 from GNC.Control_Core import sensor_fuse, GPS
 
@@ -29,10 +30,10 @@ class MotorCore():
 
     """
     As of 2/10/2025, Barco Polo's motor configuration is in the following:
-    - Stern port thruster at positive PWM levels will make the boat move clockwise.
-    - Stern starboard thruster at positive PWM levels will make the boat move counterclockwise.
-    - Aft port thruster at positive PWM levels will make the boat move counterclockwise.
-    - Aft starboard at positive PWM levels will make the boat move counterclockwise.
+    - Stern port thruster at positive PWM levels will make the boat move counterclockwise.
+    - Stern starboard thruster at positive PWM levels will make the boat move clockwise.
+    - Aft port thruster at positive PWM levels will make the boat move clockwise.
+    - Aft starboard at positive PWM levels will make the boat move clockwise.
 
     When PWMs are greater than 1500 for Blue Robotics thrusters, the thrusters spin clockwise.
     Thrusters with a clockwise prop have a forward thrust vector when spinning clockwise.
@@ -53,6 +54,7 @@ class MotorCore():
 
     def slide(self, magnitude):
         """Sliding (strafing) in horizontal direction without rotating, positive is left, negative is right."""
+        # NOTE: We want positive to be right, negative to be right.
         self.t200.set_thrusters(magnitude,-magnitude,magnitude,magnitude)
 
     def rotate(self, magnitude):
@@ -119,7 +121,21 @@ class MotorCore():
             'current_velocity' : self.sensor_fuse.get_velocity()
         }
 
+    # Calculation logic.
     # ---------------------------------------------------------------------
+
+    def solve_wp_bearing(self, curr_pos : Tuple, target_pos : Tuple):
+        """
+        Returns the absolute bearing in degrees to the target position.
+        """
+        # Returns the bearing to the target position
+        if curr_pos is None:
+            return None
+        br = gis_funcs.bearing(curr_pos[0], curr_pos[1], target_pos[0], target_pos[1])
+        # self.log(f"Current Position: {curr_pos}")
+        # self.log(f"Target Position: {target_pos}\n--------")
+        return br
+    
     def calc_rotation(self, current_heading : float, target_heading : float):
         if current_heading is None or target_heading is None:
             return 0
@@ -161,21 +177,20 @@ class MotorCore():
         Turn vector into only magnitude in forward direction by setting lateral to 0
         And also only going forward if positive
         '''
-        if self.li.mode == WAYPOINT:
-            target_vector = list(target_vector)
-            self.log(f"Raw Target Vector: {target_vector}")
-            target_vector[0] = 0
-            target_vector[1] = target_vector[1]*0.75 if target_vector[1] > 0 else 0
-            self.log(f"Normalized Target Vector: {target_vector}\n--------")
-        if self.li.mode == POSHOLD:
-            self.log(f"Raw Target Vector: {target_vector}")
-            self.log(f"Current Position: {curr_pos}")
-            self.log(f"Target Position: {target_pos}\n--------")
+        target_vector = list(target_vector)
+        # self.log(f"Raw Target Vector: {target_vector}")
+        target_vector[0] = 0
+        target_vector[1] = target_vector[1]*0.75 if target_vector[1] > 0 else 0
+        # self.log(f"Normalized Target Vector: {target_vector}\n--------")
         '''
         =======================================
         '''
-        target_rotation = self._calc_rotation(curr_heading, target_heading)
+        target_rotation = self.calc_rotation(curr_heading, target_heading)
         return target_vector, target_rotation, dist
+    
+    def parse_hold_logic(self, vector, rotation):
+        # TODO: Need equations and normalization.
+        pass
     
     # ---------------------------------------------------------------------------
 
@@ -184,14 +199,19 @@ class MotorCore():
             self.update_position()
             motor_values = [0, 0, 0, 0]
 
-            needed_x_displacement, needed_y_displacement, vector_distance = gis_funcs.vector_to_target(
-                (self.position_data["current_position"][0], self.position_data["current_position"][1]),
-                self.desired_position,
-                self.position_data["current_heading"]
+            target_bearing = self.solve_wp_bearing(
+                self.position_data["current_position"],
+                self.desired_position
             )
+            target_vector, target_rotation, dist = self.hold_logic(
+                self.position_data["current_position"],
+                self.position_data["curreent_heading"],
+                self.desired_position,
+                target_bearing
+            )
+            # TODO: Parse hold_logic calculations here.
+            motor_values = self.parse_hold_logic(target_vector, target_rotation)
 
-            vector_heading = None
-            # TODO: Calculation logic here
             send_queue.put(motor_values)
             time.sleep(calculate_rate)
 
