@@ -55,7 +55,7 @@ def relative_bearing(lat1, lon1, lat2, lon2, current_heading) -> float:
 
 def vector_to_target(pos1, pos2, current_heading) -> Tuple[float, float, float]:
     """
-    Calculate the vector to the target point (vx, vy, total distance).
+    Calculate the vector to the target point (retuns vx, vy, total distance).
     """
     lat1, lon1 = pos1
     lat2, lon2 = pos2
@@ -74,7 +74,7 @@ def vector_to_target(pos1, pos2, current_heading) -> Tuple[float, float, float]:
 
 def destination_point(lat, lon, bearing, distance) -> Tuple[float, float]:
     """
-    Calculate the destination point given a starting point, bearing, and distance in meters
+    Calculate the destination point (lat, lon) given a starting point, bearing (desired), and distance in meters
     """
     # convert decimal degrees to radians
     lon, lat, bearing = map(math.radians, [lon, lat, bearing])
@@ -207,7 +207,7 @@ if __name__ == '__main__':
 
     # test the functions
     lat1, lon1 = 27.3743248995, -82.4529466212
-    lat2, lon2 = 27.3743272662, -82.4528962098
+    lat2, lon2 = 27.374976, -82.454223
     # print(haversine(lat1, lon1, lat2, lon2))
     # print(bearing(lat1, lon1, lat2, lon2))
     # print(relative_bearing(lat1, lon1, lat2, lon2, 90))
