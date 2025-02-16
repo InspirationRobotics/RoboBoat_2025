@@ -91,8 +91,8 @@ class SensorFuse:
         """
         Returns the heading of the ASV from the Kalman filter.
         """
-        if not self.connected:
-            return None
+        # if not self.connected:
+        #     return None
         if self.filter:
             return float(self.kf.x[4])
         else:
