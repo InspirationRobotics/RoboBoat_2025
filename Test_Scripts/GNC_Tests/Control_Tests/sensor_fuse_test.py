@@ -9,7 +9,7 @@ from GNC.Control_Core.sensor_fuse import SensorFuse
 import time
 import numpy as np
 
-sf = SensorFuse(use_imu=True)
+sf = SensorFuse(enable_filter=False)
 while True:
     lat, lon = sf.get_position()
     heading = sf.get_heading()
