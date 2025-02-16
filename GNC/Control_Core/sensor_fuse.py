@@ -57,8 +57,8 @@ class SensorFuse:
         """
         Returns either the lat, lon data stored in the Kalman filter from the GPS, or the actual raw (lat, lon) data from the GPS.
         """
-        if not self.connected:
-            return None
+        # if not self.connected:
+        #     return None
         if self.filter:
             # Get lat, lon from Kalman filter
             return tuple(self.kf.x[:2])
