@@ -18,7 +18,7 @@ class MotorCore():
     def __init__(self, port = "/dev/ttyACM0"):
         self.t200 = t200.T200(port="/dev/ttyACM0")
         # TODO: Put correct heading offset
-        self.sensor_fuse = sensor_fuse.SensorFuse(heading_offset=0)
+        self.sensor_fuse = sensor_fuse.SensorFuse(heading_offset=-172)
         self.position_data = {'current_position' : None, 'current_heading' : None, 'current_velocity' : None}
 
         self.desired_position = (None, None) # lat, lon

@@ -15,7 +15,7 @@ motors.main(duration=20)
 print("Waiting...")
 time.sleep(5)
 
-# Change these.
+# TODO: Change these.
 desired_lat = 0
 desired_lon = 0
 
