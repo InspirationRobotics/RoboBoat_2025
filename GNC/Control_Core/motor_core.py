@@ -171,7 +171,7 @@ class MotorCore():
         # When more than 3 meters away, we go at the target vector, otherwise we slow down
         scale = min(dist/3, 1)
         target_vector = [vx*scale, vy*scale]
-        print(f"DEBUG MOTOR_CORE: {target_vector}")
+        print(f"[DEBUG MOTOR_CORE] Vector : {target_vector}, vx : {vx}, vy : {vy}, dist: {dist}")
         '''
         TEMPORARY =============================
         Turn vector into only magnitude in forward direction by setting lateral to 0
