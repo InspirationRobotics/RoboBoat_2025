@@ -300,4 +300,6 @@ class GPS:
     
 if __name__ == "main":
     gps = GPS()
+    print("Waiting...")
+    time.sleep(3)
     gps.calibrate_heading_offset(calib_time=5)
