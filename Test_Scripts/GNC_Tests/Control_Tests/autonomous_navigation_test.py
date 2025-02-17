@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Autonomous Navigation with Multiple Waypoints:
-This script uses GPS data and PID controllers to autonomously drive the boat
-through a series of waypoints. You can enter two waypoints, and the boat will
-attempt to navigate to them sequentially.
+Simple Autonomous Navigation without PID
+
+This script uses GPS data and basic motor commands to navigate the boat
+to a desired waypoint. It rotates the boat to face the target and then
+surges forward until the target is reached.
 """
 
 import time
@@ -13,38 +14,9 @@ import threading
 from API.GPS.gps_api import GPS, GPSData
 from GNC.Control_Core import motor_core
 
-# ==============================
-# PID Controller Class
-# ==============================
-class PIDController:
-    def __init__(self, kp, ki, kd, output_limits=(-0.5, 0.5)):
-        self.kp = kp
-        self.ki = ki
-        self.kd = kd
-        self.integral = 0.0
-        self.prev_error = 0.0
-        self.last_time = None
-        self.output_limits = output_limits
-
-    def update(self, error, current_time):
-        if self.last_time is None:
-            dt = 0.1  # initial assumption
-        else:
-            dt = current_time - self.last_time
-        self.last_time = current_time
-
-        self.integral += error * dt
-        derivative = (error - self.prev_error) / dt if dt > 0 else 0.0
-        self.prev_error = error
-
-        output = self.kp * error + self.ki * self.integral + self.kd * derivative
-        min_out, max_out = self.output_limits
-        output = max(min_out, min(output, max_out))
-        return output
-
-# ==============================
+# ------------------------------
 # Global Variable for GPS Data
-# ==============================
+# ------------------------------
 current_gps = None
 gps_lock = threading.Lock()
 
@@ -63,102 +35,101 @@ def run_gps():
     finally:
         del gps
 
-# ==============================
-# Coordinate Conversion Function
-# ==============================
-def latlon_to_xy(lat, lon, ref_lat, ref_lon):
-    R = 6371000  # Earth radius in meters
-    dlat = math.radians(lat - ref_lat)
-    dlon = math.radians(lon - ref_lon)
-    avg_lat = math.radians((lat + ref_lat) / 2.0)
-    x = dlon * math.cos(avg_lat) * R  # east-west displacement (meters)
-    y = dlat * R                     # north-south displacement (meters)
-    return x, y
+# ------------------------------
+# Helper Functions
+# ------------------------------
 
-# ==============================
-# Navigation Function for a Single Waypoint
-# ==============================
-def navigate_to_waypoint(motors, target_lat, target_lon, ref_lat, ref_lon):
-    surge_pid = PIDController(kp=0.001, ki=0.0001, kd=0.0005, output_limits=(-0.5, 0.5))
-    slide_pid = PIDController(kp=0.001, ki=0.0001, kd=0.0005, output_limits=(-0.5, 0.5))
-    
-    print(f"Navigating to waypoint: lat={target_lat}, lon={target_lon}")
+def haversine_distance(lat1, lon1, lat2, lon2):
+    """Return distance in meters between two lat/lon points."""
+    R = 6371000  # Earth radius in meters
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+    a = math.sin(dphi/2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    return R * c
+
+def calculate_bearing(lat1, lon1, lat2, lon2):
+    """Return the bearing in degrees from point 1 to point 2."""
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_lambda = math.radians(lon2 - lon1)
+    y = math.sin(delta_lambda) * math.cos(phi2)
+    x = math.cos(phi1)*math.sin(phi2) - math.sin(phi1)*math.cos(phi2)*math.cos(delta_lambda)
+    bearing = math.degrees(math.atan2(y, x))
+    return (bearing + 360) % 360
+
+# ------------------------------
+# Simple Navigation Logic
+# ------------------------------
+def simple_navigation(motors, target_lat, target_lon):
+    # Set tolerance thresholds (adjust as needed)
+    distance_threshold = 1.0  # meters
+    heading_tolerance = 5.0   # degrees
+
     while True:
-        current_time = time.time()
         with gps_lock:
-            if current_gps is None:
+            if current_gps is None or not current_gps.is_valid():
                 continue
             current_lat = current_gps.lat
             current_lon = current_gps.lon
-            boat_heading = math.radians(current_gps.heading)
+            current_heading = current_gps.heading
 
-        current_x, current_y = latlon_to_xy(current_lat, current_lon, ref_lat, ref_lon)
-        target_x, target_y = latlon_to_xy(target_lat, target_lon, ref_lat, ref_lon)
+        # Calculate distance and desired bearing
+        distance = haversine_distance(current_lat, current_lon, target_lat, target_lon)
+        desired_bearing = calculate_bearing(current_lat, current_lon, target_lat, target_lon)
+        heading_diff = (desired_bearing - current_heading + 360) % 360
+        if heading_diff > 180:
+            heading_diff -= 360  # Convert to range [-180, 180]
 
-        error_x = target_x - current_x  # east error
-        error_y = target_y - current_y  # north error
+        print(f"Distance: {distance:.2f} m | Desired Bearing: {desired_bearing:.2f}° | Current Heading: {current_heading:.2f}° | Heading Diff: {heading_diff:.2f}°")
 
-        distance_error = math.hypot(error_x, error_y)
-        if distance_error < 1.0:  # waypoint reached if within 1 meter
-            print("Waypoint reached!")
+        if distance < distance_threshold:
+            print("Target reached!")
             motors.stop()
-            time.sleep(2)  # brief pause before moving to the next waypoint
             break
 
-        # Transform error to boat frame
-        surge_error = error_y * math.cos(boat_heading) + error_x * math.sin(boat_heading)
-        slide_error = error_x * math.cos(boat_heading) - error_y * math.sin(boat_heading)
+        # If the boat is not facing the target within the tolerance, rotate it
+        if abs(heading_diff) > heading_tolerance:
+            if heading_diff > 0:
+                print("Rotating clockwise...")
+                motors.rotate(0.3)  # Adjust rotation speed as needed
+            else:
+                print("Rotating counterclockwise...")
+                motors.rotate(-0.3)
+            time.sleep(0.5)
+        else:
+            print("Surging forward...")
+            motors.surge(0.5)  # Adjust surge speed as needed
+            time.sleep(0.5)
 
-        surge_command = surge_pid.update(surge_error, current_time)
-        slide_command = slide_pid.update(slide_error, current_time)
+    motors.stop()
 
-        motors.surge(surge_command)
-        motors.slide(slide_command)
-
-        print(f"Distance: {distance_error:.2f} m | Surge Error: {surge_error:.2f} | Slide Error: {slide_error:.2f}")
-        print(f"Commands -> Surge: {surge_command:.2f}, Slide: {slide_command:.2f}")
-        time.sleep(0.1)
-
-# ==============================
-# Main Autonomous Navigation Loop
-# ==============================
+# ------------------------------
+# Main Loop
+# ------------------------------
 def main():
+    # Initialize MotorCore (assumes port "/dev/ttyACM0" is correct)
     motors = motor_core.MotorCore("/dev/ttyACM0")
 
-    # Define waypoints: You can either prompt the user or hardcode them
-    print("Enter waypoint 1:")
-    wp1_lat = float(input("  Latitude: "))
-    wp1_lon = float(input("  Longitude: "))
-
-    print("Enter waypoint 2:")
-    wp2_lat = float(input("  Latitude: "))
-    wp2_lon = float(input("  Longitude: "))
-
-    waypoints = [(wp1_lat, wp1_lon), (wp2_lat, wp2_lon)]
-
-    # Wait for initial GPS fix to set the reference coordinate
     print("Waiting for initial GPS fix...")
     while True:
         with gps_lock:
-            if current_gps is not None:
+            if current_gps is not None and current_gps.is_valid():
                 current_lat = current_gps.lat
                 current_lon = current_gps.lon
                 break
         time.sleep(0.1)
     print(f"Initial GPS fix: lat={current_lat}, lon={current_lon}")
-    ref_lat, ref_lon = current_lat, current_lon
 
-    # Navigate through each waypoint sequentially
-    for i, (target_lat, target_lon) in enumerate(waypoints, start=1):
-        print(f"Starting navigation to Waypoint {i}")
-        navigate_to_waypoint(motors, target_lat, target_lon, ref_lat, ref_lon)
+    # Get target waypoint from user
+    print("Enter desired waypoint:")
+    target_lat = float(input("  Latitude: "))
+    target_lon = float(input("  Longitude: "))
 
-    print("All waypoints reached. Stopping the boat.")
-    motors.stop()
+    simple_navigation(motors, target_lat, target_lon)
 
-# ==============================
-# Entry Point
-# ==============================
 if __name__ == "__main__":
     gps_thread = threading.Thread(target=run_gps, daemon=True)
     gps_thread.start()
