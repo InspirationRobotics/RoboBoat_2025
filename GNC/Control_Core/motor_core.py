@@ -286,6 +286,8 @@ class MotorCore():
         self.calc_motor_power_instance.join()
         self.control_loop_instance.join()
 
+        self.stop()
+
     def exit(self):
         self.stop_event.set()
 
