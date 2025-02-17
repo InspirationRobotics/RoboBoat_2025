@@ -190,6 +190,9 @@ class MotorCore():
         =======================================
         '''
         target_rotation = self.calc_rotation(curr_heading, target_heading)
+
+        current_position = self.position_data["current_position"]
+        print(f"[MOTOR CORE DEBUG] current position : {current_position}")
         print(f"[MOTOR CORE DEBUG] target_vector: {target_vector}, target_rotation: {target_rotation}, distance : {dist}")
         return target_vector, target_rotation, dist
     
