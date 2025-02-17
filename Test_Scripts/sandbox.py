@@ -4,8 +4,9 @@ Sandbox file to make it convenient to see how code works/experiment with syntax.
 
 from GNC.Nav_Core import gis_funcs
 
-lat1, lon1 = (32.9234205029357, -117.03802553160698)
-lat2, lon2 = (32.92340398751059, -117.03796687137961)
+lat1, lon1 = (32.92346104343789, -117.03798665283499)
+lat2, lon2 = (32.92344454248662, -117.03792796294756)
+
 
 print(gis_funcs.bearing(lat1, lon1, lat2, lon2))
 

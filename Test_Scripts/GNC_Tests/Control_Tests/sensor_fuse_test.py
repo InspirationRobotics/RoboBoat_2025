@@ -16,7 +16,7 @@ while True:
     lat, lon = sf.get_position()
     heading = sf.get_heading()
     velocity = sf.get_velocity()
-    print(lat, lon)
+    print(lat, lon, heading)
     # print(heading)
     # print(velocity)
     time.sleep(0.1)
