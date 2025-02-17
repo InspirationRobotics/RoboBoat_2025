@@ -20,6 +20,5 @@ desired_lat = 32.923590
 desired_lon = -117.038501
 
 motors.lat_lon_navigation(desired_lat, desired_lon)
-time.sleep(15)
 motors.exit()
 

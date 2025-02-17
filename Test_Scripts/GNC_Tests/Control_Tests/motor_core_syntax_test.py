@@ -13,4 +13,3 @@ print("Waiting...")
 time.sleep(5)
 
 motors.main()
-time.sleep(2)
