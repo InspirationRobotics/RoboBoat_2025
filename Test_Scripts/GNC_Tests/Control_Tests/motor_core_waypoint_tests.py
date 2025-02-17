@@ -10,10 +10,10 @@ from GNC.Control_Core import motor_core
 
 motor_port = "/dev/ttyACM0"
 motors = motor_core.MotorCore(motor_port)
-
-motors.main(duration=20)
 print("Waiting...")
 time.sleep(5)
+
+motors.main(duration=20)
 
 # TODO: Change these.
 desired_lat = 32.923590
