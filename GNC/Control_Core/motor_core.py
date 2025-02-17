@@ -24,8 +24,6 @@ class MotorCore():
         self.desired_position = (None, None) # lat, lon
         self.desired_heading = None # in degrees
 
-        print("[MOTOR CORE] Initializing motor core...")
-        time.sleep(2)
         print("[MOTOR CORE] Initialized.")
     
     """

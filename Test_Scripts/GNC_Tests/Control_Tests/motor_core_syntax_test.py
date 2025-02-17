@@ -9,4 +9,5 @@ from GNC.Control_Core import motor_core
 
 motor_port = "/dev/ttyACM0"
 motors = motor_core.MotorCore(motor_port)
+time.sleep(3)
 motors.main()
