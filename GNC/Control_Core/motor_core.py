@@ -17,12 +17,16 @@ from API.Motors import t200
 class MotorCore():
     def __init__(self, port = "/dev/ttyACM0"):
         self.t200 = t200.T200(port="/dev/ttyACM0")
-        # TODO: Put correct heading offset
-        self.sensor_fuse = sensor_fuse.SensorFuse(heading_offset=-172)
+
+        self.sensor_fuse = sensor_fuse.SensorFuse()
         self.position_data = {'current_position' : None, 'current_heading' : None, 'current_velocity' : None}
 
         self.desired_position = (None, None) # lat, lon
         self.desired_heading = None # in degrees
+
+        print("[MOTOR CORE] Initializing motor core...")
+        time.sleep(2)
+        print("[MOTOR CORE] Initialized.")
     
     """
     ----------------- RUDIMENTARY FUNCTIONS [PROVEN BASED ON TESTS] -----------------
@@ -293,6 +297,7 @@ class MotorCore():
 
         self.calc_motor_power_instance.join()
         self.control_loop_instance.join()
+        self.stop()
         print("[MOTOR CORE] Threads joined, motor_core exited.")
     """
     --------------------------------------------------------
