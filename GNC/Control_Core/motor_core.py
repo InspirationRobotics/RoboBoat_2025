@@ -136,6 +136,10 @@ class MotorCore():
         return br
     
     def calc_rotation(self, current_heading : float, target_heading : float):
+        """
+        Takes current heading and target heading as absolute degrees, returns 
+        scaled amount of radians needed for desired rotation.
+        """
         if current_heading is None or target_heading is None:
             return 0
         min_power = 0.1
@@ -227,7 +231,7 @@ class MotorCore():
                 self.position_data["current_position"],
                 self.desired_position
             )
-            print(f"[MOTOR CORE DEBUG] {target_bearing}")
+            print(f"[MOTOR CORE DEBUG] current_bearing: {self.position_data["current_heading"]}, target_bearing: {target_bearing}")
             target_vector, target_rotation, dist = self.hold_logic(
                 self.position_data["current_position"],
                 self.position_data["current_heading"],
