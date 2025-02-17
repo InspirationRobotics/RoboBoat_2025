@@ -175,7 +175,7 @@ class MotorCore():
         # When more than 3 meters away, we go at the target vector, otherwise we slow down
         scale = min(dist/3, 1)
         target_vector = [vx*scale, vy*scale]
-        print(f"[DEBUG MOTOR_CORE] Vector : {target_vector}, vx : {vx}, vy : {vy}, dist: {dist}")
+        print(f"[DEBUG MOTOR_CORE] Calculated vector : {target_vector}, vx : {vx}, vy : {vy}, dist: {dist}")
         '''
         TEMPORARY =============================
         Turn vector into only magnitude in forward direction by setting lateral to 0
@@ -192,7 +192,7 @@ class MotorCore():
         target_rotation = self.calc_rotation(curr_heading, target_heading)
 
         current_position = self.position_data["current_position"]
-        print(f"[MOTOR CORE DEBUG] current position : {current_position}")
+        print(f"[MOTOR CORE DEBUG] current position : {current_position}, target position : {self.desired_position}")
         print(f"[MOTOR CORE DEBUG] target_vector: {target_vector}, target_rotation: {target_rotation}, distance : {dist}")
         return target_vector, target_rotation, dist
     
