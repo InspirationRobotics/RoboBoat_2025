@@ -298,7 +298,7 @@ class GPS:
                     pass
         return waypoints
     
-if __name__ == "main":
+if __name__ == "__main__":
     gps = GPS()
     print("Waiting...")
     time.sleep(3)
