@@ -186,6 +186,7 @@ class MotorCore():
         =======================================
         '''
         target_rotation = self.calc_rotation(curr_heading, target_heading)
+        print(f"[MOTOR CORE DEBUG] target_vector: {target_vector}, target_rotation: {target_rotation}, distance : {dist}")
         return target_vector, target_rotation, dist
     
     def parse_hold_logic(self, vector, rotation):
