@@ -231,7 +231,9 @@ class MotorCore():
                 self.position_data["current_position"],
                 self.desired_position
             )
-            print(f"[MOTOR CORE DEBUG] current_bearing: {self.position_data["current_heading"]}, target_bearing: {target_bearing}")
+
+            current_heading = self.position_data["current_heading"]
+            print(f"[MOTOR CORE DEBUG] current_bearing: {current_heading}, target_bearing: {target_bearing}")
             target_vector, target_rotation, dist = self.hold_logic(
                 self.position_data["current_position"],
                 self.position_data["current_heading"],
