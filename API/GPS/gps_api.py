@@ -297,3 +297,7 @@ class GPS:
                 except:
                     pass
         return waypoints
+    
+if __name__ == "main":
+    gps = GPS()
+    gps.calibrate_heading_offset(calib_time=5)

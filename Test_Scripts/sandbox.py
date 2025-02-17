@@ -2,12 +2,19 @@
 Sandbox file to make it convenient to see how code works/experiment with syntax.
 """
 
-tuple = (None, None)
+from GNC.Nav_Core import gis_funcs
 
-if tuple == None:
-    print("None")
-else:
-    print(tuple)
+lat1, lon1 = (32.9234205029357, -117.03802553160698)
+lat2, lon2 = (32.92340398751059, -117.03796687137961)
+
+print(gis_funcs.bearing(lat1, lon1, lat2, lon2))
+
+# tuple = (None, None)
+
+# if tuple == None:
+#     print("None")
+# else:
+#     print(tuple)
 
 # import threading
 # import time
