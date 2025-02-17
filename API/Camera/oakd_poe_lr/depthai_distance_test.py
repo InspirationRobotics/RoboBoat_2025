@@ -5,9 +5,9 @@ import depthai as dai
 import numpy as np
 import math
 
-# Closer-in minimum depth, disparity range is doubled (from 95 to 190):
+# Closer-in minimum depth, disparity range is doubled (from 95 to 190) when set to true:
 extended_disparity = False
-# Better accuracy for longer distance, fractional disparity 32-levels:
+# Better accuracy for longer distance when set to true, fractional disparity 32-levels:
 subpixel = True
 # Better handling for occlusions:
 lr_check = True
@@ -47,12 +47,14 @@ stereo.disparity.link(xout.input)
 
 # Connect to device and start pipeline
 with dai.Device(pipeline) as device:
-    #focal length measured in pixels can be found at the index below
-    focal_length_in_pixels = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_C)
-    print("Cam C focal length in pixels: ", focal_length_in_pixels[0][0])
+    #depth calculations made from right-most camera socket
+    intrinsicData = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_C)
+    # focal length measured in pixels can be found at the index below
+    focal_length_in_pixels = intrinsicData[0][0]
+    print("Cam C focal length in pixels: ", focal_length_in_pixels)
     #TODO: write depth calculation equation and output to stream
-    # depth = device.readCalibration().getCamera
-    #
+    #Oak-d has a 7.5cm baseline measurement, divide by the disparity value and get the distance measurement
+
 
     # Output queue will be used to get the disparity frames from the outputs defined above
     q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
@@ -62,12 +64,17 @@ with dai.Device(pipeline) as device:
         frame = inDisparity.getFrame()
         # Normalization for better visualization
         frame = (frame * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
+        #depth = (focal_length_in_pixels * 7.5) / 95 example depth calculation since I cannot find the disparity data anywhere
+        # print(depth)
 
         #for grayscale output
         #cv2.imshow("disparity", frame)
 
         # Available color maps: https://docs.opencv.org/3.4/d3/d50/group__imgproc__colormap.html
         frame = cv2.applyColorMap(frame, cv2.COLORMAP_JET)
+        #output
+        #cv2.putText(frame, f"Depth from sensor: {depth}cm", (10,10), cv2.FONT_HERSHEY_TRIPLEX, 0.4, (255,255,255))
+
         cv2.imshow("disparity_color", frame)
 
         if cv2.waitKey(1) == ord('q'):
