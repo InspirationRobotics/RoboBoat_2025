@@ -16,8 +16,8 @@ print("Waiting...")
 time.sleep(5)
 
 # TODO: Change these.
-desired_lat = 0
-desired_lon = 0
+desired_lat = 32.923590
+desired_lon = -117.038501
 
 motors.lat_lon_navigation(desired_lat, desired_lon)
 time.sleep(15)
