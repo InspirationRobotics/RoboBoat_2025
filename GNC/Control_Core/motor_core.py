@@ -246,7 +246,7 @@ class MotorCore():
         while not stop_event.is_set():
             try:
                 value = value_queue.get(timeout=send_rate)
-                forward_port, forward_starboard, aft_port, aft_starboard = value[1], value[2], value[3], value[4]
+                forward_port, forward_starboard, aft_port, aft_starboard = value[0], value[1], value[2], value[3]
                 self.t200.set_thrusters(forward_port, forward_starboard,aft_port, aft_starboard)
             except queue.Empty:
                 continue
