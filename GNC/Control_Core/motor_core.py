@@ -228,7 +228,7 @@ class MotorCore():
             )
             target_vector, target_rotation, dist = self.hold_logic(
                 self.position_data["current_position"],
-                self.position_data["curreent_heading"],
+                self.position_data["current_heading"],
                 self.desired_position,
                 target_bearing
             )
