@@ -114,7 +114,6 @@ class MotorCore():
         self.polar_waypoint_navigation(vector_distance, vector_theta)
 
     def update_position(self):
-        # TODO: Should test this before full file test
         self.position_data = {
             'current_position' : self.sensor_fuse.get_position(),
             'current_heading' : self.sensor_fuse.get_heading(),
@@ -197,8 +196,10 @@ class MotorCore():
         
         if vector == None:
             vector = [0, 0]
+            print(f"[DEBUG MOTOR CORE] No desired vector.")
         if rotation == None:
             rotation = 0
+            print(f"[DEBUG MOTOR CORE] No desired rotation.")
 
         forward_thruster_value = min(max(-1, vector[1] * 0.5), 1)
         forward_port_value = -(forward_thruster_value)
@@ -215,6 +216,11 @@ class MotorCore():
         while not stop_event.is_set():
             self.update_position()
             motor_values = [0, 0, 0, 0]
+
+            if self.desired_position[0] == None or self.desired_position[1] == None:
+                self.desired_position = self.position_data["current_position"]
+            if self.desired_heading == None:
+                self.desired_heading = self.position_data["current_heading"]
 
             target_bearing = self.solve_wp_bearing(
                 self.position_data["current_position"],
@@ -248,15 +254,15 @@ class MotorCore():
 
     def main(self, calculate_rate=0.1, send_rate=0.1, duration=10):
         send_queue = queue.Queue()
-        stop_event = threading.Event()
+        self.stop_event = threading.Event()
 
-        control_loop_instance = threading.Thread(target=self.control_loop, args=(send_queue, send_rate, stop_event))
-        control_loop_instance.daemon = True # Ensure this thread exits when main program exits.
-        control_loop_instance.start()
+        self.control_loop_instance = threading.Thread(target=self.control_loop, args=(send_queue, send_rate, self.stop_event))
+        self.control_loop_instance.daemon = True # Ensure this thread exits when main program exits.
+        self.control_loop_instance.start()
 
-        calc_motor_power_instance = threading.Thread(target=self.calc_motor_power, args=(send_queue, calculate_rate, stop_event))
-        calc_motor_power_instance.daemon = True
-        calc_motor_power_instance.start()
+        self.calc_motor_power_instance = threading.Thread(target=self.calc_motor_power, args=(send_queue, calculate_rate, self.stop_event))
+        self.calc_motor_power_instance.daemon = True
+        self.calc_motor_power_instance.start()
 
         if duration == None:
             # Arbitrary number
@@ -264,13 +270,18 @@ class MotorCore():
 
         time.sleep(duration)
 
-        stop_event.set()
+        self.stop_event.set()
 
-        calc_motor_power_instance.join()
-        control_loop_instance.join()
+        self.calc_motor_power_instance.join()
+        self.control_loop_instance.join()
 
+    def exit(self):
+        self.stop_event.set()
+
+        self.calc_motor_power_instance.join()
+        self.control_loop_instance.join()
+        print("[MOTOR CORE] Threads joined, motor_core exited.")
     """
     --------------------------------------------------------
     """
-
     
