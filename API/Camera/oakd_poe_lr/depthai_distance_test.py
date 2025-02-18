@@ -74,8 +74,13 @@ try:
                 # disparity_map = cv2.applyColorMap(disparity_map, cv2.COLORMAP_JET)
                 # cv2.imshow("Disparity", disparity_map)
 
-                # Compute depth in cm
+                # Calculate depth
                 depth_map = (focal_length_in_pixels * 5.2) / disparity_map
+
+                # Cap the depth to 3000 cm (30 meters) 
+                # 30 meters is the range of the camera
+                depth_map[depth_map > 3000] = 3000
+
                 print("Min depth:", np.min(depth_map))
                 print("Max depth:", np.max(depth_map))
 
