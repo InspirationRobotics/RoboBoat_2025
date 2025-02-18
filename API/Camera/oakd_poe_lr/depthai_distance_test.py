@@ -65,7 +65,7 @@ try:
                 # Get the disparity map and avoid 0 in the array
                 disparity_map = inDisparity.getFrame()
                 print(f"max disparity: {stereo.initialConfig.getMaxDisparity()}")
-                disparity_map = np.where(disparity_map < 0.1, 0.1, disparity_map)
+                # disparity_map = np.where(disparity_map < 0.1, 0.1, disparity_map)
                 
 
                 # Normalize disparity map
@@ -73,7 +73,7 @@ try:
                 # Available color maps: https://docs.opencv.org/3.4/d3/d50/group__imgproc__colormap.html
                 
                 disparity_map = cv2.applyColorMap(disparity_map, cv2.COLORMAP_JET)
-                if not cv2.imwrite("Disparity.jpg", disparity_map):
+                if not cv2.imwrite("Disparity_without_cropping.jpg", disparity_map):
                     print("disparity not saved due to error")
 
                 # Calculate depth
