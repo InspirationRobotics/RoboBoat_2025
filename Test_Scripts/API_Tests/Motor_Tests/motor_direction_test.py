@@ -3,8 +3,8 @@ This is a motor direction test. It will run each of the motors at a moderate for
 It is meant to testdirectionalities of the thrusters for when the thrusters are firing "forward". This is a WATER test.
 
 The test is considered successful when:
-- The stern port thruster runs for 4 seconds
-- The stern starboard thruster runs for 4 seconds
+- The forward port thruster runs for 4 seconds
+- The forward starboard thruster runs for 4 seconds
 - The aft port thruster runs for 4 seconds
 - The aft starboard thruster runs for 4 seconds
 - The thrusters stop moving.
