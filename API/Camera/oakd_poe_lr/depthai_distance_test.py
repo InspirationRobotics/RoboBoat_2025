@@ -69,6 +69,11 @@ with dai.Device(pipeline) as device:
         # compute depth in cm
         depth_map = (focal_length_in_pixels*7.5)/disparity_map
 
+        # check min and max depth
+        print("Min depth:", np.min(depth_map))
+        print("Max depth:", np.max(depth_map))
+
+
         # Normalize for better visualization
         depth_normalized = cv2.normalize(depth_map, None, 0, 255, cv2.NORM_MINMAX)
 
@@ -100,7 +105,7 @@ with dai.Device(pipeline) as device:
         # Combine depth map and color spectrum
         combined = np.hstack((depth_colored, spectrum))
         
-        cv2.imshow("depth only", depth_colored)
+        cv2.imshow("Disparity", disparity_map.astype(np.uint8))
         cv2.imshow("combined", combined)
 
         if cv2.waitKey(1) == ord('q'):
