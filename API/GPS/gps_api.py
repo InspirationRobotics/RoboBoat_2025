@@ -9,6 +9,8 @@ from typing import Any, List, Tuple
 from pathlib import Path
 from serial import Serial
 from threading import Thread, Lock
+
+# Need to import pynmeagps locally
 from pynmeagps import NMEAReader, NMEAMessage
 
 """
@@ -69,7 +71,7 @@ class GPS:
         offset (float): Keyword argument, whether or not to take into account any sort of offset for the GPS
     """
 
-    def __init__(self, serialport : str, baudrate : int = 115200, callback = None, threaded : bool = True, *, offset : float = None):
+    def __init__(self, serialport : str = "/dev/ttyUSB0", baudrate : int = 115200, callback = None, threaded : bool = True, *, offset : float = None):
         stream = Serial(serialport, baudrate, timeout=3)
         self.nmr = NMEAReader(stream)
         self.threaded = threaded
@@ -295,3 +297,9 @@ class GPS:
                 except:
                     pass
         return waypoints
+    
+if __name__ == "__main__":
+    gps = GPS("/dev/ttyUSB0", 115200, None, True)
+    print("Waiting...")
+    time.sleep(3)
+    gps.calibrate_heading_offset(calib_time=5)

@@ -3,8 +3,8 @@ This is a motor direction test. It will run each of the motors at a slow forward
 It is meant to test the t200 API's functionality. This is a BENCH test.
 
 The test is considered successful when:
-- The stern port thruster runs for 5 seconds
-- The stern starboard thruster runs for 5 seconds
+- The forward port thruster runs for 5 seconds
+- The forward starboard thruster runs for 5 seconds
 - The aft port thruster runs for 5 seconds
 - The aft starboard thruster runs for 5 seconds
 - The thrusters stop moving.

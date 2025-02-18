@@ -9,8 +9,8 @@ from filterpy.kalman import KalmanFilter
 from filterpy.common import Q_discrete_white_noise
 from typing import Union, Tuple
 
-from API.IMU.imu_api import IMU, IMUData
 from API.GPS.gps_api import GPS, GPSData
+# from API.IMU.imu_api import IMU, IMUData
 
 # TODO: Understand calculations better, and update documentation as understanding improves.
 # Reference file: https://github.com/InspirationRobotics/RX24-OCB/blob/main/motor_control/sensor_fuse.py#L140 
@@ -25,9 +25,11 @@ class SensorFuse:
         self.raw_data = GPSData(None, None, None)
         self.filter = enable_filter
 
+        self.connected = False
         self.gps = GPS(gps_port, gps_baudrate, callback = self._gps_callback, offset=heading_offset)
         if use_imu and enable_filter:
-            self.imu = IMU(callback= self._imu_callback)
+            pass
+            # self.imu = IMU(callback= self._imu_callback)
 
     def _gps_callback(self, data : GPSData):
         """
@@ -45,7 +47,7 @@ class SensorFuse:
             else:
                 self.raw_data = data
 
-    def _imu_callback(self, data : IMUData):
+    def _imu_callback(self, data):
         """
         Callback for the IMU, usage for Kalman filter. Once data is passed in, callback modifies the data and stores it in the appropriate 
         places in the Kalman filter.
@@ -69,7 +71,7 @@ class SensorFuse:
         Returns the latitude change in meters per second and longitude change in meters per second
         based on lat and lon velocity from the Kalman filter.
         """
-        if not self.connected:
+        if not self.connected or not self.filter:
             return None
         global_velocity = tuple(self.kf.x[2:4])
         lat_vel_mps = global_velocity[0] * 111320
@@ -140,7 +142,7 @@ class SensorFuse:
         
         return kf
     
-    def _update_IMUfilter(self, data : IMUData):
+    def _update_IMUfilter(self, data):
         """
         Updates the Kalman filter with the IMU data. Specifically calculates the latitude velocity, longitude velocity, 
         latitude/longitude velocity change in degrees per second, and the yaw of the ASV, all from the IMU data or data already stored in the Kalman filter.
