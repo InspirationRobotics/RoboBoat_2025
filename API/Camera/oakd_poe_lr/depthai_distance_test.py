@@ -69,11 +69,12 @@ try:
                 
 
                 # Normalize disparity map
-                # disparity_map = (disparity_map * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
+                disparity_map = (disparity_map * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
                 # Available color maps: https://docs.opencv.org/3.4/d3/d50/group__imgproc__colormap.html
                 
-                # disparity_map = cv2.applyColorMap(disparity_map, cv2.COLORMAP_JET)
-                # cv2.imshow("Disparity", disparity_map)
+                disparity_map = cv2.applyColorMap(disparity_map, cv2.COLORMAP_JET)
+                if not cv2.imwrite("Disparity.jpg", disparity_map):
+                    print("disparity not saved due to error")
 
                 # Calculate depth
                 depth_map = (focal_length_in_pixels * 15) / disparity_map
@@ -103,7 +104,7 @@ try:
                     cv2.putText(spectrum, f"{int(distance)}cm", (0, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
                 combined = np.hstack((depth_colored, spectrum))
-                save = cv2.imwrite("depth image.jpg",combined)
+                save = cv2.imwrite("test2.jpg",combined)
                 if not save:
                     print("image not saved")
                 cv2.imshow("Combined", combined)
