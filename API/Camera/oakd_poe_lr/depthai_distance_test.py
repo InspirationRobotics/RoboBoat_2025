@@ -64,10 +64,19 @@ with dai.Device(pipeline) as device:
 
         # frame = (frame * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
         # get the disparity map and avoid 0 in the array
-        disparity_map = inDisparity.getFrame().astype(np.float32)
+        disparity_map = inDisparity.getFrame()
         print(f"max disparity: {stereo.initialConfig.getMaxDisparity()}")
         # prevent 0
         disparity_map[disparity_map==0] = 0.1
+
+        """
+        test for disparity map first
+        """
+        disparity_map = (disparity_map * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
+        frame = cv2.applyColorMap(frame, cv2.COLORMAP_JET)
+        cv2.imshow("Disparity", disparity_map.astype(np.uint8))
+
+
 
         # compute depth in cm
         depth_map = (focal_length_in_pixels*7.5)/disparity_map
@@ -110,7 +119,7 @@ with dai.Device(pipeline) as device:
         # Combine depth map and color spectrum
         combined = np.hstack((depth_colored, spectrum))
         
-        cv2.imshow("Disparity", disparity_map.astype(np.uint8))
+        # cv2.imshow("Disparity", disparity_map.astype(np.uint8))
         #cv2.imshow("combined", combined)
 
         if cv2.waitKey(1) == ord('q'):
