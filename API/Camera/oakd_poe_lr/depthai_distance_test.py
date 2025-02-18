@@ -4,6 +4,7 @@ import cv2
 import depthai as dai
 import numpy as np
 import math
+import sys
 
 # Closer-in minimum depth, disparity range is doubled (from 95 to 190) when set to true:
 extended_disparity = False
@@ -45,82 +46,72 @@ colorLeft.isp.link(stereo.left)
 colorRight.isp.link(stereo.right)
 stereo.disparity.link(xout.input)
 
-# Connect to device and start pipeline
-with dai.Device(pipeline) as device:
-    #depth calculations made from right-most camera socket
-    intrinsicData = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_C)
-    # focal length measured in pixels can be found at the index below
-    focal_length_in_pixels = intrinsicData[0][0]
-    print("Cam C focal length in pixels: ", focal_length_in_pixels)
-    #TODO: write depth calculation equation and output to stream
-    #Oak-d has a 7.5cm baseline measurement, divide by the disparity value and get the distance measurement
 
+# Try to connect to device and handle errors gracefully
+try:
+    with dai.Device(pipeline) as device:
+        # Device is connected, retrieve calibration data
+        intrinsicData = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_C)
+        focal_length_in_pixels = intrinsicData[0][0]
+        print("Cam C focal length in pixels: ", focal_length_in_pixels)
 
-    # Output queue will be used to get the disparity frames from the outputs defined above
-    q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
+        q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
 
-    while True:
-        inDisparity = q.get()  # blocking call, will wait until a new data has arrived
+        while True:
+            try:
+                # Get disparity frame
+                inDisparity = q.get()
 
-        # frame = (frame * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
-        # get the disparity map and avoid 0 in the array
-        disparity_map = inDisparity.getFrame()
-        print(f"max disparity: {stereo.initialConfig.getMaxDisparity()}")
-        # prevent 0
-        disparity_map[disparity_map==0] = 0.1
+                # Get the disparity map and avoid 0 in the array
+                disparity_map = inDisparity.getFrame()
+                print(f"max disparity: {stereo.initialConfig.getMaxDisparity()}")
+                disparity_map[disparity_map == 0] = 0.1
 
-        """
-        test for disparity map first
-        """
-        disparity_map = (disparity_map * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
-        frame = cv2.applyColorMap(frame, cv2.COLORMAP_JET)
-        cv2.imshow("Disparity", disparity_map.astype(np.uint8))
+                # Normalize disparity map
+                disparity_map = (disparity_map * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
+                # Available color maps: https://docs.opencv.org/3.4/d3/d50/group__imgproc__colormap.html
+                disparity_map = cv2.applyColorMap(disparity_map, cv2.COLORMAP_JET)
+                cv2.imshow("Disparity", disparity_map)
 
+                # Compute depth in cm
+                depth_map = (focal_length_in_pixels * 7.5) / disparity_map
+                print("Min depth:", np.min(depth_map))
+                print("Max depth:", np.max(depth_map))
 
+                depth_normalized = (disparity_map * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
+                depth_colored = cv2.applyColorMap(depth_normalized, cv2.COLORMAP_JET)
 
-        # compute depth in cm
-        depth_map = (focal_length_in_pixels*7.5)/disparity_map
+                # Create color spectrum
+                spectrum_height = depth_colored.shape[0]
+                spectrum_width = 50
+                spectrum = np.linspace(0, 255, spectrum_height, dtype=np.uint8).reshape(spectrum_height, 1)
+                spectrum = cv2.applyColorMap(spectrum, cv2.COLORMAP_JET)
+                spectrum = cv2.resize(spectrum, (spectrum_width, spectrum_height))
 
-        # check min and max depth
-        print("Min depth:", np.min(depth_map))
-        print("Max depth:", np.max(depth_map))
+                # Add labels
+                num_labels = 5
+                for i in range(num_labels):
+                    y = int(spectrum_height - (i / (num_labels - 1)) * spectrum_height)
+                    distance = (i / (num_labels - 1)) * np.max(depth_map)
+                    cv2.putText(spectrum, f"{int(distance)}cm", (0, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
-        
-        # Normalize for better visualization
-        # depth_normalized = cv2.normalize(depth_map, None, 0, 255, cv2.NORM_MINMAX)
-        # Normalize the frame
-        depth_normalized = (disparity_map * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
+                combined = np.hstack((depth_colored, spectrum))
+                # cv2.imshow("Combined", combined)
 
-        # Available color maps: https://docs.opencv.org/3.4/d3/d50/group__imgproc__colormap.html
-        depth_colored = cv2.applyColorMap(depth_normalized.astype(np.uint8), cv2.COLORMAP_JET)
+                if cv2.waitKey(1) == ord('q'):
+                    break
 
-        # Create color legend (spectrum)
-        spectrum_height = depth_colored.shape[0]
-        spectrum_width = 50  # Adjust width as needed
-        spectrum = np.linspace(0, 255, spectrum_height, dtype=np.uint8).reshape(spectrum_height, 1)
-        spectrum = cv2.applyColorMap(spectrum, cv2.COLORMAP_JET)
-        spectrum = cv2.resize(spectrum, (spectrum_width, spectrum_height))
+            except Exception as e:
+                print(f"Error in processing frame: {e}")
+                break  # Exit loop on error
 
-        # Add distance labels
-        num_labels = 5  # Adjust as needed
-        for i in range(num_labels):
-            y = int(spectrum_height - (i / (num_labels - 1)) * spectrum_height)
-            distance = (i / (num_labels - 1)) * np.max(depth_map)  # Estimate depth values
-            cv2.putText(spectrum, f"{int(distance)}cm", (0, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+except dai.DeviceException as e:
+    print(f"Error with device: {e}")
+    sys.exit(1)  # Exit gracefully when device-related error occurs
 
-        
-        #depth = (focal_length_in_pixels * 7.5) / 95 example depth calculation since I cannot find the disparity data anywhere
-        # print(depth)
-        #for grayscale output
-        #cv2.imshow("disparity", frame)
-        #output
-        #cv2.putText(frame, f"Depth from sensor: {depth}cm", (10,10), cv2.FONT_HERSHEY_TRIPLEX, 0.4, (255,255,255))
+except Exception as e:
+    print(f"Unexpected error: {e}")
+    sys.exit(1)  # Exit gracefully on unexpected error
 
-        # Combine depth map and color spectrum
-        combined = np.hstack((depth_colored, spectrum))
-        
-        # cv2.imshow("Disparity", disparity_map.astype(np.uint8))
-        #cv2.imshow("combined", combined)
-
-        if cv2.waitKey(1) == ord('q'):
-            break
+finally:
+    cv2.destroyAllWindows()  # Make sure OpenCV windows are closed after execution
