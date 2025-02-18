@@ -64,13 +64,13 @@ with dai.Device(pipeline) as device:
 
         # frame = (frame * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
         # get the disparity map and avoid 0 in the array
-        disparity_map = inDisparity.getFrame().astype(np.uint8)
+        disparity_map = inDisparity.getFrame().astype(np.float32)
         print(f"max disparity: {stereo.initialConfig.getMaxDisparity()}")
         # prevent 0
         disparity_map[disparity_map==0] = 0.1
 
-        # compute depth in meter
-        depth_map = (focal_length_in_pixels*0.075)/disparity_map
+        # compute depth in cm
+        depth_map = (focal_length_in_pixels*7.5)/disparity_map
 
         # check min and max depth
         print("Min depth:", np.min(depth_map))
@@ -97,7 +97,7 @@ with dai.Device(pipeline) as device:
         for i in range(num_labels):
             y = int(spectrum_height - (i / (num_labels - 1)) * spectrum_height)
             distance = (i / (num_labels - 1)) * np.max(depth_map)  # Estimate depth values
-            cv2.putText(spectrum, f"{int(distance)}cm", (5, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+            cv2.putText(spectrum, f"{int(distance)}cm", (0, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
         
         #depth = (focal_length_in_pixels * 7.5) / 95 example depth calculation since I cannot find the disparity data anywhere
