@@ -65,7 +65,8 @@ try:
                 # Get the disparity map and avoid 0 in the array
                 disparity_map = inDisparity.getFrame()
                 print(f"max disparity: {stereo.initialConfig.getMaxDisparity()}")
-                disparity_map[disparity_map == 0] = 0.1
+                disparity_map = np.where(disparity_map < 0.1, 0.1, disparity_map)
+                
 
                 # Normalize disparity map
                 # disparity_map = (disparity_map * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
@@ -75,7 +76,7 @@ try:
                 # cv2.imshow("Disparity", disparity_map)
 
                 # Calculate depth
-                depth_map = (focal_length_in_pixels * 5.2) / disparity_map
+                depth_map = (focal_length_in_pixels * 15) / disparity_map
 
                 # Cap the depth to 3000 cm (30 meters) 
                 # 30 meters is the range of the camera
@@ -102,9 +103,12 @@ try:
                     cv2.putText(spectrum, f"{int(distance)}cm", (0, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
                 combined = np.hstack((depth_colored, spectrum))
-                cv2.imwrite("depth image",combined)
+                save = cv2.imwrite("depth image.jpg",combined)
+                if not save:
+                    print("image not saved")
                 cv2.imshow("Combined", combined)
-
+                print("program finished")
+                break
                 if cv2.waitKey(1) == ord('q'):
                     break
 
