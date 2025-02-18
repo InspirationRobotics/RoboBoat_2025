@@ -61,21 +61,27 @@ with dai.Device(pipeline) as device:
 
     while True:
         inDisparity = q.get()  # blocking call, will wait until a new data has arrived
-        frame = inDisparity.getFrame()
-        # Normalization for better visualization
-        frame = (frame * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
-        #depth = (focal_length_in_pixels * 7.5) / 95 example depth calculation since I cannot find the disparity data anywhere
-        # print(depth)
 
-        #for grayscale output
-        #cv2.imshow("disparity", frame)
+        # get the disparity map and avoid 0 in the array
+        disparity_map = inDisparity.getFrame().astype(np.float32)
+        disparity_map[disparity_map==0] = 0.1
+
+        # compute depth in cm
+        depth_map = (focal_length_in_pixels*7.5)/disparity_map
+
+        # Normalize for better visualization
+        depth_normalized = cv2.normalize(depth_map, None, 0, 255, cv2.NORM_MINMAX)
 
         # Available color maps: https://docs.opencv.org/3.4/d3/d50/group__imgproc__colormap.html
-        frame = cv2.applyColorMap(frame, cv2.COLORMAP_JET)
+        depth_colored = cv2.applyColorMap(depth_normalized.astype(np.uint8), cv2.COLORMAP_JET)
+
+        #depth = (focal_length_in_pixels * 7.5) / 95 example depth calculation since I cannot find the disparity data anywhere
+        # print(depth)
+        #for grayscale output
+        #cv2.imshow("disparity", frame)
         #output
         #cv2.putText(frame, f"Depth from sensor: {depth}cm", (10,10), cv2.FONT_HERSHEY_TRIPLEX, 0.4, (255,255,255))
-
-        cv2.imshow("disparity_color", frame)
+        cv2.imshow("disparity_color", depth_colored)
 
         if cv2.waitKey(1) == ord('q'):
             break
