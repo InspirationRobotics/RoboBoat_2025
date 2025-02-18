@@ -75,13 +75,33 @@ with dai.Device(pipeline) as device:
         # Available color maps: https://docs.opencv.org/3.4/d3/d50/group__imgproc__colormap.html
         depth_colored = cv2.applyColorMap(depth_normalized.astype(np.uint8), cv2.COLORMAP_JET)
 
+        # Create color legend (spectrum)
+        spectrum_height = depth_colored.shape[0]
+        spectrum_width = 50  # Adjust width as needed
+        spectrum = np.linspace(0, 255, spectrum_height, dtype=np.uint8).reshape(spectrum_height, 1)
+        spectrum = cv2.applyColorMap(spectrum, cv2.COLORMAP_JET)
+        spectrum = cv2.resize(spectrum, (spectrum_width, spectrum_height))
+
+        # Add distance labels
+        num_labels = 5  # Adjust as needed
+        for i in range(num_labels):
+            y = int(spectrum_height - (i / (num_labels - 1)) * spectrum_height)
+            distance = (i / (num_labels - 1)) * np.max(depth_map)  # Estimate depth values
+            cv2.putText(spectrum, f"{int(distance)}cm", (5, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+
+        
         #depth = (focal_length_in_pixels * 7.5) / 95 example depth calculation since I cannot find the disparity data anywhere
         # print(depth)
         #for grayscale output
         #cv2.imshow("disparity", frame)
         #output
         #cv2.putText(frame, f"Depth from sensor: {depth}cm", (10,10), cv2.FONT_HERSHEY_TRIPLEX, 0.4, (255,255,255))
-        cv2.imshow("disparity_color", depth_colored)
+
+        # Combine depth map and color spectrum
+        combined = np.hstack((depth_colored, spectrum))
+        
+        cv2.imshow("depth only", depth_colored)
+        cv2.imshow("combined", combined)
 
         if cv2.waitKey(1) == ord('q'):
             break
