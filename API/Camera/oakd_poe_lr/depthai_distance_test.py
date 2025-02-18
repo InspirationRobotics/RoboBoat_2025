@@ -62,8 +62,11 @@ with dai.Device(pipeline) as device:
     while True:
         inDisparity = q.get()  # blocking call, will wait until a new data has arrived
 
+        # frame = (frame * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
         # get the disparity map and avoid 0 in the array
-        disparity_map = inDisparity.getFrame().astype(np.float32)
+        disparity_map = inDisparity.getFrame().astype(np.uint8)
+        print(f"max disparity: {stereo.initialConfig.getMaxDisparity()}")
+        # prevent 0
         disparity_map[disparity_map==0] = 0.1
 
         # compute depth in meter
@@ -73,9 +76,11 @@ with dai.Device(pipeline) as device:
         print("Min depth:", np.min(depth_map))
         print("Max depth:", np.max(depth_map))
 
-
+        
         # Normalize for better visualization
-        depth_normalized = cv2.normalize(depth_map, None, 0, 255, cv2.NORM_MINMAX)
+        # depth_normalized = cv2.normalize(depth_map, None, 0, 255, cv2.NORM_MINMAX)
+        # Normalize the frame
+        depth_normalized = (disparity_map * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
 
         # Available color maps: https://docs.opencv.org/3.4/d3/d50/group__imgproc__colormap.html
         depth_colored = cv2.applyColorMap(depth_normalized.astype(np.uint8), cv2.COLORMAP_JET)
