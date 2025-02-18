@@ -66,8 +66,8 @@ with dai.Device(pipeline) as device:
         disparity_map = inDisparity.getFrame().astype(np.float32)
         disparity_map[disparity_map==0] = 0.1
 
-        # compute depth in cm
-        depth_map = (focal_length_in_pixels*7.5)/disparity_map
+        # compute depth in meter
+        depth_map = (focal_length_in_pixels*0.075)/disparity_map
 
         # check min and max depth
         print("Min depth:", np.min(depth_map))
@@ -106,7 +106,7 @@ with dai.Device(pipeline) as device:
         combined = np.hstack((depth_colored, spectrum))
         
         cv2.imshow("Disparity", disparity_map.astype(np.uint8))
-        cv2.imshow("combined", combined)
+        #cv2.imshow("combined", combined)
 
         if cv2.waitKey(1) == ord('q'):
             break
