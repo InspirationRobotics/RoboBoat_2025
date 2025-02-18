@@ -70,8 +70,9 @@ try:
                 # Normalize disparity map
                 disparity_map = (disparity_map * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
                 # Available color maps: https://docs.opencv.org/3.4/d3/d50/group__imgproc__colormap.html
-                disparity_map = cv2.applyColorMap(disparity_map, cv2.COLORMAP_JET)
-                cv2.imshow("Disparity", disparity_map)
+                
+                # disparity_map = cv2.applyColorMap(disparity_map, cv2.COLORMAP_JET)
+                # cv2.imshow("Disparity", disparity_map)
 
                 # Compute depth in cm
                 depth_map = (focal_length_in_pixels * 7.5) / disparity_map
@@ -96,7 +97,7 @@ try:
                     cv2.putText(spectrum, f"{int(distance)}cm", (0, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
                 combined = np.hstack((depth_colored, spectrum))
-                # cv2.imshow("Combined", combined)
+                cv2.imshow("Combined", combined)
 
                 if cv2.waitKey(1) == ord('q'):
                     break
@@ -104,10 +105,6 @@ try:
             except Exception as e:
                 print(f"Error in processing frame: {e}")
                 break  # Exit loop on error
-
-except dai.DeviceException as e:
-    print(f"Error with device: {e}")
-    sys.exit(1)  # Exit gracefully when device-related error occurs
 
 except Exception as e:
     print(f"Unexpected error: {e}")
