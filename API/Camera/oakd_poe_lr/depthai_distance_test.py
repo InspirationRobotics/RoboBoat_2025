@@ -73,8 +73,6 @@ try:
                 # Available color maps: https://docs.opencv.org/3.4/d3/d50/group__imgproc__colormap.html
                 
                 disparity_map = cv2.applyColorMap(disparity_map, cv2.COLORMAP_JET)
-                if not cv2.imwrite("Disparity_without_cropping.jpg", disparity_map):
-                    print("disparity not saved due to error")
 
                 # Calculate depth
                 depth_map = (focal_length_in_pixels * 15) / disparity_map
@@ -83,8 +81,6 @@ try:
                 # 30 meters is the range of the camera
                 depth_map[depth_map > 3000] = 3000
 
-                print("Min depth:", np.min(depth_map))
-                print("Max depth:", np.max(depth_map))
 
                 depth_normalized = (disparity_map * (255 / stereo.initialConfig.getMaxDisparity())).astype(np.uint8)
                 depth_colored = cv2.applyColorMap(depth_normalized, cv2.COLORMAP_JET)
@@ -104,12 +100,10 @@ try:
                     cv2.putText(spectrum, f"{int(distance)}cm", (0, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
                 combined = np.hstack((depth_colored, spectrum))
-                save = cv2.imwrite("test2.jpg",combined)
-                if not save:
-                    print("image not saved")
+
                 cv2.imshow("Combined", combined)
-                print("program finished")
-                break
+
+
                 if cv2.waitKey(1) == ord('q'):
                     break
 

@@ -21,14 +21,12 @@ xout_right.setStreamName("right")
 xout_color.setStreamName("color")
 
 # Configure left and right cameras (monochrome)
-left_cam.setBoardSocket(dai.CameraBoardSocket.LEFT)
-right_cam.setBoardSocket(dai.CameraBoardSocket.RIGHT)
-left_cam.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
-right_cam.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
+left_cam.setBoardSocket(dai.CameraBoardSocket.CAM_B)
+right_cam.setBoardSocket(dai.CameraBoardSocket.CAM_C)
+
 
 # Configure color camera
-color_cam.setBoardSocket(dai.CameraBoardSocket.RGB)
-color_cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
+color_cam.setBoardSocket(dai.CameraBoardSocket.CAM_A)
 color_cam.setIspScale(2, 3)  # Reduce resolution if needed
 
 # Linking cameras to outputs
