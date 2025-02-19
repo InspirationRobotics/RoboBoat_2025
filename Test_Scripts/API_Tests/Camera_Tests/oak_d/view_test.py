@@ -6,58 +6,51 @@ import numpy as np
 pipeline = dai.Pipeline()
 
 # Create nodes for left, right, and color cameras
-left_cam = pipeline.create(dai.node.MonoCamera)
-right_cam = pipeline.create(dai.node.MonoCamera)
-color_cam = pipeline.create(dai.node.ColorCamera)
+CAM_A = pipeline.create(dai.node.ColorCamera)
+CAM_B= pipeline.create(dai.node.ColorCamera)
+CAM_C = pipeline.create(dai.node.ColorCamera)
 
 # Create output nodes
-xout_left = pipeline.create(dai.node.XLinkOut)
-xout_right = pipeline.create(dai.node.XLinkOut)
-xout_color = pipeline.create(dai.node.XLinkOut)
+xout_A = pipeline.create(dai.node.XLinkOut)
+xout_B = pipeline.create(dai.node.XLinkOut)
+xout_C = pipeline.create(dai.node.XLinkOut)
 
 # Set stream names
-xout_left.setStreamName("left")
-xout_right.setStreamName("right")
-xout_color.setStreamName("color")
-
-# Configure left and right cameras (monochrome)
-left_cam.setBoardSocket(dai.CameraBoardSocket.CAM_B)
-right_cam.setBoardSocket(dai.CameraBoardSocket.CAM_C)
+xout_A.setStreamName("CAM_A")
+xout_B.setStreamName("CAM_B")
+xout_C.setStreamName("CAM_C")
 
 
 # Configure color camera
-color_cam.setBoardSocket(dai.CameraBoardSocket.CAM_A)
-color_cam.setIspScale(2, 3)  # Reduce resolution if needed
+CAM_A.setBoardSocket(dai.CameraBoardSocket.CAM_A)
+# CAM_A.setIspScale(2, 3)  # Reduce resolution if needed
+CAM_C.setBoardSocket(dai.CameraBoardSocket.CAM_C)
+CAM_B.setBoardSocket(dai.CameraBoardSocket.CAM_B)
 
-# Linking cameras to outputs
-left_cam.out.link(xout_left.input)
-right_cam.out.link(xout_right.input)
-color_cam.isp.link(xout_color.input)
+CAM_A.isp.link(xout_A.input)
+CAM_B.isp.link(xout_B.input)
+CAM_C.isp.link(xout_C.input)
 
 # Connect to the device and start the pipeline
 with dai.Device(pipeline) as device:
-    left_q = device.getOutputQueue(name="left", maxSize=4, blocking=False)
-    right_q = device.getOutputQueue(name="right", maxSize=4, blocking=False)
-    color_q = device.getOutputQueue(name="color", maxSize=4, blocking=False)
+    CAM_A_q = device.getOutputQueue(name="CAM_A", maxSize=4, blocking=False)
+    CAM_B_q = device.getOutputQueue(name="CAM_B", maxSize=4, blocking=False)
+    CAM_C_q = device.getOutputQueue(name="CAM_C", maxSize=4, blocking=False)
 
     print("Capturing images...")
 
-    # Get frames
-    left_frame = left_q.get().getCvFrame()
-    right_frame = right_q.get().getCvFrame()
-    color_frame = color_q.get().getCvFrame()
+    while (True):
+        # Get frames
+        camA_frame= CAM_A_q.get().getCvFrame()
+        camB_frame = CAM_B_q.get().getCvFrame()
+        camC_frame = CAM_C_q.get().getCvFrame()
 
-    # Save images
-    cv2.imwrite("left_camera.jpg", left_frame)
-    cv2.imwrite("right_camera.jpg", right_frame)
-    cv2.imwrite("color_camera.jpg", color_frame)
+        # Display images (optional)
+        cv2.imshow("Left Camera", camA_frame)
+        cv2.imshow("Right Camera", camB_frame)
+        cv2.imshow("Color Camera", camC_frame)
 
-    print("Images saved successfully!")
-
-    # Display images (optional)
-    cv2.imshow("Left Camera", left_frame)
-    cv2.imshow("Right Camera", right_frame)
-    cv2.imshow("Color Camera", color_frame)
-
-    cv2.waitKey(0)
+        if cv2.waitKey(1) == ord('q'):
+            break
+    
     cv2.destroyAllWindows()
