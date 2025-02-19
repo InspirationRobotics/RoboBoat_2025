@@ -29,13 +29,13 @@ xout_right.setStreamName("right")
 xout.setStreamName("disparity")
 
 # Configure left camera
-left_cam.setBoardSocket(dai.CameraBoardSocket.CAM_B)
+left_cam.setBoardSocket(dai.CameraBoardSocket.CAM_A)
 left_cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1200_P)
 left_cam.setCamera("left")
 left_cam.setIspScale(2, 3)
 
 # Configure right camera
-right_cam.setBoardSocket(dai.CameraBoardSocket.CAM_A)
+right_cam.setBoardSocket(dai.CameraBoardSocket.CAM_B)
 right_cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1200_P)
 right_cam.setCamera("right")
 right_cam.setIspScale(2, 3)
@@ -69,18 +69,18 @@ try:
     with dai.Device(pipeline) as device:
         # Retrieve camera calibration data
         intrinsic_dataB = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_B)
-        intrinsic_dataC = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_C)
+        intrinsic_dataA = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_A)
         focal_lengthB = intrinsic_dataB[0][0]
-        focal_lengthC = intrinsic_dataC[0][0]
+        focal_lengthA = intrinsic_dataA[0][0]
 
-        print("Cam B focal length in pixels:", focal_lengthC)
-        print("Cam C focal length in pixels:", focal_lengthC)
+        print("Cam B focal length in pixels:", focal_lengthA)
+        print("Cam C focal length in pixels:", focal_lengthA)
         left_q = device.getOutputQueue(name="left", maxSize=4, blocking=False)
         right_q = device.getOutputQueue(name="right", maxSize=4, blocking=False)
         q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
 
-        cv2.namedWindow("Depth Map")
-        cv2.setMouseCallback("Depth Map", on_mouse)
+        cv2.namedWindow("raw disparity")
+        cv2.setMouseCallback("raw disparity", on_mouse)
 
         while True:
             try:
@@ -91,19 +91,17 @@ try:
                 # Get disparity frame
                 in_disparity = q.get()
                 disparity_map = in_disparity.getCvFrame()
+                max_disparity = stereo.initialConfig.getMaxDisparity()
 
-                cv2.imshow("raw disparity", in_disparity.getCvFrame())
+
+                normalized_disparity = (disparity_map * (255 / max_disparity)).astype(np.uint8)
+                #disparity_map = cv2.applyColorMap(depth_normalized, cv2.COLORMAP_JET)
+
+                cv2.imshow("raw disparity", normalized_disparity)
                 
                 # Compute depth map
-                depth_map = (focal_lengthC * 15) / np.maximum(disparity_map, 0.001) # divide by 32 because subpixel is on, scale back down
+                depth_map = (focal_lengthA * 15) / np.maximum(disparity_map, 0.001) 
                 depth_map = np.clip(depth_map, 0, 3000)  # Limit depth to 30m
-
-                # Normalize disparity for visualization
-                max_disparity = stereo.initialConfig.getMaxDisparity()
-                depth_normalized = (disparity_map * (255 / max_disparity)).astype(np.uint8)
-                depth_colored = cv2.applyColorMap(depth_normalized, cv2.COLORMAP_JET)
-                
-                cv2.imshow("Depth Map", depth_colored)
                 
                 if cv2.waitKey(1) == ord('q'):
                     break
