@@ -25,19 +25,20 @@ class GPSVisualizer:
         heading_offset (float, kwarg): Heading offset of the GPS to take into account in visualizer, defaults to 0.
     """
 
-    def __init__(self, file_path : Path | str, *, zoom : int = 19, playback_speed : int = 10, frame_size : int = 600, heading_offset : float = 0):
-        self.target = {}
-        self.position = {}
-        self.heading = {}
-
-        dp = GPSDataParser(file_path)
-        self.position, self.heading = dp.parse_data()
-        
-        self.playback_speed = playback_speed
-        self.zoom = zoom
-        self.frame_size = frame_size
-        self.heading_offset = heading_offset
-        self.get_map()
+    
+    def __init__(self, file_path: Path, str, *, zoom: int = 19, playback_speed: int = 10, frame_size: int = 600, heading_offset: float = 0):
+            self.target = {}
+            self.position = {}
+            self.heading = {}
+    
+            dp = GPSDataParser(file_path)
+            self.position, self.heading = dp.parse_data()
+            
+            self.playback_speed = playback_speed
+            self.zoom = zoom
+            self.frame_size = frame_size
+            self.heading_offset = heading_offset
+            self.get_map()
         
     def get_map(self, save : bool = False):
         lat, lon = self.position[next(iter(self.position))]

@@ -5,6 +5,7 @@ waypoints over time.
 """
 
 from pathlib import Path
+from typing import Union
 
 class GPSDataParser:
     """
@@ -14,7 +15,7 @@ class GPSDataParser:
         file_path (Path(str)): A Path object that takes in a string. That string is the relative file path from the directory of the execution.
     """
 
-    def __init__(self, file_path : Path | str):
+    def __init__(self, file_path : Union[Path, str]):
         if isinstance(file_path, str):
             file_path = Path(file_path)
         self.file_path = file_path
