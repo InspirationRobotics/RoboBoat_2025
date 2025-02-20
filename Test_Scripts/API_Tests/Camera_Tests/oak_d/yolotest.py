@@ -13,6 +13,9 @@ import depthai as dai
 import numpy as np
 import time
 
+# TODO: The confidence level when using the cross model is oddly hight, need to find out why
+# Also the camera can't detect the label when it's far away, we need to train new model so it can see the cross from far away
+
 # Get yolo v8n model blob file path
 nnPath = str((Path(__file__).parent / Path('../../../../Perception/Models/cross model/best_openvino_2022.1_6shave.blob')).resolve().absolute())
 if not Path(nnPath).exists():
@@ -84,6 +87,7 @@ with dai.Device(pipeline) as device:
     def displayFrame(name, frame):
         color = (255, 0, 0)
         for detection in detections:
+            # TODO: Investigate into the label index.
             print(f"label index: {detection.label}")
             bbox = frameNorm(frame, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
             print(bbox)

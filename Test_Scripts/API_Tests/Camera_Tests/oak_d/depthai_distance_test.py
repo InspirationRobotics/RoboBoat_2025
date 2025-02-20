@@ -93,6 +93,9 @@ try:
                 # Get disparity frame
                 in_disparity = q.get()
                 disparity_map = in_disparity.getCvFrame()
+                #The return value in the disparity map doesn't make sense, when you hover over the disparity map window, the disparity is 
+                # too large(2000 as the return), while the real camera disparity of that object is only 50
+                # TODO: Find the meaning of the disparity map return, and concert it to what we need, in pixel
                 max_disparity = stereo.initialConfig.getMaxDisparity()
 
                 normalized_disparity = (disparity_map * (255 / max_disparity)).astype(np.uint8)
