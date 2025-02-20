@@ -11,7 +11,8 @@ import cv2
 import numpy as np
 from pathlib import Path
 from API.GPS.waypoint_data_parser import GPSDataParser
-from datetime import datetime
+from datetime import datetime\
+from typing import Union
 
 class GPSVisualizer:
     """
