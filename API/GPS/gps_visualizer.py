@@ -26,7 +26,7 @@ class GPSVisualizer:
     """
 
     
-def __init__(self, file_path: Union[Path, str], *, zoom: int = 19, playback_speed: int = 10, frame_size: int = 600, heading_offset: float = 0):
+def __init__(self, file_path: Path, str, *, zoom: int = 19, playback_speed: int = 10, frame_size: int = 600, heading_offset: float = 0):
         self.target = {}
         self.position = {}
         self.heading = {}
