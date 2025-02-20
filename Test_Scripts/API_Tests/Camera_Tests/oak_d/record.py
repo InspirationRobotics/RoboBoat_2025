@@ -1,67 +1,42 @@
 #!/usr/bin/env python3
 
-import time
-from pathlib import Path
-import cv2
 import depthai as dai
 
 # Create pipeline
 pipeline = dai.Pipeline()
 
+# Define sources and output
 camRgb = pipeline.create(dai.node.ColorCamera)
-camRgb.setBoardSocket(dai.CameraBoardSocket.CAM_A)
-camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_4_K)
+videoEnc = pipeline.create(dai.node.VideoEncoder)
+xout = pipeline.create(dai.node.XLinkOut)
 
-xoutRgb = pipeline.create(dai.node.XLinkOut)
-xoutRgb.setStreamName("rgb")
-camRgb.video.link(xoutRgb.input)
-
-xin = pipeline.create(dai.node.XLinkIn)
-xin.setStreamName("control")
-xin.out.link(camRgb.inputControl)
+xout.setStreamName('h265')
 
 # Properties
-videoEnc = pipeline.create(dai.node.VideoEncoder)
-videoEnc.setDefaultProfilePreset(1, dai.VideoEncoderProperties.Profile.MJPEG)
-camRgb.still.link(videoEnc.input)
+camRgb.setBoardSocket(dai.CameraBoardSocket.CAM_A)
+camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1200_P)
+videoEnc.setDefaultProfilePreset(30, dai.VideoEncoderProperties.Profile.H265_MAIN)
 
 # Linking
-xoutStill = pipeline.create(dai.node.XLinkOut)
-xoutStill.setStreamName("still")
-videoEnc.bitstream.link(xoutStill.input)
+camRgb.video.link(videoEnc.input)
+videoEnc.bitstream.link(xout.input)
 
 # Connect to device and start pipeline
 with dai.Device(pipeline) as device:
 
-    # Output queue will be used to get the rgb frames from the output defined above
-    qRgb = device.getOutputQueue(name="rgb", maxSize=30, blocking=False)
-    qStill = device.getOutputQueue(name="still", maxSize=30, blocking=True)
-    qControl = device.getInputQueue(name="control")
+    # Output queue will be used to get the encoded data from the output defined above
+    q = device.getOutputQueue(name="h265", maxSize=30, blocking=True)
 
-    # Make sure the destination path is present before starting to store the examples
-    dirName = "rgb_data"
-    Path(dirName).mkdir(parents=True, exist_ok=True)
+    # The .h265 file is a raw stream file (not playable yet)
+    with open('video.h265', 'wb') as videoFile:
+        print("Press Ctrl+C to stop encoding...")
+        try:
+            while True:
+                h265Packet = q.get()  # Blocking call, will wait until a new data has arrived
+                h265Packet.getData().tofile(videoFile)  # Appends the packet data to the opened file
+        except KeyboardInterrupt:
+            # Keyboard interrupt (Ctrl + C) detected
+            pass
 
-    while True:
-        inRgb = qRgb.tryGet()  # Non-blocking call, will return a new data that has arrived or None otherwise
-        if inRgb is not None:
-            frame = inRgb.getCvFrame()
-            # 4k / 4
-            frame = cv2.pyrDown(frame)
-            frame = cv2.pyrDown(frame)
-            cv2.imshow("rgb", frame)
-
-        if qStill.has():
-            fName = f"{dirName}/{int(time.time() * 1000)}.jpeg"
-            with open(fName, "wb") as f:
-                f.write(qStill.get().getData())
-                print('Image saved to', fName)
-
-        key = cv2.waitKey(1)
-        if key == ord('q'):
-            break
-        elif key == ord('c'):
-            ctrl = dai.CameraControl()
-            ctrl.setCaptureStill(True)
-            qControl.send(ctrl)
-            print("Sent 'still' event to the camera!")
+    print("To view the encoded data, convert the stream file (.h265) into a video file (.mp4) using a command below:")
+    print("ffmpeg -framerate 30 -i video.h265 -c copy video.mp4")
