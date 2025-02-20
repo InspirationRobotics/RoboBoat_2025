@@ -5,58 +5,136 @@ import depthai as dai
 import numpy as np
 
 # Closer-in minimum depth, disparity range is doubled (from 95 to 190):
-extended_disparity = False
+extended_disparity = True
 # Better accuracy for longer distance, fractional disparity 32-levels:
-subpixel = False
+subpixel = True
 # Better handling for occlusions:
 lr_check = True
+
+enableRectified = False
 
 # Create pipeline
 pipeline = dai.Pipeline()
 
 # Define sources and outputs
-monoLeft = pipeline.create(dai.node.MonoCamera)
-monoRight = pipeline.create(dai.node.MonoCamera)
-depth = pipeline.create(dai.node.StereoDepth)
-xout = pipeline.create(dai.node.XLinkOut)
+left = pipeline.create(dai.node.ColorCamera)
+center = pipeline.create(dai.node.ColorCamera)
+right = pipeline.create(dai.node.ColorCamera)
+LC_depth = pipeline.create(dai.node.StereoDepth)
+LR_depth = pipeline.create(dai.node.StereoDepth)
+CR_depth = pipeline.create(dai.node.StereoDepth)
 
-xout.setStreamName("disparity")
+
+xout_LC = pipeline.create(dai.node.XLinkOut)
+xout_LR = pipeline.create(dai.node.XLinkOut)
+xout_CR = pipeline.create(dai.node.XLinkOut)
+
+xout_LC.setStreamName("disparity_LC")
+if enableRectified:
+    xoutl_LC = pipeline.create(dai.node.XLinkOut)
+    xoutr_LC = pipeline.create(dai.node.XLinkOut)
+    xoutl_LC.setStreamName("rectifiedLeft_LC")
+    xoutr_LC.setStreamName("rectifiedRight_LC")
+
+
+xout_LR.setStreamName("disparity_LR")
+if enableRectified:
+    xoutl_LR = pipeline.create(dai.node.XLinkOut)
+    xoutr_LR = pipeline.create(dai.node.XLinkOut)
+    xoutl_LR.setStreamName("rectifiedLeft_LR")
+    xoutr_LR.setStreamName("rectifiedRight_LR")
+
+xout_CR.setStreamName("disparity_CR")
+if enableRectified:
+    xoutl_CR = pipeline.create(dai.node.XLinkOut)
+    xoutr_CR = pipeline.create(dai.node.XLinkOut)
+    xoutl_CR.setStreamName("rectifiedLeft_CR")
+    xoutr_CR.setStreamName("rectifiedRight_CR")
+    xoutr_CR.initialConfig.setMedianFilter(dai.MedianFilter.KERNEL_7x7)
 
 # Properties
-monoLeft.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
-monoLeft.setCamera("left")
-monoRight.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
-monoRight.setCamera("right")
+left.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1200_P)
+left.setCamera("left")
+left.setIspScale(2, 3)
 
-# Create a node that will produce the depth map (using disparity output as it's easier to visualize depth this way)
-depth.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.HIGH_DENSITY)
-# Options: MEDIAN_OFF, KERNEL_3x3, KERNEL_5x5, KERNEL_7x7 (default)
-depth.initialConfig.setMedianFilter(dai.MedianFilter.KERNEL_7x7)
-depth.setLeftRightCheck(lr_check)
-depth.setExtendedDisparity(extended_disparity)
-depth.setSubpixel(subpixel)
+center.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1200_P)
+center.setBoardSocket(dai.CameraBoardSocket.CENTER)
+center.setIspScale(2, 3)
 
-# Create a colormap
-colormap = pipeline.create(dai.node.ImageManip)
-colormap.initialConfig.setColormap(dai.Colormap.STEREO_TURBO, depth.initialConfig.getMaxDisparity())
-colormap.initialConfig.setFrameType(dai.ImgFrame.Type.NV12)
+right.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1200_P)
+right.setCamera("right")
+right.setIspScale(2, 3)
+
+LC_depth.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
+LC_depth.initialConfig.setMedianFilter(dai.MedianFilter.MEDIAN_OFF)   #POST PROCESSING
+LC_depth.setLeftRightCheck(lr_check)
+LC_depth.setExtendedDisparity(extended_disparity)
+LC_depth.setSubpixel(subpixel)
+
+LR_depth.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
+LR_depth.initialConfig.setMedianFilter(dai.MedianFilter.MEDIAN_OFF)
+LR_depth.setLeftRightCheck(lr_check)
+LR_depth.setExtendedDisparity(extended_disparity)
+LR_depth.setSubpixel(subpixel)
+
+CR_depth.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
+CR_depth.initialConfig.setMedianFilter(dai.MedianFilter.MEDIAN_OFF)
+CR_depth.setLeftRightCheck(lr_check)
+CR_depth.setExtendedDisparity(extended_disparity)
+CR_depth.setSubpixel(subpixel)
 
 # Linking
-monoLeft.out.link(depth.left)
-monoRight.out.link(depth.right)
-depth.disparity.link(colormap.inputImage)
-colormap.out.link(xout.input)
+# LC
+left.isp.link(LC_depth.left)
+center.isp.link(LC_depth.right)
+LC_depth.depth.link(xout_LC.input)
+if enableRectified:
+    LC_depth.rectifiedLeft.link(xoutl_LC.input)
+    LC_depth.rectifiedRight.link(xoutr_LC.input)
+# LR
+left.isp.link(LR_depth.left)
+right.isp.link(LR_depth.right)
+LR_depth.depth.link(xout_LR.input)
+if enableRectified:
+    LR_depth.rectifiedLeft.link(xoutl_LR.input)
+    LR_depth.rectifiedRight.link(xoutr_LR.input)
+# CR
+center.isp.link(CR_depth.left)
+right.isp.link(CR_depth.right)
+CR_depth.depth.link(xout_CR.input)
+if enableRectified:
+    CR_depth.rectifiedLeft.link(xoutl_CR.input)
+    CR_depth.rectifiedRight.link(xoutr_CR.input)
+
+maxDisp = LC_depth.initialConfig.getMaxDisparity()
+
+def on_mouse(event, x, y, flags, param):
+    if event == cv2.EVENT_MOUSEMOVE:
+        value = frame[y,x]
+        if value is not None:
+            print(f"Depth at ({x}, {y}): {value/1000} meters", end="\r")
 
 # Connect to device and start pipeline
 with dai.Device(pipeline) as device:
+    cv2.namedWindow("disparity_LC")
+    cv2.namedWindow("disparity_CR")
+    cv2.namedWindow("disparity_LR")
 
-    # Output queue will be used to get the disparity frames from the outputs defined above
-    q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
-
-    while True:
-        inDisparity = q.get()  # blocking call, will wait until a new data has arrived
-        frame = inDisparity.getCvFrame()
-        cv2.imshow("disparity", frame)
-
+    cv2.setMouseCallback("disparity_LC", on_mouse)
+    cv2.setMouseCallback("disparity_CR", on_mouse)
+    cv2.setMouseCallback("disparity_LR", on_mouse)
+    while not device.isClosed():
+        queueNames = device.getQueueEvents()
+        for q in queueNames:
+            message = device.getOutputQueue(q).get()
+            # Display arrived frames
+            if type(message) == dai.ImgFrame:
+                frame = message.getCvFrame()
+                if 'disparity' in q:
+                    disp = (frame * (255.0 / maxDisp)).astype(np.uint8)
+                    disp = cv2.applyColorMap(disp, cv2.COLORMAP_JET)
+                    cv2.imshow(q, disp)
+                else:
+                    cv2.imshow(q, frame)
         if cv2.waitKey(1) == ord('q'):
             break

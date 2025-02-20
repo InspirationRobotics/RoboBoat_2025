@@ -52,7 +52,7 @@ stereo.setSubpixel(SUBPIXEL)
 # Link nodes for stereo
 left_cam.isp.link(stereo.left)
 right_cam.isp.link(stereo.right)
-stereo.disparity.link(xout.input)
+stereo.depth.link(xout.input)
 
 # Link nodes for individual camera 
 left_cam.isp.link(xout_left.input)
@@ -64,7 +64,7 @@ def on_mouse(event, x, y, flags, param):
         depth_value = depth_map[y, x] if 0 <= y < depth_map.shape[0] and 0 <= x < depth_map.shape[1] else None
         disparity_value = disparity_map[y, x] if 0 <= y < disparity_map.shape[0] and 0 <= x < disparity_map.shape[1] else None
         if depth_value is not None:
-            print(f"Disparity at ({x}, {y}): {disparity_value:.2f} pixels | Depth: {depth_value:.2f} cm", end="\r")
+            print(f"Disparity at ({x}, {y}): {disparity_value/1000:.2f} meter | Depth: {depth_value:.2f} cm", end="\r")
 
 
 try:
