@@ -36,10 +36,16 @@ depth.setLeftRightCheck(lr_check)
 depth.setExtendedDisparity(extended_disparity)
 depth.setSubpixel(subpixel)
 
+# Create a colormap
+colormap = pipeline.create(dai.node.ImageManip)
+colormap.initialConfig.setColormap(dai.Colormap.STEREO_TURBO, depth.initialConfig.getMaxDisparity())
+colormap.initialConfig.setFrameType(dai.ImgFrame.Type.NV12)
+
 # Linking
 monoLeft.out.link(depth.left)
 monoRight.out.link(depth.right)
-depth.disparity.link(xout.input)
+depth.disparity.link(colormap.inputImage)
+colormap.out.link(xout.input)
 
 # Connect to device and start pipeline
 with dai.Device(pipeline) as device:
@@ -49,15 +55,8 @@ with dai.Device(pipeline) as device:
 
     while True:
         inDisparity = q.get()  # blocking call, will wait until a new data has arrived
-        frame = inDisparity.getFrame()
-        # Normalization for better visualization
-        frame = (frame * (255 / depth.initialConfig.getMaxDisparity())).astype(np.uint8)
-
+        frame = inDisparity.getCvFrame()
         cv2.imshow("disparity", frame)
-
-        # Available color maps: https://docs.opencv.org/3.4/d3/d50/group__imgproc__colormap.html
-        frame = cv2.applyColorMap(frame, cv2.COLORMAP_JET)
-        cv2.imshow("disparity_color", frame)
 
         if cv2.waitKey(1) == ord('q'):
             break

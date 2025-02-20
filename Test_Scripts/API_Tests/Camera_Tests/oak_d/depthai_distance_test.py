@@ -22,11 +22,13 @@ stereo = pipeline.create(dai.node.StereoDepth)
 xout_left = pipeline.create(dai.node.XLinkOut)
 xout_right = pipeline.create(dai.node.XLinkOut)
 xout = pipeline.create(dai.node.XLinkOut)
+xout_depth = pipeline.create(dai.node.XLinkOut)
 
 # Set stream name
 xout_left.setStreamName("left")
 xout_right.setStreamName("right")
 xout.setStreamName("disparity")
+xout_depth.setStreamName("depth")
 
 # Configure left camera
 left_cam.setBoardSocket(dai.CameraBoardSocket.CAM_A)
@@ -92,7 +94,6 @@ try:
                 in_disparity = q.get()
                 disparity_map = in_disparity.getCvFrame()
                 max_disparity = stereo.initialConfig.getMaxDisparity()
-
 
                 normalized_disparity = (disparity_map * (255 / max_disparity)).astype(np.uint8)
                 #disparity_map = cv2.applyColorMap(depth_normalized, cv2.COLORMAP_JET)

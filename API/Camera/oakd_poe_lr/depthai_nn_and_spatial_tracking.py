@@ -16,21 +16,21 @@ Spatial Tiny-yolo example
 '''
 
 # Get argument first
-nnBlobPath = str((Path(__file__).parent / Path('../../../Perception/best_openvino_2022.1_6shave.blob')).resolve().absolute())
+nnBlobPath = str((Path(__file__).parent / Path('../../../Perception/Models/cross model/best_openvino_2022.1_6shave.blob')).resolve().absolute())
 #conditionals below might not be necessary since we're using yolov8
-if 1 < len(sys.argv):
-    arg = sys.argv[1]
-    if arg == "yolo3":
-        nnBlobPath = str((Path(__file__).parent / Path('../models/yolo-v3-tiny-tf_openvino_2021.4_6shave.blob')).resolve().absolute())
-    elif arg == "yolo4":
-        nnBlobPath = str((Path(__file__).parent / Path('../models/yolo-v4-tiny-tf_openvino_2021.4_6shave.blob')).resolve().absolute())
-    else:
-        nnBlobPath = arg
-else:
-    print("Using Tiny YoloV4 model. If you wish to use Tiny YOLOv3, call 'tiny_yolo.py yolo3'")
+# if 1 < len(sys.argv):
+#     arg = sys.argv[1]
+#     if arg == "yolo3":
+#         nnBlobPath = str((Path(__file__).parent / Path('../../../Perception/Models/cross model/best_openvino_2022.1_6shave.blob')).resolve().absolute())
+#     elif arg == "yolo4":
+#         nnBlobPath = str((Path(__file__).parent / Path('../../../Perception/Models/cross model/best_openvino_2022.1_6shave.blob')).resolve().absolute())
+#     else:
+#         nnBlobPath = arg
+# else:
+#     print("Using Tiny YoloV4 model. If you wish to use Tiny YOLOv3, call 'tiny_yolo.py yolo3'")
 
 if not Path(nnBlobPath).exists():
-    import sys
+    print(Path(nnBlobPath))
     raise FileNotFoundError(f'Required file/s not found, please run "{sys.executable} install_requirements.py"')
 
 # Tiny yolo v3/4 label texts
@@ -74,15 +74,15 @@ xoutDepth.setStreamName("depth")
 nnNetworkOut.setStreamName("nnNetwork")
 
 # Properties
-camRgb.setPreviewSize(416, 416)
+camRgb.setPreviewSize(640, 480)
 camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
 camRgb.setInterleaved(False)
 camRgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
 
-colorLeft.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
+# colorLeft.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
 colorLeft.setCamera("left")
 colorLeft.setIspScale(2,3)
-colorRight.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
+# colorRight.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
 colorRight.setCamera("right")
 colorRight.setIspScale(2,3)
 
@@ -101,7 +101,7 @@ spatialDetectionNetwork.setDepthLowerThreshold(100)
 spatialDetectionNetwork.setDepthUpperThreshold(5000)
 
 # Yolo specific parameters
-spatialDetectionNetwork.setNumClasses(80)
+spatialDetectionNetwork.setNumClasses(1)
 spatialDetectionNetwork.setCoordinateSize(4)
 spatialDetectionNetwork.setAnchors([10,14, 23,27, 37,58, 81,82, 135,169, 344,319])
 spatialDetectionNetwork.setAnchorMasks({ "side26": [1,2,3], "side13": [3,4,5] })
