@@ -5,6 +5,7 @@ waypoints over time.
 """
 
 from pathlib import Path
+from typing import Union
 
 class GPSDataParser:
     """
