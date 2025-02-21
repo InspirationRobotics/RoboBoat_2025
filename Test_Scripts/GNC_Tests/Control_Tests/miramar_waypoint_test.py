@@ -70,7 +70,7 @@ def main(waypoint_file: str, calculate_rate=0.1, send_rate=0.1):
 
     # Execute waypoints for a fixed number of iterations
     for _ in range(iterations):
-        for lat, lon, heading in waypoints:  
+        for lat, lon in waypoints:
             motors.desired_position = (lat, lon)
             motors.lat_lon_navigation(lat, lon)
 
