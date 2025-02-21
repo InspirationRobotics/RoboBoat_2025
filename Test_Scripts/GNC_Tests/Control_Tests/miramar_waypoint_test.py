@@ -82,7 +82,7 @@ def main(waypoint_file: str, calculate_rate=0.1, send_rate=0.1):
     print("[MOTOR CORE] Navigation completed.")
 
 # Run navigation
-main(waypoint_file="/API/GPS/waypoint_data/20250220_miramar_testingcoordinates.csv")
+main(waypoint_file="/API/GPS/waypoint_data/20250221_backyardpool_3point.csv")
 
 # Exit after navigation
 motors.exit()
