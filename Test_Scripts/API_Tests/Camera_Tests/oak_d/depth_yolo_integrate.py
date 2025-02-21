@@ -119,8 +119,6 @@ detectionNetwork.setCoordinateSize(4)
 detectionNetwork.setIouThreshold(0.5)
 detectionNetwork.setBlobPath(nnPath)
 detectionNetwork.setNumInferenceThreads(2)
-detectionNetwork.setNumShaves(3)  # TODO need to test this
-detectionNetwork.setNumMemorySlices(3)
 detectionNetwork.input.setBlocking(False)
 
 
@@ -140,7 +138,7 @@ stereo.depth.link(xoutDepth.input)
 
 maxDisp = stereo.initialConfig.getMaxDisparity()
 
-# defin mouse callback
+# define mouse callback
 def on_mouse(event, x, y, flags, param):
     if event == cv2.EVENT_MOUSEMOVE:
         value = depth_map[y,x]
@@ -152,9 +150,9 @@ with dai.Device(pipeline) as device:
     cv2.namedWindow("depth")
     cv2.namedWindow("combined")
     cv2.namedWindow("rgb")
-    cv2.setMouseCallback("depth", on_mouse)
-    cv2.setMouseCallback("combined", on_mouse)
-    cv2.setMouseCallback("rgb", on_mouse)
+    # cv2.setMouseCallback("depth", on_mouse)
+    # cv2.setMouseCallback("combined", on_mouse)
+    # cv2.setMouseCallback("rgb", on_mouse)
 
 
     # Output queues will be used to get the rgb frames and nn data from the outputs defined above
@@ -182,7 +180,7 @@ with dai.Device(pipeline) as device:
             # print(f"label index: {detection.label}")
             bbox = frameNorm(frame, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
             # print(bbox)
-            cv2.putText(frame, labelMap[detection.label-1], (bbox[0] + 10, bbox[1] + 20), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)  # I added -1 because the label is one whne I only have one detect object
+            cv2.putText(frame, labelMap[detection.label], (bbox[0] + 10, bbox[1] + 20), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)  # I added -1 because the label is one whne I only have one detect object
             cv2.putText(frame, f"{int(detection.confidence * 100)}%", (bbox[0] + 10, bbox[1] + 40), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
             cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
         # Show the frame
@@ -217,5 +215,13 @@ with dai.Device(pipeline) as device:
             displayFrame("rgb", frame)
             displayFrame("combined", depth_normalized)
 
-        if cv2.waitKey(1) == ord('q'):
+        key = cv2.waitKey(1)
+        if key == ord('q'):
             break
+        elif key == ord('s'):
+            for dect in detections:
+                print(f"label: {dect.label}")
+                print(f"confidence: {dect.confidence}")
+                print(f"xmin: {dect.xmin}")
+
+                print("\n")

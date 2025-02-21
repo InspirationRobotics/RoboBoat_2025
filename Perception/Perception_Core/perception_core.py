@@ -7,8 +7,9 @@ from threading import Thread, Lock
 from multiprocessing import Process, Value
 import numpy as np
 from API.Camera.oakd_poe_lr.oakd_api import OAKD_LR
+import cv2
 
-
+# TODO figure out threading, the program is unacceptably slow
 class Camera:
     def __init__(self,model_path:str, labelMap:list):
         self.cam        = OAKD_LR(model_path=model_path, labelMap=labelMap)
@@ -16,10 +17,11 @@ class Camera:
         self.labelMap   = labelMap
 
         # cv frame from camera
-        self.Rgb,self.Det,self.Depth = None
         # Rgb and Depth are cv frame, Det is list containing object information
+        self.Rgb    = None
+        self.Det    = None
+        self.Depth  = None
 
-        # 
         pass
     
     def _info(self,message:str):
@@ -32,16 +34,15 @@ class Camera:
         print(f"OAK_D LR Info: {message}")
     def _getView(self):
         self.inRgb,self.inDepth = self.cam.getBuffers()
+        return self.inRgb, self.inDepth
     
-    def __frameNorm(self,frame,bbox):
-        # bounding box, value from 0~1 tl->top left | bl->buttom left bbox=(tlx,tly,blx,bly)
-        # We are converting the bbox values from percentage to pixels
-        normVals = np.full(len(bbox), frame.shape[0])
-        normVals[::2] = frame.shape[1]
-        return (np.clip(np.array(bbox), 0, 1) * normVals).astype(int)
+    def __frameNorm(self,frame, bbox):
+            normVals = np.full(len(bbox), frame.shape[0])
+            normVals[::2] = frame.shape[1]
+            return (np.clip(np.array(bbox), 0, 1) * normVals).astype(int)
 
     def start(self):
-        self.cam_thread = Thread(target=self.cam.startCapture())
+        self.cam_thread = Thread(target=self.cam.startCapture)
         self.cam_thread.start()
         self._info("Camera capture started")
 
@@ -55,6 +56,7 @@ class Camera:
 
     def getObjectDepth(self) ->list:
         """This function get the depth of detected object and return them"""
+        # TODO create a smaller bbox to find the average depth
         detections = self.cam.getDetection()
 
         result = []
@@ -63,10 +65,31 @@ class Camera:
             result.append(
                 {
                     "label": detection.label, # this is the index of the object on label map
-                    "bbox" : self.frameNorm(self.Depth,(detection.xmin, detection.ymin, detection.xmax, detection.ymax)) 
+                    "bbox" : self.__frameNorm(self.Depth,(detection.xmin, detection.ymin, detection.xmax, detection.ymax)) 
                 }
             )
         
         return result
+    
+
+    def visualize(self):
+        """This return a labeled cv2 frame for visualizaiton"""
+        RGB, DEPTH = self._getView()
+        if(RGB is None):
+            return None
+        color = (255, 0, 0)
+        try:
+            for detection in self.cam.getDetection():
+                # TODO: Investigate into the label index.
+                # print(f"label index: {detection.label}")
+                bbox = self.__frameNorm(RGB, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
+                # print(bbox)
+                cv2.putText(RGB, self.labelMap[detection.label], (bbox[0] + 10, bbox[1] + 20), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)  # I added -1 because the label is one whne I only have one detect object
+                cv2.putText(RGB, f"{int(detection.confidence * 100)}%", (bbox[0] + 10, bbox[1] + 40), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
+                cv2.rectangle(RGB, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
+        except Exception as e:
+            print(f"Failed to detect Error: {e}")
+
+        return RGB
     
         
