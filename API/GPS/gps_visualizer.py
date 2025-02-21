@@ -12,6 +12,7 @@ import numpy as np
 from pathlib import Path
 from API.GPS.waypoint_data_parser import GPSDataParser
 from datetime import datetime
+from typing import Union
 
 class GPSVisualizer:
     """
@@ -26,7 +27,7 @@ class GPSVisualizer:
     """
 
     
-    def __init__(self, file_path: Path, str, *, zoom: int = 19, playback_speed: int = 10, frame_size: int = 600, heading_offset: float = 0):
+    def __init__(self, file_path: Union[Path, str], *, zoom: int = 19, playback_speed: int = 10, frame_size: int = 600, heading_offset: float = 0):
             self.target = {}
             self.position = {}
             self.heading = {}
