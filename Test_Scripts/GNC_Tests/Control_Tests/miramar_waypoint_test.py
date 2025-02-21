@@ -92,6 +92,7 @@ def main(waypoint_file: str, calculate_rate=0.1, send_rate=0.1):
     print("[MOTOR CORE] Navigation completed.")
 
 # Run navigation
+load_waypoints(waypoint_file="20250221_backyardpool_3point.csv")
 main(waypoint_file="20250221_backyardpool_3point.csv")
 
 # Exit after navigation
