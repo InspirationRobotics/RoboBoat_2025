@@ -44,7 +44,7 @@ def has_reached_target(motors, tolerance=2.0) -> bool:
         motors.exit()
         return False
     
-    distance_to_target = gis_funcs.distance(
+    distance_to_target = gis_funcs.haversine(
         current_position[0], current_position[1],
         motors.desired_position[0], motors.desired_position[1]
     )
