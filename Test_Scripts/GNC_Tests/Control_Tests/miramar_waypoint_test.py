@@ -1,6 +1,7 @@
 import queue
 import time
 import threading
+from typing import List, Tuple
 from GNC.Control_Core import motor_core
 from GNC.Nav_Core import gis_funcs
 
