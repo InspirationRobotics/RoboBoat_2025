@@ -17,7 +17,7 @@ time.sleep(5)
 # Number of times to iterate through waypoints
 iterations = 3
 
-def load_waypoints(file_path: str) -> List[Tuple[float, float, float]]:
+def load_waypoints(file_path: str) -> List[Tuple[float, float]]:
     """
     Load waypoints (latitude, longitude, heading) from a CSV file.
     Args:
@@ -31,7 +31,7 @@ def load_waypoints(file_path: str) -> List[Tuple[float, float, float]]:
         for row in reader:
             lat = float(row['latitude'])
             lon = float(row['longitude'])
-            waypoints.append((lat, lon, heading))
+            waypoints.append((lat, lon))
     return waypoints
 
 def has_reached_target(motors, tolerance=2.0) -> bool:
