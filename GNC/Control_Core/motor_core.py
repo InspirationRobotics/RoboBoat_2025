@@ -72,63 +72,63 @@ class MotorCore():
     ----------------- FUNCTIONS WITH GPS WAYPOINT NAVIGATION/Kalman Filter/Control Loop [NEEDS TESTING] -----------------
     """
     def load_waypoints(self, file_path: str) -> List[Tuple[float, float, float]]:
-    """
-    Load waypoints (latitude, longitude, heading) from a CSV file.
-    Args:
-        file_path (str): Path to the data file.
-    Returns:
-        List[Tuple[float, float, float]]: List of waypoints (latitude, longitude, heading).
-    """
-    waypoints = []
-    with open(file_path, 'r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            lat = float(row['latitude'])
-            lon = float(row['longitude'])
-            heading = float(row['heading'])
-            waypoints.append((lat, lon, heading))
-    return waypoints
-
-def execute_waypoints(self, waypoints: List[Tuple[float, float, float]]):
-    """
-    Navigate to each waypoint sequentially.
-    Args:
-        waypoints (List[Tuple[float, float, float]]): List of waypoints (latitude, longitude, heading).
-    """
-    for lat, lon, heading in waypoints:
-        self.desired_position = (lat, lon)  # Set the desired position
-        self.desired_heading = heading       # Set the desired heading
-        print(f"Navigating to waypoint: {lat}, {lon}, heading: {heading}")
-        
-        # Navigation logic (you might need to implement actual movement logic here)
-        self.lat_lon_navigation(lat, lon)
-        # Wait until the vehicle reaches the waypoint
-        while not self.has_reached_target():
-            time.sleep(0.1)
-        print(f"Reached waypoint: {lat}, {lon}, heading: {heading}")
-
- def has_reached_target(self, tolerance=2.0, heading_tolerance=5.0) -> bool:
         """
-        Check if the vehicle has reached the target position and heading.
+        Load waypoints (latitude, longitude, heading) from a CSV file.
         Args:
-            tolerance (float): Distance tolerance in meters.
-            heading_tolerance (float): Heading tolerance in degrees.
+            file_path (str): Path to the data file.
         Returns:
-            bool: True if the target is reached, False otherwise.
+            List[Tuple[float, float, float]]: List of waypoints (latitude, longitude, heading).
         """
-        current_position = self.position_data["current_position"]
-        current_heading = self.position_data["current_heading"]
-        if current_position is None or current_heading is None:
-            return False
-        distance_to_target = gis_funcs.distance(
-            current_position[0], current_position[1],
-            self.desired_position[0], self.desired_position[1]
-        )
-        heading_difference = abs(current_heading - self.desired_heading) % 360
-        heading_difference = min(heading_difference, 360 - heading_difference)
-        return distance_to_target <= tolerance and heading_difference <= heading_tolerance
+        waypoints = []
+        with open(file_path, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                lat = float(row['latitude'])
+                lon = float(row['longitude'])
+                heading = float(row['heading'])
+                waypoints.append((lat, lon, heading))
+        return waypoints
 
-    
+    def execute_waypoints(self, waypoints: List[Tuple[float, float, float]]):
+        """
+        Navigate to each waypoint sequentially.
+        Args:
+            waypoints (List[Tuple[float, float, float]]): List of waypoints (latitude, longitude, heading).
+        """
+        for lat, lon, heading in waypoints:
+            self.desired_position = (lat, lon)  # Set the desired position
+            self.desired_heading = heading       # Set the desired heading
+            print(f"Navigating to waypoint: {lat}, {lon}, heading: {heading}")
+            
+            # Navigation logic (you might need to implement actual movement logic here)
+            self.lat_lon_navigation(lat, lon)
+            # Wait until the vehicle reaches the waypoint
+            while not self.has_reached_target():
+                time.sleep(0.1)
+            print(f"Reached waypoint: {lat}, {lon}, heading: {heading}")
+
+    def has_reached_target(self, tolerance=2.0, heading_tolerance=5.0) -> bool:
+            """
+            Check if the vehicle has reached the target position and heading.
+            Args:
+                tolerance (float): Distance tolerance in meters.
+                heading_tolerance (float): Heading tolerance in degrees.
+            Returns:
+                bool: True if the target is reached, False otherwise.
+            """
+            current_position = self.position_data["current_position"]
+            current_heading = self.position_data["current_heading"]
+            if current_position is None or current_heading is None:
+                return False
+            distance_to_target = gis_funcs.distance(
+                current_position[0], current_position[1],
+                self.desired_position[0], self.desired_position[1]
+            )
+            heading_difference = abs(current_heading - self.desired_heading) % 360
+            heading_difference = min(heading_difference, 360 - heading_difference)
+            return distance_to_target <= tolerance and heading_difference <= heading_tolerance
+
+        
     def polar_waypoint_navigation(self, distance_theta, heading):
         """
         Navigate to a given point that is a certain number of meters away along a certain heading.
@@ -255,7 +255,7 @@ def execute_waypoints(self, waypoints: List[Tuple[float, float, float]]):
         print(f"[MOTOR CORE DEBUG] current position : {current_position}, target position : {self.desired_position}")
         print(f"[MOTOR CORE DEBUG] target_vector: {target_vector}, target_rotation: {target_rotation}, distance : {dist}")
         return target_vector, target_rotation, dist
-    
+        
     def parse_hold_logic(self, vector, rotation):
         # Pseudocode:
         # If the target rotation or vector is none, initialize as empty list/value
@@ -323,7 +323,7 @@ def execute_waypoints(self, waypoints: List[Tuple[float, float, float]]):
     # Calculate motor power thread will send to the control_loop thread. Will have a constant point where we want to go
     # (self.desired_position, heading, etc.), which will be passed into calc_motor_power(). Will deal with specifics for each later.
 
-     def main(self, waypoint_file: str, calculate_rate=0.1, send_rate=0.1, duration=None):
+    def main(self, waypoint_file: str, calculate_rate=0.1, send_rate=0.1, duration=None):
         """
         Main entry point to start navigation using a data file for waypoints.
         Args:
