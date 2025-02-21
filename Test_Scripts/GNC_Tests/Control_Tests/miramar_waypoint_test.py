@@ -31,7 +31,6 @@ def load_waypoints(file_path: str) -> List[Tuple[float, float, float]]:
         for row in reader:
             lat = float(row['latitude'])
             lon = float(row['longitude'])
-            heading = float(row['heading'])
             waypoints.append((lat, lon, heading))
     return waypoints
 
