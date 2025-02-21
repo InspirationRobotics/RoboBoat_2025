@@ -119,6 +119,8 @@ detectionNetwork.setCoordinateSize(4)
 detectionNetwork.setIouThreshold(0.5)
 detectionNetwork.setBlobPath(nnPath)
 detectionNetwork.setNumInferenceThreads(2)
+detectionNetwork.setNumShaves(3)  # TODO need to test this
+detectionNetwork.setNumMemorySlices(3)
 detectionNetwork.input.setBlocking(False)
 
 
