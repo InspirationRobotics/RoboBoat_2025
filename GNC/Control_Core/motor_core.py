@@ -8,7 +8,6 @@ import numpy as np
 import threading
 import queue
 import math
-import csv
 from typing import Tuple, List
 from GNC.Nav_Core import gis_funcs
 from GNC.Control_Core import sensor_fuse
@@ -71,64 +70,7 @@ class MotorCore():
     """
     ----------------- FUNCTIONS WITH GPS WAYPOINT NAVIGATION/Kalman Filter/Control Loop [NEEDS TESTING] -----------------
     """
-    def load_waypoints(self, file_path: str) -> List[Tuple[float, float, float]]:
-        """
-        Load waypoints (latitude, longitude, heading) from a CSV file.
-        Args:
-            file_path (str): Path to the data file.
-        Returns:
-            List[Tuple[float, float, float]]: List of waypoints (latitude, longitude, heading).
-        """
-        waypoints = []
-        with open(file_path, 'r') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                lat = float(row['latitude'])
-                lon = float(row['longitude'])
-                heading = float(row['heading'])
-                waypoints.append((lat, lon, heading))
-        return waypoints
 
-    def execute_waypoints(self, waypoints: List[Tuple[float, float, float]]):
-        """
-        Navigate to each waypoint sequentially.
-        Args:
-            waypoints (List[Tuple[float, float, float]]): List of waypoints (latitude, longitude, heading).
-        """
-        for lat, lon, heading in waypoints:
-            self.desired_position = (lat, lon)  # Set the desired position
-            self.desired_heading = heading       # Set the desired heading
-            print(f"Navigating to waypoint: {lat}, {lon}, heading: {heading}")
-            
-            # Navigation logic (you might need to implement actual movement logic here)
-            self.lat_lon_navigation(lat, lon)
-            # Wait until the vehicle reaches the waypoint
-            while not self.has_reached_target():
-                time.sleep(0.1)
-            print(f"Reached waypoint: {lat}, {lon}, heading: {heading}")
-
-    def has_reached_target(self, tolerance=2.0, heading_tolerance=5.0) -> bool:
-            """
-            Check if the vehicle has reached the target position and heading.
-            Args:
-                tolerance (float): Distance tolerance in meters.
-                heading_tolerance (float): Heading tolerance in degrees.
-            Returns:
-                bool: True if the target is reached, False otherwise.
-            """
-            current_position = self.position_data["current_position"]
-            current_heading = self.position_data["current_heading"]
-            if current_position is None or current_heading is None:
-                return False
-            distance_to_target = gis_funcs.distance(
-                current_position[0], current_position[1],
-                self.desired_position[0], self.desired_position[1]
-            )
-            heading_difference = abs(current_heading - self.desired_heading) % 360
-            heading_difference = min(heading_difference, 360 - heading_difference)
-            return distance_to_target <= tolerance and heading_difference <= heading_tolerance
-
-        
     def polar_waypoint_navigation(self, distance_theta, heading):
         """
         Navigate to a given point that is a certain number of meters away along a certain heading.
@@ -255,7 +197,7 @@ class MotorCore():
         print(f"[MOTOR CORE DEBUG] current position : {current_position}, target position : {self.desired_position}")
         print(f"[MOTOR CORE DEBUG] target_vector: {target_vector}, target_rotation: {target_rotation}, distance : {dist}")
         return target_vector, target_rotation, dist
-        
+    
     def parse_hold_logic(self, vector, rotation):
         # Pseudocode:
         # If the target rotation or vector is none, initialize as empty list/value
@@ -323,58 +265,30 @@ class MotorCore():
     # Calculate motor power thread will send to the control_loop thread. Will have a constant point where we want to go
     # (self.desired_position, heading, etc.), which will be passed into calc_motor_power(). Will deal with specifics for each later.
 
-    def main(self, waypoint_file: str, calculate_rate=0.1, send_rate=0.1, duration=None):
-        """
-        Main entry point to start navigation using a data file for waypoints.
-        Args:
-            waypoint_file (str): Path to the data file with waypoints.
-            calculate_rate (float): Rate to calculate motor power.
-            send_rate (float): Rate to send motor commands.
-            duration (int): Maximum duration in seconds (None for indefinite).
-        """
-        # Load waypoints from the file
-        waypoints = self.load_waypoints(waypoint_file)
-
-        # Start motor control threads
+    def main(self, calculate_rate=0.1, send_rate=0.1, duration=10):
         send_queue = queue.Queue()
         self.stop_event = threading.Event()
 
         self.control_loop_instance = threading.Thread(target=self.control_loop, args=(send_queue, send_rate, self.stop_event))
-        self.control_loop_instance.daemon = True
+        self.control_loop_instance.daemon = True # Ensure this thread exits when main program exits.
         self.control_loop_instance.start()
 
         self.calc_motor_power_instance = threading.Thread(target=self.calc_motor_power, args=(send_queue, calculate_rate, self.stop_event))
         self.calc_motor_power_instance.daemon = True
         self.calc_motor_power_instance.start()
 
-        # Execute waypoints
-        self.execute_waypoints(waypoints)
+        if duration == None:
+            # Arbitrary number
+            duration = 100
 
-        # Stop after the duration (if provided)
-        if duration is not None:
-            time.sleep(duration)
-            self.stop_event.set()
+        time.sleep(duration)
 
-        # Clean up threads
-        self.calc_motor_power_instance.join()
-        self.control_loop_instance.join()
-        self.stop()
-
-        print("[MOTOR CORE] Navigation completed.")
-
-
-    def exit(self):
         self.stop_event.set()
 
         self.calc_motor_power_instance.join()
         self.control_loop_instance.join()
-        self.stop()
-        print("[MOTOR CORE] Threads joined, motor_core exited.")
-    """
-    --------------------------------------------------------
-    """
-    
 
+        self.stop()
 
     def exit(self):
         self.stop_event.set()
