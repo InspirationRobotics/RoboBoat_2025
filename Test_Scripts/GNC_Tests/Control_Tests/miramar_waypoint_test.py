@@ -1,6 +1,7 @@
 import queue
 import time
 import threading
+from typing import List, Tuple
 from GNC.Control_Core import motor_core
 from GNC.Nav_Core import gis_funcs
 
@@ -14,7 +15,24 @@ time.sleep(5)
 
 # Number of times to iterate through waypoints
 iterations = 3
-
+def load_waypoints(file_path: str) -> List[Tuple[float, float, float]]:
+        """
+        Load waypoints (latitude, longitude, heading) from a CSV file.
+        Args:
+            file_path (str): Path to the data file.
+        Returns:
+            List[Tuple[float, float, float]]: List of waypoints (latitude, longitude, heading).
+        """
+        waypoints = []
+        with open(file_path, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                lat = float(row['latitude'])
+                lon = float(row['longitude'])
+                heading = float(row['heading'])
+                waypoints.append((lat, lon, heading))
+        return waypoints
+    
 def has_reached_target(motors, tolerance=2.0) -> bool:
     """
     Check if the vehicle has reached the target position within a given tolerance.
