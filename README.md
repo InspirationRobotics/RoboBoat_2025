@@ -1,4 +1,4 @@
-# RoboBoat_2025
+# RoboBoat_2025 (Barco Polo Software Package v2.0)
 Team Inspiration's Codebase for the 2025 RoboBoat Competition. We utilize a single ASV (autonomous surface vessel). See [Hardware Prerequisites](#hardware-prerequisites) for a more detailed specification of our current system.
 Before developing ANY code, please read the [format](#format) section thoroughly.
 
