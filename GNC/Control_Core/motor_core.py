@@ -15,14 +15,21 @@ from GNC.Control_Core import sensor_fuse
 from API.Motors import t200
 
 class MotorCore():
-    def __init__(self, port = "/dev/ttyACM0"):
-        self.t200 = t200.T200(port="/dev/ttyACM0")
+    def __init__(self, motor_port : str = "/dev/ttyACM0", gps_port : str = "/dev/ttyUSB0"):
+        if motor_port is None:
+            self.t200 = t200.T200()
+        else:
+            self.t200 = t200.T200(motor_port)
 
-        self.sensor_fuse = sensor_fuse.SensorFuse()
+        if gps_port is None:
+            self.sensor_fuse = sensor_fuse.SensorFuse(heading_offset=-13)
+        else:
+            self.sensor_fuse = sensor_fuse.SensorFuse(gps_port)
+        
         self.position_data = {'current_position' : None, 'current_heading' : None, 'current_velocity' : None}
 
         self.desired_position = (None, None) # lat, lon
-        self.desired_heading = None # in degrees
+        self.target_reached = False
 
         print("[MOTOR CORE] Initialized.")
     
@@ -88,7 +95,6 @@ class MotorCore():
         )
 
         self.desired_position = (desired_lat, desired_lon)
-        self.desired_heading = heading
 
     def lat_lon_navigation(self, lat, lon):
         """
@@ -99,9 +105,6 @@ class MotorCore():
             lon (float): Desired GPS longitude coordinate.
         """
         self.desired_position = (lat, lon)
-        self.desired_heading = gis_funcs.bearing(
-            self.position_data["current_position"][0], self.position_data["current_position"][1], lat, lon
-        )
 
     def cartesian_vector_navigation(self, x, y):
         """
@@ -116,6 +119,8 @@ class MotorCore():
         self.polar_waypoint_navigation(vector_distance, vector_theta)
 
     def update_position(self):
+        """Update attribute of MotorCore (MotorCore.position_data) with the current position (lat lon), heading (absolute, degrees), 
+        and velocity (not currently applicable) of the boat."""
         self.position_data = {
             'current_position' : self.sensor_fuse.get_position(),
             'current_heading' : self.sensor_fuse.get_heading(),
@@ -223,14 +228,22 @@ class MotorCore():
     # ---------------------------------------------------------------------------
 
     def calc_motor_power(self, send_queue, calculate_rate, stop_event):
+        """
+        Calculate the motor power to sent to the thread control_loop.
+        Runs all necessary calculations based on current position versus desired position.
+        If the target waypoint is within 1 meter, the boat stops its thrusters (assumes it has reached its position.)
+
+        Args:
+            send_queue: Threading queue to sent motor commands through to the control_loop thread.
+            calculate_rate: Rate at which to run calculations.
+            stop_event: Event that, when set, stops this function from continuously running.
+        """
         while not stop_event.is_set():
             self.update_position()
             motor_values = [0, 0, 0, 0]
 
             if self.desired_position[0] == None or self.desired_position[1] == None:
                 self.desired_position = self.position_data["current_position"]
-            if self.desired_heading == None:
-                self.desired_heading = self.position_data["current_heading"]
 
             target_bearing = self.solve_wp_bearing(
                 self.position_data["current_position"],
@@ -245,7 +258,13 @@ class MotorCore():
                 self.desired_position,
                 target_bearing
             )
-            motor_values = self.parse_hold_logic(target_vector, target_rotation)
+            if dist < 1:
+                self.target_reached = True
+
+            if self.target_reached:
+                motor_values = [0, 0, 0, 0]
+            else:
+                motor_values = self.parse_hold_logic(target_vector, target_rotation)
 
             send_queue.put(motor_values)
             time.sleep(calculate_rate)

@@ -1,11 +1,41 @@
 """
 Sandbox file to make it convenient to see how code works/experiment with syntax.
 """
-lat, lon = (0, 0)
-heading = 1
+import time
+from GNC.Guidance_Core import mission
 
-dictionary = {"Position" : (lat, lon), "Heading" : heading}
-print(str(dictionary))
+start_time = time.time()
+m = mission.Mission()
+m.run()
+
+
+# def experiment(*, box):
+#     if box is not None and box == 1:
+#         print("1")
+#     else:
+#         print("None")
+
+# experiment()
+
+# tr = False
+# start_time = time.time()
+
+# while True:
+#     list = [0, 0, 0, 0]
+
+#     if time.time() - start_time < 5:
+#         tr = False
+#     else:
+#         tr = True
+
+#     if tr:
+#         list = [1, 1, 1, 1]
+#     else:
+#         list = [2, 2, 2, 2]
+
+#     print(list)
+#     time.sleep(1)
+
 
 # from GNC.Nav_Core import gis_funcs
 
