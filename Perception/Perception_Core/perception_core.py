@@ -8,6 +8,7 @@ from multiprocessing import Process, Value
 import numpy as np
 from API.Camera.oakd_poe_lr.oakd_api import OAKD_LR
 import cv2
+import math
 
 # TODO figure out threading, the program is unacceptably slow
 class Camera:
@@ -33,8 +34,8 @@ class Camera:
         """
         print(f"OAK_D LR Info: {message}")
     def _getView(self):
-        self.inRgb,self.inDepth = self.cam.getBuffers()
-        return self.inRgb, self.inDepth
+        self.Rgb,self.Depth = self.cam.getBuffers()
+        return self.Rgb, self.Depth
     
     def __frameNorm(self,frame, bbox):
             normVals = np.full(len(bbox), frame.shape[0])
@@ -54,18 +55,36 @@ class Camera:
             return
         self._info("Camera thread stopped")
 
-    def getObjectDepth(self) ->list:
+    def getObjectDepth(self, scale:float = 0.5) ->list:
         """This function get the depth of detected object and return them"""
-        # TODO create a smaller bbox to find the average depth
+        # TODO Test smaller bbox and depth accuracy
         detections = self.cam.getDetection()
-
         result = []
+        
         # TODO ask what kind of bbox we need, do we need percentage or exact pixels?
+        scale_value = scale # the size of the center bbox for finding the average depth
+
         for detection in detections:
+            width       = math.abs(detection.xmax - detection.xmin)
+            height      = math.abs(detection.ymax - detection.ymin)
+            center_x    = (detection.xmax + detection.xmin)/2
+            center_y    = (detection.ymax + detection.ymin)/2
+
+            # The original bbox
+            bbox_full   = self.__frameNorm(self.Depth, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
+            
+            # Smaller bbox for depth calculation
+            
+            bbox_cetner = self.__frameNorm(self.Depth, (center_x-width*scale_value/2, center_y-height*scale_value/2, center_x+width*scale_value/2, center_y+height*scale_value/2))
+            depth_crop = self.Depth[bbox_cetner[1]:bbox_cetner[3], bbox_cetner[0]:bbox_cetner[2]]
+            avg_depth = np.mean(depth_crop) if depth_crop.size > 0 else 0  # Handle empty crop cases
+            
+            # Add information to return
             result.append(
                 {
                     "label": detection.label, # this is the index of the object on label map
-                    "bbox" : self.__frameNorm(self.Depth,(detection.xmin, detection.ymin, detection.xmax, detection.ymax)) 
+                    "bbox" : self.__frameNorm(self.Depth,(detection.xmin, detection.ymin, detection.xmax, detection.ymax)),
+                    "depth": avg_depth/1000 # original in mm, convert to meters
                 }
             )
         

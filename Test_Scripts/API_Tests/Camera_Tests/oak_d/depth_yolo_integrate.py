@@ -185,7 +185,7 @@ with dai.Device(pipeline) as device:
             cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
         # Show the frame
         cv2.imshow(name, frame)
-
+    
     while True:
         if syncNN:
             inRgb = qRgb.get()
