@@ -1,14 +1,19 @@
 """
 Sandbox file to make it convenient to see how code works/experiment with syntax.
 """
+lat, lon = (0, 0)
+heading = 1
 
-from GNC.Nav_Core import gis_funcs
+dictionary = {"Position" : (lat, lon), "Heading" : heading}
+print(str(dictionary))
 
-lat1, lon1 = (32.92346104343789, -117.03798665283499)
-lat2, lon2 = (32.92344454248662, -117.03792796294756)
+# from GNC.Nav_Core import gis_funcs
+
+# lat1, lon1 = (32.92346104343789, -117.03798665283499)
+# lat2, lon2 = (32.92344454248662, -117.03792796294756)
 
 
-print(gis_funcs.bearing(lat1, lon1, lat2, lon2))
+# print(gis_funcs.bearing(lat1, lon1, lat2, lon2))
 
 # tuple = (None, None)
 
