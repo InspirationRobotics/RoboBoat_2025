@@ -1,17 +1,13 @@
-from Perception.Perception_Core.perception_core import Camera
 import cv2
+import time
+from Perception.Perception_Core.perception_core import CameraCore  # Adjust path if needed
 from pathlib import Path
-"""
-TODO fix threaidng issue
-The program cannot run consistantly, most likely caused by threaidhg issue
-"""
+import threading
 
-
-# Path to the model blob
-nnPath = str((Path(__file__).parent / Path('../../../../Perception/Models/test_model/yolov8n_coco_640x352.blob')).resolve().absolute())
+MODEL_PATH = str((Path(__file__).parent / Path('../../../../Perception/Models/test_model/yolov8n_coco_640x352.blob')).resolve().absolute())
 
 # Label Map for detection classes
-labelMap = [
+LABELS = [
     "person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train",
     "truck", "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench",
     "bird", "cat", "dog", "horse", "sheep", "cow", "elephant",
@@ -25,17 +21,37 @@ labelMap = [
     "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors",
     "teddy bear", "hair drier", "toothbrush"
 ]
-cam = Camera(model_path=nnPath, labelMap=labelMap)
 
-cam.start()
+# Initialize the camera core
+camera = CameraCore(model_path=MODEL_PATH, labelMap=LABELS)
 
-while(True):
-    try:
-        cv2.imshow("visualization", cam.visualize())
-        print(cam.getObjectDepth())
-        if cv2.waitKey(1) & 0xFF == ord('q'):  # Exit on pressing 'q'
-            break
-    except Exception as e:
-        print(f"Failed to display Error: {e}")
+# Start capturing
+camera.start()
 
-cam.stop()
+on = True
+lock = threading.Lock()
+
+def count():
+    global on  # Explicitly declare 'on' as a global variable
+    for i in range(15):
+        print(f"{i} s passed")
+        time.sleep(1)
+    print("finishing program")
+    with lock:
+        on = False  # Update the global 'on' variable
+
+countThread = threading.Thread(target=count)
+countThread.start()  # Start the count thread
+
+while(on):
+    depth = camera.get_object_depth(scale=0.2)
+    frame = camera.visualize()
+    cv2.imshow("rgb", frame)
+    # print(depth)
+    # print("\n")
+    if cv2.waitKey(1) & 0xFF == ord('q'):  # Exit on pressing 'q'
+        break
+
+# Stop capturing
+camera.stop()
+countThread.join()  # Ensure the count thread finishes before the program ends

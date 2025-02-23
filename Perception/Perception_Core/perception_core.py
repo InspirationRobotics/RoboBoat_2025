@@ -1,114 +1,158 @@
-"""
-WORK IN PROGRESS
-Here will be all of the perception core code.
-Link to source file: https://github.com/InspirationRobotics/RX24-perception/blob/main/perception/perception_core/perception.py
-"""
 from threading import Thread, Lock
-from multiprocessing import Process, Value
 import numpy as np
-from API.Camera.oakd_poe_lr.oakd_api import OAKD_LR
 import cv2
-import math
+import time
+from API.Camera.oakd_poe_lr.oakd_api import OAKD_LR
 
-# TODO figure out threading, the program is unacceptably slow
-class Camera:
-    def __init__(self,model_path:str, labelMap:list):
-        self.cam        = OAKD_LR(model_path=model_path, labelMap=labelMap)
-        self.cam_lock   = Lock()
-        self.labelMap   = labelMap
-
-        # cv frame from camera
-        # Rgb and Depth are cv frame, Det is list containing object information
-        self.Rgb    = None
-        self.Det    = None
-        self.Depth  = None
-
-        pass
-    
-    def _info(self,message:str):
-        """
-        Utility function to notify the user of information pertaining to a specific camera.
-
-        Args:
-            message (str): Message to print out to terminal.
-        """
-        print(f"OAK_D LR Info: {message}")
-    def _getView(self):
-        self.Rgb,self.Depth = self.cam.getBuffers()
-        return self.Rgb, self.Depth
-    
-    def __frameNorm(self,frame, bbox):
-            normVals = np.full(len(bbox), frame.shape[0])
-            normVals[::2] = frame.shape[1]
-            return (np.clip(np.array(bbox), 0, 1) * normVals).astype(int)
-
-    def start(self):
-        self.cam_thread = Thread(target=self.cam.startCapture)
-        self.cam_thread.start()
-        self._info("Camera capture started")
-
-    def stop(self):
-        try:
-            self.cam_thread.join()
-        except:
-            self._info("Failed to stop thread")
-            return
-        self._info("Camera thread stopped")
-
-    def getObjectDepth(self, scale:float = 0.5) ->list:
-        """This function get the depth of detected object and return them"""
-        # TODO Test smaller bbox and depth accuracy
-        detections = self.cam.getDetection()
-        result = []
+class CameraCore:
+    def __init__(self, model_path: str, labelMap: list):
+        self.cam = OAKD_LR(model_path=model_path, labelMap=labelMap)
+        self.cam_lock = Lock()
+        self.labelMap = labelMap
         
-        # TODO ask what kind of bbox we need, do we need percentage or exact pixels?
-        scale_value = scale # the size of the center bbox for finding the average depth
+        # Shared resources (protected by lock)
+        self.rgb_frame = None
+        self.depth_frame = None
+        self.detections = []
+        
+        self.running = False
+        self.capture_thread = None
+    
+    def start(self):
+        """Start camera streaming in a separate thread."""
+        if self.running:
+            print("Camera is already running.")
+            return
+        
+        self.running = True
+        self.cam.startCapture()
+        self.capture_thread = Thread(target=self._capture_loop, daemon=True)
+        self.capture_thread.start()
+        print("Camera capture started.")
+    
+    def stop(self):
+        """Stop camera streaming."""
+        self.running = False
+        if self.capture_thread:
+            self.capture_thread.join()
+            self.capture_thread = None
+            self.cam.stopCapture()
+        print("Camera capture stopped.")
+    
+    def _capture_loop(self):
+        """Continuously fetch frames and detections in the background."""
+        while self.running:
+            with self.cam_lock:
+                frames = self.cam.getLatestBuffers()
+                if frames is not None:
+                    self.rgb_frame, self.depth_frame = frames
+                else:
+                    print("Warning: No frames available from the camera.")
+                    self.rgb_frame, self.depth_frame = None, None
+                
+                detections = self.cam.getLatestDetection()
+                if detections is not None:
+                    self.detections = detections
+                else:
+                    self.detections = []
+            
+            time.sleep(1 / self.cam.FPS)  # Sleep to match frame rate
+    
+    def get_latest_frames(self):
+        """Retrieve the latest RGB and depth frames."""
+        with self.cam_lock:
+            if self.rgb_frame is None or self.depth_frame is None:
+                print("Warning: Frames are not available.")
+            return self.rgb_frame, self.depth_frame
+    
+    def get_latest_detections(self):
+        """Retrieve the latest object detections."""
+        with self.cam_lock:
+            return self.detections
+    
+    def get_object_depth(self, scale: float = 0.5) -> list:
+        """
+        Calculate the depth of detected objects and return their details.
+        
+        Args:
+            scale (float): Scale factor to define the size of the bounding box for depth calculation.
+                          A smaller scale focuses on the center of the bounding box.
+        
+        Returns:
+            list: A list of dictionaries containing the label, confidence, bounding box, and average depth of each object.
+        """
+        depth_data = []
+        self.rgb_frame, self.depth_frame = self.get_latest_frames()
+        detections = self.get_latest_detections()
+
+        if self.depth_frame is None or detections is None:
+            # print("Error: Depth frame or detections are not available.")
+            return depth_data
 
         for detection in detections:
-            width       = math.abs(detection.xmax - detection.xmin)
-            height      = math.abs(detection.ymax - detection.ymin)
-            center_x    = (detection.xmax + detection.xmin)/2
-            center_y    = (detection.ymax + detection.ymin)/2
-
-            # The original bbox
-            bbox_full   = self.__frameNorm(self.Depth, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
+            # Calculate bounding box coordinates
+            bbox = self._frame_norm(self.rgb_frame, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
             
-            # Smaller bbox for depth calculation
+            # Calculate the center of the bounding box
+            center_x = (bbox[0] + bbox[2]) // 2
+            center_y = (bbox[1] + bbox[3]) // 2
             
-            bbox_cetner = self.__frameNorm(self.Depth, (center_x-width*scale_value/2, center_y-height*scale_value/2, center_x+width*scale_value/2, center_y+height*scale_value/2))
-            depth_crop = self.Depth[bbox_cetner[1]:bbox_cetner[3], bbox_cetner[0]:bbox_cetner[2]]
-            avg_depth = np.mean(depth_crop) if depth_crop.size > 0 else 0  # Handle empty crop cases
-            
-            # Add information to return
-            result.append(
-                {
-                    "label": detection.label, # this is the index of the object on label map
-                    "bbox" : self.__frameNorm(self.Depth,(detection.xmin, detection.ymin, detection.xmax, detection.ymax)),
-                    "depth": avg_depth/1000 # original in mm, convert to meters
-                }
+            # Define a smaller bounding box for depth calculation
+            width = bbox[2] - bbox[0]
+            height = bbox[3] - bbox[1]
+            bbox_center = (
+                max(0, center_x - int(width * scale / 2)),
+                max(0, center_y - int(height * scale / 2)),
+                min(self.depth_frame.shape[1], center_x + int(width * scale / 2)),
+                min(self.depth_frame.shape[0], center_y + int(height * scale / 2))
             )
+            
+            # Crop the depth frame to the smaller bounding box
+            depth_crop = self.depth_frame[bbox_center[1]:bbox_center[3], bbox_center[0]:bbox_center[2]]
+            
+            # Calculate the average depth (in mm) and convert to meters
+            avg_depth = np.mean(depth_crop) if depth_crop.size > 0 else 0
+            avg_depth_meters = avg_depth / 1000  # Convert mm to meters
+            
+            # Append the result
+            depth_data.append({
+                "label": self.labelMap[detection.label],
+                "confidence":detection.confidence,
+                "bbox": (detection.xmin, detection.ymin, detection.xmax, detection.ymax),
+                "depth": avg_depth_meters
+            })
         
-        return result
+        return depth_data
     
-
     def visualize(self):
-        """This return a labeled cv2 frame for visualizaiton"""
-        RGB, DEPTH = self._getView()
-        if(RGB is None):
+        """Return a labeled OpenCV frame with bounding boxes and labels."""
+        rgb, _ = self.get_latest_frames()
+        depth = self.get_object_depth()
+        if rgb is None:
+            print("Error: RGB frame is not available for visualization.")
             return None
+        
         color = (255, 0, 0)
         try:
-            for detection in self.cam.getDetection():
-                # TODO: Investigate into the label index.
-                # print(f"label index: {detection.label}")
-                bbox = self.__frameNorm(RGB, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
-                # print(bbox)
-                cv2.putText(RGB, self.labelMap[detection.label], (bbox[0] + 10, bbox[1] + 20), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)  # I added -1 because the label is one whne I only have one detect object
-                cv2.putText(RGB, f"{int(detection.confidence * 100)}%", (bbox[0] + 10, bbox[1] + 40), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
-                cv2.rectangle(RGB, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
+            for object in depth:
+                bbox = self._frame_norm(rgb, (object["bbox"][0], object["bbox"][1], object["bbox"][2], object["bbox"][3]))
+                cv2.putText(rgb, object["label"], (bbox[0] + 10, bbox[1] + 20), 
+                            cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
+                cv2.putText(rgb, f"{int(object['confidence'] * 100)}%", (bbox[0] + 10, bbox[1] + 40),
+                            cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
+                cv2.putText(rgb, f"{object['depth']:.2f} meters", (bbox[0] + 10, bbox[1] + 60),
+                            cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
+                cv2.rectangle(rgb, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
         except Exception as e:
-            print(f"Failed to detect Error: {e}")
-
-        return RGB
-    
+            print(f"Visualization Error: {e}")
         
+        return rgb
+    
+    def _frame_norm(self, frame, bbox):
+        """Normalize bounding box coordinates to match frame size."""
+        try:
+            norm_vals = np.full(len(bbox), frame.shape[0])
+            norm_vals[::2] = frame.shape[1]
+            return (np.clip(np.array(bbox), 0, 1) * norm_vals).astype(int)
+        except Exception as e:
+            print("Normoalize bbox Error: {e}")
