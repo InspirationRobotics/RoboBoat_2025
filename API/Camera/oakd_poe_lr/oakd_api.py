@@ -17,7 +17,11 @@ class OAKD_LR:
         self.labelMap = labelMap
         self.confidenceThreshold = 0.5
 
-        self.device = dai.Device()
+        if(self._findCamera()):
+            self.device = dai.Device()
+        else:
+            print("ERROR: DID NOT FOUND OAK_D CAMERA")
+            self.device = None
         self.COLOR_RESOLUTION = dai.ColorCameraProperties.SensorResolution.THE_1200_P
         self.imageWidth = 1920
         self.imageHeight = 1200
@@ -48,7 +52,7 @@ class OAKD_LR:
 
     def _setProperties(self):
         self.leftCam.setIspScale(2, 3)
-        self.leftCam.setPreviewSize(640, 352)
+        self.leftCam.setPreviewSize(640, 352) # the size should be 640,400 for future models
         self.leftCam.setCamera("left")
         self.leftCam.setResolution(self.COLOR_RESOLUTION)
         self.leftCam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
@@ -129,6 +133,25 @@ class OAKD_LR:
                     self.det_queue.put(inDet.detections)
 
             time.sleep(1 / self.FPS)  # Sleep to match frame rate
+    def _findCamera(self) -> bool:
+        """ Check if a DepthAI device exists """
+        try:
+            # Get available devices
+            available_devices = dai.Device.getAllConnectedDevices()
+
+            # Check if any device is found
+            if len(available_devices) == 0:
+                print("[ERROR] No DepthAI devices found.")
+                return False
+            
+            # If a device is found, print the device info and return True
+            print(f"Found DepthAI device: {available_devices[0].getMxId()}")
+            return True
+
+        except RuntimeError as e:
+            # Handle exceptions (e.g., if the device cannot be found)
+            print(f"[ERROR] Failed to find DepthAI camera: {e}")
+            return False
 
     def startCapture(self):
         if not self.device:

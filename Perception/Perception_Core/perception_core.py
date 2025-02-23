@@ -25,7 +25,14 @@ class CameraCore:
             return
         
         self.running = True
-        self.cam.startCapture()
+        try:
+            if(self._findCamera):
+                self.cam.startCapture()
+            else:
+                print("ERROR: CAMERA NOT FOUND PLEASE CHECK CONNECTION")
+                return
+        except RuntimeError as e:
+            print(f"ERROR Device not found {e}")
         self.capture_thread = Thread(target=self._capture_loop, daemon=True)
         self.capture_thread.start()
         print("Camera capture started.")
@@ -38,6 +45,10 @@ class CameraCore:
             self.capture_thread = None
             self.cam.stopCapture()
         print("Camera capture stopped.")
+    
+    def _findCamera(self) ->bool:
+        """Check if the camera exist"""
+        return not (self.cam.device is None)
     
     def _capture_loop(self):
         """Continuously fetch frames and detections in the background."""
