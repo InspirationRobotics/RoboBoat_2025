@@ -36,16 +36,24 @@ class OAKD_LR:
 
     def _initPipeline(self):
         self.pipeline = dai.Pipeline()
+        # 3 cameras
         self.leftCam = self.pipeline.create(dai.node.ColorCamera)
         self.rightCam = self.pipeline.create(dai.node.ColorCamera)
         self.centerCam = self.pipeline.create(dai.node.ColorCamera)
+
+        # depth map
         self.stereo = self.pipeline.create(dai.node.StereoDepth)
+
+        # Neural network
         self.detection = self.pipeline.create(dai.node.YoloDetectionNetwork)
         self.manip = self.pipeline.create(dai.node.ImageManip)
+
+        # Out put node
         self.xoutRgb = self.pipeline.create(dai.node.XLinkOut)
         self.xoutDepth = self.pipeline.create(dai.node.XLinkOut)
         self.xoutYolo = self.pipeline.create(dai.node.XLinkOut)
 
+        # set stream name
         self.xoutRgb.setStreamName("rgb")
         self.xoutDepth.setStreamName("depth")
         self.xoutYolo.setStreamName("yolo")
