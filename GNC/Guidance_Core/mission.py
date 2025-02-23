@@ -80,3 +80,12 @@ class Mission(MissionHelper):
     def exit_mission(self):
         self.motors.exit()
         self.mission_path.exit()
+
+if __name__ == "__main__":
+    from GNC.Guidance_Core import mission
+    m = mission.Mission()
+    
+    try:
+        m.run()
+    except KeyboardInterrupt:
+        pass
