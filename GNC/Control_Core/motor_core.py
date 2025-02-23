@@ -15,8 +15,8 @@ from GNC.Control_Core import sensor_fuse
 from API.Motors import t200
 
 class MotorCore():
-    def __init__(self, port = "/dev/ttyACM0"):
-        self.t200 = t200.T200(port="/dev/ttyACM0")
+    def __init__(self, port = "/dev/ttyACM2"):
+        self.t200 = t200.T200(port="/dev/ttyACM2")
 
         self.sensor_fuse = sensor_fuse.SensorFuse()
         self.position_data = {'current_position' : None, 'current_heading' : None, 'current_velocity' : None}
@@ -318,7 +318,7 @@ class MotorCore():
 # from API.Motors import t200
 
 # class MotorCore():
-#     def __init__(self, motor_port : str = "/dev/ttyACM0", gps_port : str = "/dev/ttyUSB0"):
+#     def __init__(self, motor_port : str = "/dev/ttyACM2", gps_port : str = "/dev/ttyUSB0"):
 #         if motor_port is None:
 #             self.t200 = t200.T200()
 #         else:
