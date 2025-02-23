@@ -91,8 +91,8 @@ def main(waypoint_file: str, calculate_rate=0.1, send_rate=0.1):
     print("[MOTOR CORE] Navigation completed.")
 
 # Run navigation
-load_waypoints(file_path="miramar.csv")
-main(waypoint_file="miramar.csv")
+load_waypoints(file_path="RoboBoat_2025/miramar.csv")
+main(waypoint_file="RoboBoat_2025/miramar.csv")
 
 # Exit after navigation
 motors.exit()
