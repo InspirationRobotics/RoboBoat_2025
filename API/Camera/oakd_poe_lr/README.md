@@ -1,0 +1,1 @@
+To run oakd_poe_lr code, you must clone [this repo](https://github.com/luxonis/depthai-python/). After cloning, from the examples directory run the install_requirements.py file and then the code should be fully functional.
