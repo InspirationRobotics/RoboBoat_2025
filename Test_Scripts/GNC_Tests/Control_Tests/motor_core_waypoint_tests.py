@@ -8,7 +8,7 @@ This test is considered successful if the ASV is able to navigate to the desired
 import time
 from GNC.Control_Core import motor_core
 
-motor_port = "/dev/ttyACM0"
+motor_port = "/dev/ttyACM2"
 motors = motor_core.MotorCore(motor_port)
 print("Waiting...")
 time.sleep(5)
