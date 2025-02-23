@@ -1,11 +1,18 @@
 {
     "boat": "Barco Polo",
+    "mission_plan": "GNC/Guidance_Core/Config/mission_plan.json",
     "motor_port": "/dev/tty/ACM2",
     "gps_port": "/dev/tty/USB0",
+
     "waypoint_generation_method": "hardcode",
     "waypoint_file": "GNC/Guidance_Core/Config/waypoints.txt",
     "map_file": "None",
+
     "camera_port": "None",
     "camera_mxid": "None",
-    "camera_focal_length": "None"
+    "camera_focal_length": "None",
+
+    "mini_maestro_port": "None",
+    "racquetball_launcher_channel": "0",
+    "water_cannon_channel": "1"
 }

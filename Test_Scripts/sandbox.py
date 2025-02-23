@@ -2,11 +2,13 @@
 Sandbox file to make it convenient to see how code works/experiment with syntax.
 """
 import time
-from GNC.Guidance_Core import mission
+from GNC.Guidance_Core import mission_helper
 
 start_time = time.time()
-m = mission.Mission()
-m.run()
+m = mission_helper.MissionHelper()
+data = m.load_json(r"GNC/Guidance_Core/Config/barco_polo.json")
+m.parse_config_data(data)
+print(m.mission_sequence)
 
 
 # def experiment(*, box):

@@ -6,21 +6,27 @@ class MissionHelper:
 
     def load_json(self, path : str) -> dict:
         with open(path, "r") as file:
-            data = json.load(file)
-        return data
+            config = json.load(file)
+        return config
     
-    def parse_config_data(self, data : dict):
-        self.motor_port = data["motor_port"]
-        self.gps_port = data["gps_port"]
-        self.waypoint_generation_method = data["waypoint_generation_method"]
+    def parse_config_config(self, config : dict):
+        self.motor_port = config["motor_port"]
+        self.gps_port = config["gps_port"]
+        self.servo_port = config["mini_maestro_port"]
+        self.racquetball_launcher_channel = config["racquetball_launcher_channel"]
+        self.water_cannon_channel = config["racquetball_launcher_channel"]
+
+
+        self.waypoint_generation_method = config["waypoint_generation_method"]
+        self.mission_file_location = config["mission_plan"]
+        
+        self.mission_sequence = self.load_json(str(self.mission_file_location))["missions"]
 
         if self.waypoint_generation_method == "hardcode":
             self.read_waypoints = True
             self.use_map = False
-            self.waypoint_file = data["waypoint_file"]
-            self.map_file = None
+            self.waypoint_file = config["waypoint_file"]
         elif self.waypoint_generation_method == "map":
             self.read_waypoints = False
             self.use_map = True
             self.waypoint_file = None
-            self.map_file = data["map_file"]
