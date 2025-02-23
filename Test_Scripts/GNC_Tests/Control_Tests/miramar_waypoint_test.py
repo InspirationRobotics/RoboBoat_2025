@@ -7,7 +7,7 @@ from GNC.Control_Core import motor_core
 from GNC.Nav_Core import gis_funcs
 
 # Initialize motors
-motor_port = "/dev/ttyACM0"
+motor_port = "/dev/ttyACM2"
 motors = motor_core.MotorCore(motor_port)
 
 # Wait for the motor system to initialize
