@@ -6,7 +6,7 @@ Remember that all files are run as modules: run "python3 -m API.GPS.gps_visualiz
 
 # Smopy eeds to be imported onto host computer. See Setup/install_smopy.sh to install smopy individually, 
 # if you haven't already setup all necessary dependencies, or just run "pip install smopy" in terminal.
-import smopy 
+import smopy
 import cv2
 import numpy as np
 from pathlib import Path
@@ -126,6 +126,6 @@ class GPSVisualizer:
 
 if __name__ == "__main__":
     # Test for GPSVisualizer.
-    file_path = r'Test_Scripts/API_Tests/GPS_Tests/Missions/large_gps_parser_test.txt'
+    file_path = r'/Users/brandontran3/GPS_log.txt'
     visualizer = GPSVisualizer(file_path, playback_speed=5, frame_size=900, zoom=17)
     visualizer.draw()

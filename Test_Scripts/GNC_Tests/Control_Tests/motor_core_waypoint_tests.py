@@ -8,7 +8,7 @@ This test is considered successful if the ASV is able to navigate to the desired
 import time
 from GNC.Control_Core import motor_core
 
-motor_port = "/dev/ttyACM0"
+motor_port = "/dev/ttyACM2"
 motors = motor_core.MotorCore(motor_port)
 print("Waiting...")
 time.sleep(5)
@@ -16,8 +16,8 @@ time.sleep(5)
 motors.main(duration=20)
 
 # TODO: Change these.
-desired_lat = 32.923590
-desired_lon = -117.038501
+desired_lat = 32.914415207734535
+desired_lon = -117.10090419685663
 
 motors.lat_lon_navigation(desired_lat, desired_lon)
 motors.exit()

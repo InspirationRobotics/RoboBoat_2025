@@ -1,8 +1,18 @@
 {
     "boat": "Barco Polo",
-    "arduino_port": "platform-3610000.xhci-usb-0:2.2:1.0",
-    "gps_port": "filler_space",
-    "camera_port": "filler_space",
-    "camera_mxid": "filler_space",
-    "camera_focal_length": "filler_space"
+    "mission_plan": "GNC/Guidance_Core/Config/mission_plan.json",
+    "motor_port": "/dev/tty/ACM2",
+    "gps_port": "/dev/tty/USB0",
+
+    "waypoint_generation_method": "map",
+    "waypoint_file": "GNC/Guidance_Core/Config/waypoints.txt",
+
+    "camera_port": "None",
+    "camera_mxid": "None",
+    "camera_focal_length": "None",
+    "root_model_path": "Perception/Models",
+
+    "mini_maestro_port": "None",
+    "racquetball_launcher_channel": "0",
+    "water_cannon_channel": "1"
 }

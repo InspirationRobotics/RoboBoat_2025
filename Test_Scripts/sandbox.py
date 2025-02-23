@@ -1,14 +1,57 @@
 """
 Sandbox file to make it convenient to see how code works/experiment with syntax.
 """
+# import time
+# from GNC.Guidance_Core import mission_helper
 
-from GNC.Nav_Core import gis_funcs
+# start_time = time.time()
+# m = mission_helper.MissionHelper()
+# data = m.load_json(r"GNC/Guidance_Core/Config/barco_polo.json")
+# m.parse_config_data(data)
+# print(m.mission_sequence)
 
-lat1, lon1 = (32.92346104343789, -117.03798665283499)
-lat2, lon2 = (32.92344454248662, -117.03792796294756)
+import math
+
+x, y = (0, 10)
+vector_distance = round(math.sqrt(x^2 + y^2), 2)
+vector_theta = round(math.degrees(math.atan2(y, (x + 0.001))), 2)
+print(vector_theta)
+
+# def experiment(*, box):
+#     if box is not None and box == 1:
+#         print("1")
+#     else:
+#         print("None")
+
+# experiment()
+
+# tr = False
+# start_time = time.time()
+
+# while True:
+#     list = [0, 0, 0, 0]
+
+#     if time.time() - start_time < 5:
+#         tr = False
+#     else:
+#         tr = True
+
+#     if tr:
+#         list = [1, 1, 1, 1]
+#     else:
+#         list = [2, 2, 2, 2]
+
+#     print(list)
+#     time.sleep(1)
 
 
-print(gis_funcs.bearing(lat1, lon1, lat2, lon2))
+# from GNC.Nav_Core import gis_funcs
+
+# lat1, lon1 = (32.92346104343789, -117.03798665283499)
+# lat2, lon2 = (32.92344454248662, -117.03792796294756)
+
+
+# print(gis_funcs.bearing(lat1, lon1, lat2, lon2))
 
 # tuple = (None, None)
 
