@@ -9,8 +9,7 @@ Mission:
 - Fire the racquetball launcher at the black boat, water cannon at the orange boat.
 - The mission should time out in 300 seconds.
 
-TODO: BEFORE running, make sure to set up the servo states (PWMs) and channels properly. Also, DummyPerceptionThread's simulated coordinates 
-will have to be changed.
+TODO: BEFORE running, make sure to change DummyPerceptionThread's simulated coordinates.
 """
 
 
@@ -126,17 +125,16 @@ class Mission(MissionHelper):
 
             # If we are ready to fire the racquetball launcher/water cannon.
             if self.motors.target_reached == True and self.target is not None:
-                # TODO: Change PWM values and barco_polo.json settings as soon as hardware setup is known.
                 # If black, fire racquetballs. 
                 if self.target == "black_boat":
-                    self.servo.set_pwm(self.racquetball_launcher_channel, 1500)
+                    self.servo.set_pwm(self.racquetball_launcher_channel, self.launchPWM)
                     time.sleep(2)
-                    self.servo.set_pwm(self.racquetball_launcher_channel, 1000)
+                    self.servo.set_pwm(self.racquetball_launcher_channel, self.nominalPWM)
                 # If orange, fire water cannon.
                 elif self.target == "orange_boat":
-                    self.servo.set_pwm(self.water_cannon_channel, 1500)
+                    self.servo.set_pwm(self.water_cannon_channel, self.launchPWM)
                     time.sleep(2)
-                    self.servo.set_pwm(self.water_cannon_channel, 1000)
+                    self.servo.set_pwm(self.water_cannon_channel, self.nominalPWM)
 
                 self.target = None
                 self.initiate_next_waypoint = True
@@ -149,6 +147,7 @@ class Mission(MissionHelper):
     def exit_mission(self):
         self.motors.exit()
         self.mission_path.exit()
+        self.servo.close()
 
 if __name__ == "__main__":
     from GNC.Guidance_Core import mission
