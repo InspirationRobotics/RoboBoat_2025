@@ -32,6 +32,10 @@ class Map:
                 list.append(object)
         return list
     
+    def change_map(self, new_value: Object):
+        self.map.append(new_value)
+        print(f"Map updated with: {new_value}")
+    
     # def put_object_in_map(self, object : Object):
     #     parsed_object = {object.object_type: ((object.latitude, object.longitude), object.confidence)}
     #     self.map.append(parsed_object)

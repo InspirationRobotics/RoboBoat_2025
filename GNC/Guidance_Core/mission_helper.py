@@ -9,13 +9,15 @@ class MissionHelper:
             config = json.load(file)
         return config
     
-    def parse_config_config(self, config : dict):
+    def parse_config_data(self, config : dict):
         self.motor_port = config["motor_port"]
         self.gps_port = config["gps_port"]
+
         self.servo_port = config["mini_maestro_port"]
         self.racquetball_launcher_channel = config["racquetball_launcher_channel"]
         self.water_cannon_channel = config["racquetball_launcher_channel"]
 
+        self.root_model_path = config["model_path"]
 
         self.waypoint_generation_method = config["waypoint_generation_method"]
         self.mission_file_location = config["mission_plan"]

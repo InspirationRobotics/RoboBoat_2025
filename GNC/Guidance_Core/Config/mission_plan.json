@@ -1,3 +1,3 @@
 {
-    "missions" : ["rescue_deliveries"]
+    "missions" : ["waypoints", "rescue_deliveries"]
 }

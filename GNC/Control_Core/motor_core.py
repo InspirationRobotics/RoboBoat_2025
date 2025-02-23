@@ -381,7 +381,7 @@ class MotorCore():
     ----------------- FUNCTIONS WITH GPS WAYPOINT NAVIGATION/Kalman Filter/Control Loop [NEEDS TESTING] -----------------
     """
 
-    def polar_waypoint_navigation(self, distance_theta, heading):
+    def polar_waypoint_navigation(self, distance_delta, heading):
         """
         Navigate to a given point that is a certain number of meters away along a certain heading.
         Will rotate and then move the set distance.
@@ -394,7 +394,7 @@ class MotorCore():
             self.position_data["current_position"][0],
             self.position_data["current_position"][1],
             heading,
-            distance_theta
+            distance_delta
         )
 
         self.desired_position = (desired_lat, desired_lon)
@@ -418,7 +418,7 @@ class MotorCore():
             y (float): Desired displacement in meters along surge direction.
         """
         vector_distance = round(math.sqrt(x^2 + y^2), 2)
-        vector_theta = round(math.degrees(math.atan2(y/x)), 2)
+        vector_theta = round(math.degrees(math.atan2(y, (x + 0.001))), 2)
         self.polar_waypoint_navigation(vector_distance, vector_theta)
 
     def update_position(self):

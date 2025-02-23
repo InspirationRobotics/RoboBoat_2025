@@ -1,9 +1,71 @@
+"""
+File to run in order to begin Barco Polo's mission. 
+"""
+"""
+Mission:
+
+- Go forward for 10 meters. While doing so, simulate the detections of a black and orange boat.
+- Move towards the black boat and orange boat (black first).
+- Fire the racquetball launcher at the black boat, water cannon at the orange boat.
+- The mission should time out in 300 seconds.
+
+TODO: BEFORE running, make sure to set up the servo states (PWMs) and channels properly. Also, DummyPerceptionThread's simulated coordinates 
+will have to be changed.
+"""
+
+
 import time
+import threading
 from GNC.Control_Core import motor_core
 from API.Servos import mini_maestro
 from GNC.Nav_Core import map, nav_path
 from GNC.Guidance_Core.mission_helper import MissionHelper
-from Perception.Perception_Core import perception_core
+# from Perception.Perception_Core import perception_core
+
+class DummyPerceptionThread:
+    """
+    Thread to simulate the detections for an orange and black boat. Basic structure for later conversion into perception thread.
+    After x number of seconds, the thread will simulate the detection of a boat, and put it in the Map.map attribute (list).
+    """
+    def __init__(self, M):
+        self.object = map.Object()
+        self.map = M
+        self.thread = threading.Thread(target=self.time)
+        self.thread.daemon = True  # Ensures thread stops when the main program exits
+
+        self.black = False
+        self.orange = False
+        self.start_time = time.time()
+
+        self.thread.start()
+    
+    def time(self):
+        while True:
+            if self.black == True:
+                self
+            
+            # Can add as many boats as we want with different lat and lons. 
+            if time.time() - self.start_time > 10 and self.black == False:
+                self.black = True
+                self.object.object_type = "black_boat"
+                self.object.latitude = 32.001010
+                self.object.longitude = -107.101
+                self.object.confidence = 100
+                self.map.change_map(self.object)
+            if time.time() - self.start_time > 25  and self.orange == False:
+                self.orange = True
+                self.object.object_type = "orange_boat"
+                self.object.latitude = 32.001015
+                self.object.longitude = -107.1015
+                self.object.confidence = 100
+                self.map.change_map(self.object)
+            # if self.black == True and self.orange == True:
+            #     break
+
+            time.sleep(0.5)
+
+    def exit(self):
+        self.thread.join()
 
 class Mission(MissionHelper):
     def __init__(self, *, config : str = "GNC/Guidance_Core/Config/barco_polo.json"):
@@ -15,6 +77,7 @@ class Mission(MissionHelper):
         self.map = map.Map()
         self.mission_path = nav_path.Nav_Path(read_waypoints=self.read_waypoints, waypoint_file=self.waypoint_file, 
                                               use_map=self.use_map)
+        self.perception_thread = DummyPerceptionThread(self.map)
         
         self.initiate_next_waypoint = False
         self.next_waypoint = None
@@ -24,7 +87,7 @@ class Mission(MissionHelper):
         print("[MISSION] Initalizing threads...")
         time.sleep(3)
 
-        self.motors.main(duration=60)
+        self.motors.main(duration=300)
         self.state = self.mission_sequence[0]
 
     def run(self):
@@ -42,6 +105,12 @@ class Mission(MissionHelper):
             # Logic block to find the next waypoint. Only does so when there is not a next waypoint (when we just switched to a new desired waypoint).
             # If by the end of this conditional self.next_waypoint is still None, this means there is no waypoint left in the program.
             if self.next_waypoint == None:
+                if self.state == "waypoint":
+                    # Here we are just going to move 10 meters forward. Once we have moved 10 meters forward, we are going to switch 
+                    # to self.state == "rescue_deliveries".
+                    self.motors.cartesian_vector_navigation(x=0, y=10)
+                    self.next_waypoint = self.motors.desired_position
+
                 if self.state == "rescue_deliveries":
                     black_boats = self.map.find_object("black_boat")
                     orange_boats = self.map.find_object("orange_boat")
@@ -83,8 +152,9 @@ class Mission(MissionHelper):
 
 if __name__ == "__main__":
     from GNC.Guidance_Core import mission
+
     m = mission.Mission()
-    
+
     try:
         m.run()
     except KeyboardInterrupt:

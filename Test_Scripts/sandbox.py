@@ -1,15 +1,21 @@
 """
 Sandbox file to make it convenient to see how code works/experiment with syntax.
 """
-import time
-from GNC.Guidance_Core import mission_helper
+# import time
+# from GNC.Guidance_Core import mission_helper
 
-start_time = time.time()
-m = mission_helper.MissionHelper()
-data = m.load_json(r"GNC/Guidance_Core/Config/barco_polo.json")
-m.parse_config_data(data)
-print(m.mission_sequence)
+# start_time = time.time()
+# m = mission_helper.MissionHelper()
+# data = m.load_json(r"GNC/Guidance_Core/Config/barco_polo.json")
+# m.parse_config_data(data)
+# print(m.mission_sequence)
 
+import math
+
+x, y = (0, 10)
+vector_distance = round(math.sqrt(x^2 + y^2), 2)
+vector_theta = round(math.degrees(math.atan2(y, (x + 0.001))), 2)
+print(vector_theta)
 
 # def experiment(*, box):
 #     if box is not None and box == 1:
