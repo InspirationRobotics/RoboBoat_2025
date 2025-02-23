@@ -23,8 +23,8 @@ class MotorCore():
 
         if gps_port is None:
             self.sensor_fuse = sensor_fuse.SensorFuse(heading_offset=-13)
-        else:
-            self.sensor_fuse = sensor_fuse.SensorFuse(gps_port)
+        #else:
+            #self.sensor_fuse = sensor_fuse.SensorFuse(gps_port)
         
         self.position_data = {'current_position' : None, 'current_heading' : None, 'current_velocity' : None}
 
