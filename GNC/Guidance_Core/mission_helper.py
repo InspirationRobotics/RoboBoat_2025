@@ -16,6 +16,8 @@ class MissionHelper:
         self.servo_port = config["mini_maestro_port"]
         self.racquetball_launcher_channel = config["racquetball_launcher_channel"]
         self.water_cannon_channel = config["racquetball_launcher_channel"]
+        self.launchPWM = config["launch_PWM"]
+        self.nominalPWM = config["nominal_PWM"]
 
         self.root_model_path = config["model_path"]
 

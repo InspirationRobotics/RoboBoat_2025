@@ -12,7 +12,9 @@
     "camera_focal_length": "None",
     "root_model_path": "Perception/Models",
 
-    "mini_maestro_port": "None",
+    "mini_maestro_port": "/dev/tty/USB1",
     "racquetball_launcher_channel": "0",
-    "water_cannon_channel": "1"
+    "water_cannon_channel": "1",
+    "launch_PWM": "1800",
+    "nominal_PWM": "1500"
 }
