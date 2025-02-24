@@ -1,6 +1,9 @@
 """
 Utility GPS functions. To be used in map and motor core code.
 Assumes spherical earth.
+
+In general, this script contains functions that take in GPS data
+and use those data to caculate useful informaiton
 """
 
 import math
