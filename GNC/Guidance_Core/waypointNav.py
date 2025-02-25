@@ -25,9 +25,6 @@ class waypointNav:
     def _loadWaypoints(self) ->list:
         pass
 
-    def _controlLoop(self):
-        pass
-
     def start(self):
         self.info.start_collecting()
         print("Background Threads started")
@@ -37,8 +34,8 @@ class waypointNav:
         print("Background Threads stopped")
 
     def run(self):
-        angleTolerance = 5      # 5 degrees tolerance
-        distanceTolerance = 3   # 3 meters tolerance
+        angleTolerance = 5.0/180    # 5 degrees tolerance  (I think we don't need this)
+        distanceTolerance = 3       # 3 meters tolerance
 
         for points in self.waypoints:
             lat = points[0]
@@ -62,23 +59,12 @@ class waypointNav:
                 # apply expoential relationship for turning power and angle
                 self.motor.yaw(MAXFRONT,MAXFRONT,turningPower,turningPower)
 
-
-
-        pass
-
     def updateDelta(self,lat,lon):
         gpsdata = self.info.getGPSData
         self.cur_ang =  gpsfunc.normalized_bearing_bearing(lat1=gpsdata.lat,lon1=gpsdata.lon,lat2=lat,lon2=lon,current_heading=gpsdata.heading)
-        self.cur_dis =  gpsfunc.haversine(lat1=gpsdata.lat,lon1=gpsdata.lon,lat2=lat,lon2=lon) # this return (-180,180)
+        self.cur_dis =  gpsfunc.haversine(lat1=gpsdata.lat,lon1=gpsdata.lon,lat2=lat,lon2=lon) # this return angle to the range (-180,180)
         # normalize angle to value between 0 and 1
         self.cur_dis /= 180
 
-# load waypoints (for testing)
-
-
-
-# Start infoCore
-info_core = infoCore()
-info_core.start_collecting()
 
 
