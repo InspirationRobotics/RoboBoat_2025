@@ -49,11 +49,11 @@ class waypointNav:
                 MAXFRONT    = 0.6
                 MAXBACK     = 0.4
 
-                # Equation: 0.58(e^x-1) why? when x=0,y=0, when x =1 y ~= 1
-                turningPower = MAXBACK * (0.58*(math.exp(self.cur_ang)-1))
+                # Equation: x^2 why? when x=0,y=0, when x =1 y ~= 1
+                turningPower = MAXBACK * (math.pow(self.cur_ang,2))
                 
-                # Equation: -0.73e^x +2 why? when x=0, y=1, x=1, y~=0
-                thrusterPower = MAXFRONT * ((-0.73)*(math.exp(self.cur_ang)) + 2)
+                # Equation: -x^2+1 why? when x=0, y=1, x=1, y~=0
+                thrusterPower = MAXFRONT * (-math.pow(self.cur_ang,2) + 2)
 
                 # yaw base on angle and distance
                 # apply expoential relationship for turning power and angle
