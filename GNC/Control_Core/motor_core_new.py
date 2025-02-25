@@ -1,5 +1,5 @@
 """
-This script only do certain motion
+This script only do certain motion, magnitude between 0 and 1
 """
 from API.Motors import t200
 

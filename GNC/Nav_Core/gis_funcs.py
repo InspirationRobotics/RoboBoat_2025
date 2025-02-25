@@ -56,6 +56,11 @@ def relative_bearing(lat1, lon1, lat2, lon2, current_heading) -> float:
     relative_bearing = abs_bearing - current_heading
     return relative_bearing
 
+def normalized_bearing(lat1, lon1, lat2, lon2, current_heading) ->float:
+    """Normalize an angle to the range (-180, 180] degrees."""
+    angle = relative_bearing(lat1, lon1, lat2, lon2, current_heading)
+    return (angle + 180) % 360 - 180
+
 def vector_to_target(pos1 : Tuple, pos2 : Tuple, current_heading) -> Tuple[float, float, float]:
     """
     Calculate the vector to the target point (retuns vx, vy, total distance).

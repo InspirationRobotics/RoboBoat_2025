@@ -5,6 +5,7 @@ from GNC.Control_Core.motor_core_new  import MotorCore
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
 import GNC.Nav_Core.gis_funcs as gpsfunc
+import math
 
 class waypointNav:
     def __init__(self):
@@ -48,14 +49,18 @@ class waypointNav:
 
             while(self.cur_dis>distanceTolerance):
                 # set max motor power pwm
-                MAXFRONT    = 1750
-                MAXBACK     = 1600
+                MAXFRONT    = 0.6
+                MAXBACK     = 0.4
 
-                # convert bearing angle to vector
-                delta_ang = 180-self.cur_ang
+                # Equation: 0.58(e^x-1) why? when x=0,y=0, when x =1 y ~= 1
+                turningPower = MAXBACK * (0.58*(math.exp(self.cur_ang)-1))
+                
+                # Equation: -0.73e^x +2 why? when x=0, y=1, x=1, y~=0
+                thrusterPower = MAXFRONT * ((-0.73)*(math.exp(self.cur_ang)) + 2)
 
                 # yaw base on angle and distance
-                self.motor.yaw(MAXFRONT,MAXFRONT,MAXBACK)
+                # apply expoential relationship for turning power and angle
+                self.motor.yaw(MAXFRONT,MAXFRONT,turningPower,turningPower)
 
 
 
@@ -63,9 +68,10 @@ class waypointNav:
 
     def updateDelta(self,lat,lon):
         gpsdata = self.info.getGPSData
-        self.cur_ang =  gpsfunc.relative_bearing(lat1=gpsdata.lat,lon1=gpsdata.lon,lat2=lat,lon2=lon,current_heading=gpsdata.heading)
-        self.cur_dis =  gpsfunc.haversine(lat1=gpsdata.lat,lon1=gpsdata.lon,lat2=lat,lon2=lon)
-
+        self.cur_ang =  gpsfunc.normalized_bearing_bearing(lat1=gpsdata.lat,lon1=gpsdata.lon,lat2=lat,lon2=lon,current_heading=gpsdata.heading)
+        self.cur_dis =  gpsfunc.haversine(lat1=gpsdata.lat,lon1=gpsdata.lon,lat2=lat,lon2=lon) # this return (-180,180)
+        # normalize angle to value between 0 and 1
+        self.cur_dis /= 180
 
 # load waypoints (for testing)
 
