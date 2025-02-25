@@ -19,7 +19,9 @@ class MissionHelper:
         self.launchPWM = config["launch_PWM"]
         self.nominalPWM = config["nominal_PWM"]
 
-        self.root_model_path = config["model_path"]
+        self.root_model_path = config["root_model_path"]
+        self.model_path = config["model_path"]
+        self.label_map = config["label_map"]
 
         self.waypoint_generation_method = config["waypoint_generation_method"]
         self.mission_file_location = config["mission_plan"]
