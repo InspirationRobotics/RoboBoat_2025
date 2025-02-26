@@ -1,12 +1,11 @@
 """
-This script visualize cpu usage from cpu_usage_log.csv
+This script visualizes CPU usage from cpu_usage_log.csv
 """
 
 import pandas as pd
 import matplotlib
 matplotlib.use("TkAgg")  # Or "Qt5Agg" if you have PyQt installed
 import matplotlib.pyplot as plt
-
 
 # Load the CSV file
 LOG_FILE = "cpu_usage_log.csv"
@@ -15,25 +14,30 @@ df = pd.read_csv(LOG_FILE)
 # Convert timestamp to datetime format
 df["Timestamp"] = pd.to_datetime(df["Timestamp"])
 
-# Plot CPU Usage
-plt.figure(figsize=(12, 5))
-plt.plot(df["Timestamp"], df["CPU Usage (%)"], label="CPU Usage (%)", color="blue", linestyle="-", marker="o")
-plt.xlabel("Time")
-plt.ylabel("CPU Usage (%)")
-plt.title("CPU Usage Over Time")
-plt.xticks(rotation=45)
-plt.legend()
-plt.grid(True)
-plt.show()
+# Create a figure with two subplots (stacked vertically)
+fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(12, 10), sharex=True)
 
-# Plot Response Times for GPS and Camera
-plt.figure(figsize=(12, 5))
-plt.plot(df["Timestamp"], df["GPS Response Time (ms)"], label="GPS Response Time (ms)", color="red", linestyle="--", marker="s")
-plt.plot(df["Timestamp"], df["Camera Response Time (ms)"], label="Camera Response Time (ms)", color="green", linestyle="--", marker="d")
-plt.xlabel("Time")
-plt.ylabel("Response Time (ms)")
-plt.title("GPS & Camera Response Times Over Time")
+# Plot CPU Usage on the first subplot
+ax[0].plot(df["Timestamp"], df["CPU Usage (%)"], label="CPU Usage (%)", color="blue", linestyle="-", marker="o")
+ax[0].set_ylabel("CPU Usage (%)")
+ax[0].set_title("CPU Usage Over Time")
+ax[0].legend()
+ax[0].grid(True)
+
+# Plot GPS & Camera Response Times on the second subplot
+ax[1].plot(df["Timestamp"], df["GPS Response Time (ms)"], label="GPS Response Time (ms)", color="red", linestyle="--", marker="s")
+ax[1].plot(df["Timestamp"], df["Camera Response Time (ms)"], label="Camera Response Time (ms)", color="green", linestyle="--", marker="d")
+ax[1].set_xlabel("Time")
+ax[1].set_ylabel("Response Time (ms)")
+ax[1].set_title("GPS & Camera Response Times Over Time")
+ax[1].legend()
+ax[1].grid(True)
+
+# Rotate x-axis labels for better readability
 plt.xticks(rotation=45)
-plt.legend()
-plt.grid(True)
+
+# Adjust layout to prevent overlap
+plt.tight_layout()
+
+# Show both plots in the same figure
 plt.show()
