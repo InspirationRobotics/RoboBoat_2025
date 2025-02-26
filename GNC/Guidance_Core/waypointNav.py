@@ -10,30 +10,56 @@ import math
 class waypointNav:
     def __init__(self):
         self.config             = MissionHelper()
-        self.info               = infoCore()
+        print("Loading Config file ...")
+        self._loadConfig()                 
+
+        self.info               = infoCore(modelPath=self.config.model_path,labelMap=self.config.label_map)
         self.motor              = MotorCore() # load with default port "/dev/ttyACM2"
 
         self.waypoints :list    = None
         
         self.cur_ang            = None
         self.cur_dis            = None
-        pass
 
-    def _loadConfig(self,path:str):
-        self.config.parse_config_data(self.config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json"))
 
-    def _loadWaypoints(self) ->list:
-        pass
+    def _loadConfig(self,file_path:str = "GNC/Guidance_Core/Config/barco_polo.json"):
+        self.config.parse_config_data(self.config.load_json(path=file_path))
+
+    def _loadWaypoints(self):
+        print(f"path: {self.config.waypoint_file}")
+        self.waypoints = self.__readLatLon(self.config.waypoint_file)
+        print("\nWaypoints: ")
+        for points in self.waypoints:
+            print(points)
+
+
+    def __readLatLon(self,file_path:str)->list:
+        lat_lon_list = []
+    
+        with open(file_path, 'r') as file:
+            for line in file:
+                lat, lon = map(float, line.strip().split(','))
+                lat_lon_list.append({'lat': lat, 'lon': lon})
+        
+        return lat_lon_list
 
     def start(self):
+        # start info core and load config
+        print("Starting background Threads...")
         self.info.start_collecting()
-        print("Background Threads started")
+
+        # load waypoints
+        print("Loading waypoints...")
+        self._loadWaypoints()
+
+
 
     def stop(self):
         self.info.stop_collecting()
         print("Background Threads stopped")
 
     def run(self):
+        """Main logic of waypoint navigation"""
         angleTolerance = 5.0/180    # 5 degrees tolerance  (I think we don't need this)
         distanceTolerance = 3       # 3 meters tolerance
 
@@ -49,15 +75,15 @@ class waypointNav:
                 MAXFRONT    = 0.6
                 MAXBACK     = 0.4
 
-                # Equation: x^2 why? when x=0,y=0, when x =1 y ~= 1
-                turningPower = MAXBACK * (math.pow(self.cur_ang,2))
+                # Equation: |x^3| why? Higher turning power at a greater angle, decreases as angle decreases
+                turningPower = MAXBACK * (abs(math.pow(self.cur_ang,3)))
                 
-                # Equation: -x^2+1 why? when x=0, y=1, x=1, y~=0
-                thrusterPower = MAXFRONT * (-math.pow(self.cur_ang,2) + 2)
+                # Equation: 1-|x&0.2| why? concave up and decreasing as angle increase
+                thrusterPower = MAXFRONT * (1-abs(math.pow(self.cur_ang,0.2)))
 
                 # yaw base on angle and distance
                 # apply expoential relationship for turning power and angle
-                self.motor.yaw(MAXFRONT,MAXFRONT,turningPower,turningPower)
+                self.motor.yaw(thrusterPower,thrusterPower,turningPower,turningPower)
 
     def updateDelta(self,lat,lon):
         gpsdata = self.info.getGPSData
@@ -68,3 +94,7 @@ class waypointNav:
 
 
 
+if __name__ == "__main__":
+    mission = waypointNav()
+    mission.start()
+    mission.run()

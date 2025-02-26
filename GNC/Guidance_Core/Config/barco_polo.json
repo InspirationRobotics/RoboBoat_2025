@@ -4,7 +4,7 @@
     "motor_port": "/dev/tty/ACM2",
     "gps_port": "/dev/tty/USB0",
 
-    "waypoint_generation_method": "map",
+    "waypoint_generation_method": "hardcode",
     "waypoint_file": "GNC/Guidance_Core/Config/waypoints.txt",
 
     "camera_port": "None",
