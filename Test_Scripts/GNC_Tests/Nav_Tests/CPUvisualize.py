@@ -3,7 +3,10 @@ This script visualize cpu usage from cpu_usage_log.csv
 """
 
 import pandas as pd
+import matplotlib
+matplotlib.use("TkAgg")  # Or "Qt5Agg" if you have PyQt installed
 import matplotlib.pyplot as plt
+
 
 # Load the CSV file
 LOG_FILE = "cpu_usage_log.csv"
