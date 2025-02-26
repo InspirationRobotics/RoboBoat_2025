@@ -28,11 +28,12 @@ infocore = infoCore("Perception/Models/test_model/yolov8n_coco_640x352.blob",LAB
 infocore.start_collecting()  # Starts background threads
 
 # Logging results
-results = {"GPS": 0, "Camera": 0}
+results = {"GPS": 0, "Camera": 0, "lat":0.0,"lon":0.0,"heading":0.0,"detection":[]}
 
+# Logging results
 with open(LOG_FILE, mode="w", newline="") as file:
     writer = csv.writer(file)
-    writer.writerow(["Timestamp", "CPU Usage (%)", "GPS Response Time (ms)", "Camera Response Time (ms)"])
+    writer.writerow(["Timestamp", "CPU Usage (%)", "GPS Response Time (ms)", "Camera Response Time (ms)", "lat", "lon", "heading", "detection"])
 
     try:
         while True:
@@ -41,7 +42,7 @@ with open(LOG_FILE, mode="w", newline="") as file:
 
             # Measure Camera getter response time
             start = time.time_ns()
-            detect = infocore.getDetection()
+            detect = infocore.getDetection()  # List of detected objects
             end = time.time_ns()
             results["Camera"] = (end - start) / 1e6  # Convert to milliseconds
 
@@ -51,14 +52,20 @@ with open(LOG_FILE, mode="w", newline="") as file:
             end = time.time_ns()
             results["GPS"] = (end - start) / 1e6  # Convert to milliseconds
 
+            # Extract GPS data
+            lat, lon, heading = gpsdata.lat, gpsdata.lon, gpsdata.heading
+
+            # Convert detection list to a string
+            detection_str = ";".join(detect) if detect else "None"
+
             # Write to CSV
-            writer.writerow([timestamp, cpu_usage, results["GPS"], results["Camera"]])
+            writer.writerow([timestamp, cpu_usage, results["GPS"], results["Camera"], lat, lon, heading, detection_str])
 
             print(f"{timestamp} | CPU: {cpu_usage}% | GPS: {results['GPS']}ms | Camera: {results['Camera']}ms")
-            print(detect)
-            print(gpsdata.lat,gpsdata.lon,gpsdata.heading)
+            print(detect) if len(detect)>0 else None
+            print(lat, lon, heading)
             time.sleep(1)  # Log every second
 
     except KeyboardInterrupt:
-        """Ctrl + C to stop"""
         print("Logging stopped.")
+

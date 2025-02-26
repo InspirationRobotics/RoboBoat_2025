@@ -135,6 +135,28 @@ class CameraCore:
         
         return depth_data
     
+    def switchModel(self, modelPath: str):
+        """Switch to a different model dynamically."""
+        if not modelPath:
+            print("Error: Model path is empty.")
+            return
+
+        print(f"Switching model to: {modelPath}")
+
+        self.stop()  # Stop camera capture
+
+        try:
+            # Create a new OAKD_LR instance with the new model
+            self.cam = OAKD_LR(model_path=modelPath, labelMap=self.labelMap)
+            
+            # Restart capture with new model
+            self.start()
+            print("Model switched successfully.")
+        except Exception as e:
+            print(f"Error switching model: {e}")
+            self.start()  # Restart with the previous model if switch fails
+
+
     def visualize(self):
         """Return a labeled OpenCV frame with bounding boxes and labels."""
         rgb, _ = self.get_latest_frames()

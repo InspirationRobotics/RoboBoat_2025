@@ -32,6 +32,9 @@ class infoCore:
     
     def getGPSData(self) ->GPSData:
         return self.GPS.get_data()
+    
+    def switchModel(self,modelPath:str):
+        self.Camera.switchModel(modelPath=modelPath)
 
 
 

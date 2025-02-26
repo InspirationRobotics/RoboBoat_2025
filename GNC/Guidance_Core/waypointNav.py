@@ -65,11 +65,15 @@ class waypointNav:
         distanceTolerance = 3       # 3 meters tolerance
 
         for points in self.waypoints:
+            
             latin = points[0]
             lonin = points[1]
         
             # update bearing angle and distance
             self.updateDelta(lat=latin, lon=lonin)
+            
+            # store current distance
+            initDis = self.cur_dis
 
             while(self.cur_dis>distanceTolerance):
                 # set max motor power pwm
@@ -83,7 +87,8 @@ class waypointNav:
                 turningPower = MAXBACK * (abs(math.pow(self.cur_ang,3)))
                 
                 # Equation: 1-|x^0.2| why? concave up and decreasing as angle increase
-                thrusterPower = MAXFRONT * (1-abs(math.pow(self.cur_ang,0.2)))
+                # TODO I think we need to add another varaible to slow down when distance is smaller
+                thrusterPower = MAXFRONT * (1-abs(math.pow(self.cur_ang,0.2))) * (math.pow((self.cur_dis/initDis),2))
 
                 # yaw base on angle and distance
                 # apply expoential relationship for turning power and angle
