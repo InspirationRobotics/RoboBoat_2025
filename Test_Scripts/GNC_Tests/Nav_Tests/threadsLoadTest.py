@@ -27,13 +27,13 @@ with open(LOG_FILE, mode="w", newline="") as file:
 
             # Measure Camera getter response time
             start = time.time_ns()
-            infocore.getDetection()
+            detect = infocore.getDetection()
             end = time.time_ns()
             results["Camera"] = (end - start) / 1e6  # Convert to milliseconds
 
             # Measure GPS getter response time
             start = time.time_ns()
-            infocore.getGPSData()
+            gpsdata = infocore.getGPSData()
             end = time.time_ns()
             results["GPS"] = (end - start) / 1e6  # Convert to milliseconds
 
@@ -41,7 +41,8 @@ with open(LOG_FILE, mode="w", newline="") as file:
             writer.writerow([timestamp, cpu_usage, results["GPS"], results["Camera"]])
 
             print(f"{timestamp} | CPU: {cpu_usage}% | GPS: {results['GPS']}ms | Camera: {results['Camera']}ms")
-
+            print(detect)
+            print(gpsdata.lat,gpsdata.lon,gpsdata.heading)
             time.sleep(1)  # Log every second
 
     except KeyboardInterrupt:
