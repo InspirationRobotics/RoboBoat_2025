@@ -6,6 +6,7 @@ from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
 import GNC.Nav_Core.gis_funcs as gpsfunc
 import math
+import time
 
 class waypointNav:
     def __init__(self):
@@ -64,26 +65,35 @@ class waypointNav:
         distanceTolerance = 3       # 3 meters tolerance
 
         for points in self.waypoints:
-            lat = points[0]
-            lon = points[1]
+            latin = points[0]
+            lonin = points[1]
         
             # update bearing angle and distance
-            self.updateDelta(lat=lat, lon=lon)
+            self.updateDelta(lat=latin, lon=lonin)
 
             while(self.cur_dis>distanceTolerance):
                 # set max motor power pwm
                 MAXFRONT    = 0.6
                 MAXBACK     = 0.4
 
+                # TODO test different graph and its impact on the performance, 
+                # Try ^2.5 for turning power
+                # Try ^0.4 for thruster power
                 # Equation: |x^3| why? Higher turning power at a greater angle, decreases as angle decreases
                 turningPower = MAXBACK * (abs(math.pow(self.cur_ang,3)))
                 
-                # Equation: 1-|x&0.2| why? concave up and decreasing as angle increase
+                # Equation: 1-|x^0.2| why? concave up and decreasing as angle increase
                 thrusterPower = MAXFRONT * (1-abs(math.pow(self.cur_ang,0.2)))
 
                 # yaw base on angle and distance
                 # apply expoential relationship for turning power and angle
                 self.motor.yaw(thrusterPower,thrusterPower,turningPower,turningPower)
+
+                # 0.2 s interval
+                time.sleep(0.2)
+
+                # update information
+                self.updateDelta(lat=latin, lon=lonin)
 
     def updateDelta(self,lat,lon):
         gpsdata = self.info.getGPSData
