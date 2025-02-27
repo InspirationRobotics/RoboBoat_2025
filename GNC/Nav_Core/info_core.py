@@ -1,14 +1,17 @@
 """
 This is a manager class
 This script meant to collect information from gps and perception, and start background threads
+We will also do some simple calculation here
+Normalized relative bearing angle
+object location base on perception and heading.
+    convert relative angle to abs -> find lat lon
 """
 
 from API.GPS.gps_api import GPS, GPSData
 from Perception.Perception_Core.perception_core import CameraCore
-
 from threading import Thread, Lock
 from queue import Queue
-
+import math
 class infoCore:
     def __init__(self,modelPath:str ,labelMap:list):
         # Stop event to control the manager core and background threads
@@ -27,10 +30,31 @@ class infoCore:
         self.GPS.__del__()
         self.Camera.stop()
 
-    def getDetection(self) ->list: # return detection & depth information
-        return self.Camera.get_object_depth()  
+    def getInfo(self): # return object information and GPS data
+        detections = self.Camera.get_object_depth()  
+        gpsData = self.GPS.get_data()
+        boat_heading    = gpsData.heading
+        boat_lat        = gpsData.lat
+        boat_lon        = gpsData.lon
+        for object in detections:
+            R = 6371000  # Earth radius in meters
+            heading = math.radians((boat_heading + object["angle"]) % 360)     # abs heading [0,2pi]
+            distance = object["distance"]
+            # Compute change in latitude and longitude
+            delta_lat = (distance / R) * math.cos(heading)
+            delta_lon = (distance / R) * math.sin(heading) / math.cos(math.radians(boat_lat)) # compute in radians
+
+            # Convert back to degrees
+            lat_obj = boat_lat + math.degrees(delta_lat)
+            lon_obj = boat_lon + math.degrees(delta_lon)
+
+            # add location to dictionary
+            object["location"] = (lat_obj,lon_obj)  # replacce 0,0, with lat lon
+
+        return gpsData, detections
     
     def getGPSData(self) ->GPSData:
+        """DEPRECATED it's now integrated in getInfo"""
         return self.GPS.get_data()
     
     def switchModel(self,modelPath:str):

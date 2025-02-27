@@ -28,12 +28,12 @@ infocore = infoCore("Perception/Models/test_model/yolov8n_coco_640x352.blob",LAB
 infocore.start_collecting()  # Starts background threads
 
 # Logging results
-results = {"GPS": 0, "Camera": 0, "lat":0.0,"lon":0.0,"heading":0.0,"detection":[]}
+results = {"response time": 0, "lat":0.0,"lon":0.0,"heading":0.0,"detection":[]}
 
 # Logging results
 with open(LOG_FILE, mode="w", newline="") as file:
     writer = csv.writer(file)
-    writer.writerow(["Timestamp", "CPU Usage (%)", "GPS Response Time (ms)", "Camera Response Time (ms)", "lat", "lon", "heading", "detection"])
+    writer.writerow(["Timestamp", "CPU Usage (%)", "Response Time (ms)", "lat", "lon", "heading", "detection"])
 
     try:
         while True:
@@ -42,15 +42,9 @@ with open(LOG_FILE, mode="w", newline="") as file:
 
             # Measure Camera getter response time
             start = time.time_ns()
-            detect = infocore.getDetection()  # List of detected objects
+            gpsdata , detect = infocore.getInfo()
             end = time.time_ns()
-            results["Camera"] = (end - start) / 1e6  # Convert to milliseconds
-
-            # Measure GPS getter response time
-            start = time.time_ns()
-            gpsdata = infocore.getGPSData()
-            end = time.time_ns()
-            results["GPS"] = (end - start) / 1e6  # Convert to milliseconds
+            results["response time"] = (end - start) / 1e6  # Convert to milliseconds
 
             # Extract GPS data
             lat, lon, heading = gpsdata.lat, gpsdata.lon, gpsdata.heading
@@ -59,11 +53,12 @@ with open(LOG_FILE, mode="w", newline="") as file:
             detection_str = ";".join(detect) if detect else "None"
 
             # Write to CSV
-            writer.writerow([timestamp, cpu_usage, results["GPS"], results["Camera"], lat, lon, heading, detection_str])
+            writer.writerow([timestamp, cpu_usage, results["response time"], lat, lon, heading, detection_str])
 
-            print(f"{timestamp} | CPU: {cpu_usage}% | GPS: {results['GPS']}ms | Camera: {results['Camera']}ms")
+            print(f"{timestamp} | CPU: {cpu_usage}% | response time: {results['response time']}ms")
             print(detect) if len(detect)>0 else None
             print(lat, lon, heading)
+            print("\n")
             time.sleep(1)  # Log every second
 
     except KeyboardInterrupt:

@@ -2,6 +2,7 @@ from threading import Thread, Lock
 import numpy as np
 import cv2
 import time
+import math
 from API.Camera.oakd_poe_lr.oakd_api import OAKD_LR
 
 class CameraCore:
@@ -125,12 +126,21 @@ class CameraCore:
             avg_depth = np.mean(depth_crop) if depth_crop.size > 0 else 0
             avg_depth_meters = avg_depth / 1000  # Convert mm to meters
             
+            # Calculate the relative angle of the object
+            # angle = (x-0.5) x HFOV     Camera specs: DFOV / HFOV / VFOV  100° / 82° / 56°
+            angle = (center_x-0.5)* 82          # in degrees
+            angle_rad = math.radians(angle)     # in radians
+
+            # Convert perpendicular depth to actual distance
+            distance = avg_depth_meters/(math.cos(angle_rad))
             # Append the result
             depth_data.append({
                 "label": self.labelMap[detection.label],
                 "confidence":detection.confidence,
                 "bbox": (detection.xmin, detection.ymin, detection.xmax, detection.ymax),
-                "depth": avg_depth_meters
+                "depth": avg_depth_meters,
+                "distance":distance,
+                "angle":angle
             })
         
         return depth_data

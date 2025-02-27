@@ -1,1 +1,0 @@
-"""for speed challenge code"""
