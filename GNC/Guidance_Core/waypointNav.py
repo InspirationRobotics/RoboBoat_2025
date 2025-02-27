@@ -77,8 +77,8 @@ class waypointNav:
 
             while(self.cur_dis>distanceTolerance):
                 # set max motor power pwm
-                MAXFRONT    = 0.6
-                MAXBACK     = 0.4
+                MAXFRONT    = 0.8
+                MAXBACK     = 0.5
 
                 # TODO test different graph and its impact on the performance, 
                 # Try ^2.5 for turning power
@@ -94,8 +94,8 @@ class waypointNav:
                 # apply expoential relationship for turning power and angle
                 self.motor.yaw(thrusterPower,thrusterPower,turningPower,turningPower)
 
-                # 0.2 s interval
-                time.sleep(0.2)
+                # 0.1 s interval
+                time.sleep(0.1)
 
                 # update information
                 self.updateDelta(lat=latin, lon=lonin)
