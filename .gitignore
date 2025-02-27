@@ -3,5 +3,6 @@ __pycache__/
 .venv/
 venv/
 
-*.mp4
 *.pt
+*.mp4
+*.h265

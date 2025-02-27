@@ -39,4 +39,6 @@ with dai.Device(pipeline) as device:
             pass
 
     print("To view the encoded data, convert the stream file (.h265) into a video file (.mp4) using a command below:")
-    print("ffmpeg -framerate 30 -i video.h265 -c copy video.mp4")
+    print("ffmpeg -framerate 30 -i video.h265 -c copy video_h265.mp4")
+    print("To convert .h265 type mp4 to .h264 (.mp4) using a command below")
+    print("ffmpeg -i video_h265.mp4 -c:v libx264 -preset fast -crf 23 -c:a aac -b:a 128k video_h264.mp4")
