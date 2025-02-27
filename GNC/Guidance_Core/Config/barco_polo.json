@@ -11,8 +11,9 @@
     "camera_mxid": "None",
     "camera_focal_length": "None",
     "root_model_path": "Perception/Models",
-    "model_path" : "Perception/Models/test_model/yolov8n_coco_640x352.blob",
-    "label_map" :[
+
+    "test_model_path" : "Perception/Models/test_model/yolov8n_coco_640x352.blob",
+    "test_label_map" :[
         "person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train",
         "truck", "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench",
         "bird", "cat", "dog", "horse", "sheep", "cow", "elephant",
@@ -26,6 +27,14 @@
         "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors",
         "teddy bear", "hair drier", "toothbrush"
     ],
+    "sign_model_path" : "Perception/Models/sign_model/sign_openvino_2022.1_6shave.blob",
+    "sign_label_map" :[
+        "Black Boat",
+        "Cross",
+        "Orange Boat",
+        "Triangle"
+    ],
+
 
     "mini_maestro_port": "/dev/tty/USB1",
     "racquetball_launcher_channel": "0",

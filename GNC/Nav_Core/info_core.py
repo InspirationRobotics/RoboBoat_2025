@@ -57,8 +57,8 @@ class infoCore:
         """DEPRECATED it's now integrated in getInfo"""
         return self.GPS.get_data()
     
-    def switchModel(self,modelPath:str):
-        self.Camera.switchModel(modelPath=modelPath)
+    def switchModel(self,modelPath:str,labelMap:str):
+        self.Camera.switchModel(modelPath=modelPath,labelMap=labelMap)
 
 
 

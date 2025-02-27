@@ -145,7 +145,7 @@ class CameraCore:
         
         return depth_data
     
-    def switchModel(self, modelPath: str):
+    def switchModel(self, modelPath: str,labelMap:str):
         """Switch to a different model dynamically."""
         if not modelPath:
             print("Error: Model path is empty.")
@@ -157,7 +157,7 @@ class CameraCore:
 
         try:
             # Create a new OAKD_LR instance with the new model
-            self.cam = OAKD_LR(model_path=modelPath, labelMap=self.labelMap)
+            self.cam = OAKD_LR(model_path=modelPath, labelMap=labelMap)
             
             # Restart capture with new model
             self.start()
