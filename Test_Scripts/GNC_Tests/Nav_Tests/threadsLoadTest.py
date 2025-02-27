@@ -5,26 +5,25 @@ from GNC.Nav_Core.info_core import infoCore
 import time
 import psutil
 import csv
+from GNC.Guidance_Core.mission_helper import MissionHelper
 
 # Log file
 LOG_FILE = "cpu_usage_log.csv"
 
-LABELMAP = [
-        "person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train",
-        "truck", "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench",
-        "bird", "cat", "dog", "horse", "sheep", "cow", "elephant",
-        "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie",
-        "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat",
-        "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle", "wine glass", "cup",
-        "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich",
-        "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake",
-        "chair", "sofa", "pottedplant", "bed", "diningtable", "toilet", "tvmonitor",
-        "laptop", "mouse", "remote", "keyboard", "cell phone", "microwave", "oven",
-        "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors",
-        "teddy bear", "hair drier", "toothbrush"
-    ]
+
+# Load config
+config = MissionHelper().load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
+
+# Define paths to models
+MODEL_1 = config["test_model_path"]
+MODEL_2 = config["sign_model_path"]
+
+# Label Map (Ensure it matches your detection classes)
+LABELMAP_1 = config["test_label_map"]
+LABELMAP_2 = config["sign_label_map"]
+
 # Initialize info Core
-infocore = infoCore("Perception/Models/test_model/yolov8n_coco_640x352.blob",LABELMAP)
+infocore = infoCore(MODEL_1,LABELMAP_1)
 infocore.start_collecting()  # Starts background threads
 
 # Logging results
