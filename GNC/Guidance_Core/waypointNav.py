@@ -33,6 +33,10 @@ class waypointNav:
         for points in self.waypoints:
             print(points)
 
+    def loadWaypoints(self,points):
+        """This is used when waypoint nav is not reading waypoint"""
+        self.waypoints = list(points)
+        pass
 
     def __readLatLon(self,file_path:str)->list:
         lat_lon_list = []
@@ -106,6 +110,8 @@ class waypointNav:
         self.cur_dis =  gpsfunc.haversine(lat1=gpsdata.lat,lon1=gpsdata.lon,lat2=lat,lon2=lon) # this return angle to the range (-180,180)
         # normalize angle to value between 0 and 1
         self.cur_dis /= 180
+
+        return self.cur_ang, self.cur_dis
 
 
 
