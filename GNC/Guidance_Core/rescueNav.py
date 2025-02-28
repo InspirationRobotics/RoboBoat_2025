@@ -22,11 +22,17 @@ class Rescue:
         self.triangleObject = []
 
         # TODO declare mini maestro channel for water gun and racketball launcher also the PWM value
+        self.racquetball_launcher_channel   = 0
+        self.water_cannon_channel           = 0
+        self.launchPWM                      = 1600
+        self.nominalPWM                     = 1800
 
     def start(self):
+        # TODO Here is a conflict, because we initialize info core in wayPNav object start method
+        # Solution: put everything in a big ass file never stop wayPNav until return, pass in info core to wayPNav ...
+        self.wayPNav.start()  
         self.info.start_collecting()
 
-    
     def run(self):
         on = True
         while(on):
@@ -59,3 +65,7 @@ class Rescue:
             self.motor.rotate(0.2) # rotate to find target
 
         print("mission finished")
+
+    def stop(self):
+        self.info.stop_collecting()
+        self.wayPNav.stop()
