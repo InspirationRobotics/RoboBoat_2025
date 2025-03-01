@@ -128,11 +128,11 @@ class CameraCore:
             
             # Calculate the relative angle of the object
             # angle = (x-0.5) x HFOV     Camera specs: DFOV / HFOV / VFOV  100° / 82° / 56°
-            angle = (center_x-0.5)* 82          # in degrees
+            angle = ((((detection.xmin+detection.xmax)/2))-0.5)* 82          # in degrees
             angle_rad = math.radians(angle)     # in radians
 
             # Convert perpendicular depth to actual distance
-            distance = avg_depth_meters/(math.cos(angle_rad))
+            distance = abs(avg_depth_meters/(math.cos(angle_rad)))
             # Append the result
             depth_data.append({
                 "label": self.labelMap[detection.label],
