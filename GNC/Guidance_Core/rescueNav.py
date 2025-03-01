@@ -44,6 +44,7 @@ class Rescue(MissionHelper):
         while(on):
             gps, detections = self.info.getInfo()
             print(detections)
+            self.objectDetected = False
             for object in detections:
                 label = object["label"]
                 self.objectDetected = True
@@ -70,8 +71,8 @@ class Rescue(MissionHelper):
 
             if(self.objectDetected == False and self.duration > (time.time() - self.startTime)):
                 self.motor.rotate(0.2) # rotate to find target
-            else: 
-                on = False # stop the while loop
+            # else: 
+            #     on = False # stop the while loop
 
             
             time.sleep(0.05) # sampling rate
