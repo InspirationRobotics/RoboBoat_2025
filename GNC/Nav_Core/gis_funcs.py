@@ -51,17 +51,14 @@ def bearing(lat1, lon1, lat2, lon2) -> float:
 
 def relative_bearing(lat1, lon1, lat2, lon2, current_heading) -> float:
     """
-    Calculate the relative bearing between two points
-    on the earth (specified in decimal degrees) and the current heading.
+    Calculate the relative bearing between two points on Earth (in decimal degrees)
+    relative to the current heading. The result is normalized to (-180, 180] degrees.
     """
     abs_bearing = bearing(lat1, lon1, lat2, lon2)
-    relative_bearing = abs_bearing - current_heading
-    return relative_bearing
+    relative_bearing = (abs_bearing - current_heading + 180) % 360 - 180  
+    return 180 if relative_bearing == -180 else relative_bearing  # Ensures -180 → 180
 
-def normalized_bearing(lat1, lon1, lat2, lon2, current_heading) ->float:
-    """Normalize an angle to the range (-180, 180] degrees."""
-    angle = relative_bearing(lat1, lon1, lat2, lon2, current_heading)
-    return (angle + 180) % 360 - 180
+
 
 def vector_to_target(pos1 : Tuple, pos2 : Tuple, current_heading) -> Tuple[float, float, float]:
     """
