@@ -15,7 +15,7 @@ class waypointNav:
         self._loadConfig()                 
 
         self.info               = infoCore(modelPath=self.config.model_path,labelMap=self.config.label_map)
-        self.motor              = motor_core_new.MotorCore("/dev/ttyACM0") # load with default port "/dev/ttyACM2"
+        self.motor              = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
 
         self.waypoints :list    = None
         
@@ -96,8 +96,7 @@ class waypointNav:
 
                 # yaw base on angle and distance
                 # apply expoential relationship for turning power and angle
-                #self.motor.yaw(thrusterPower,turningPower)
-                self.motor.surge(thrusterPower)
+                self.motor.yaw(thrusterPower,turningPower)
                 # 0.1 s interval
                 time.sleep(0.1)
 
