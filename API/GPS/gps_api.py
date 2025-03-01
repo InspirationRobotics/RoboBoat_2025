@@ -107,7 +107,7 @@ class GPS:
                     self.data.lat = parsed_data.lat
                     self.data.lon = parsed_data.lon
             elif parsed_data.msgID == 'THS':
-                    self.data.heading = (parsed_data.headt + self.offse t) % 360
+                    self.data.heading = (parsed_data.headt + self.offset) % 360
         except Exception as e:
             # print("Error grabbing data")
             # print(e)
