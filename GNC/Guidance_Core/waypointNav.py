@@ -103,6 +103,10 @@ class waypointNav:
 
                 # update information
                 self.updateDelta(lat=latin, lon=lonin)
+            
+            print("wapoint reached")
+
+        print("All points reached")
 
     def updateDelta(self,lat,lon):
         gpsdata = self.info.getGPSData()
