@@ -9,13 +9,10 @@ import math
 import time
 
 class waypointNav:
-    def __init__(self):
-        self.config             = MissionHelper()
-        print("Loading Config file ...")
-        self._loadConfig()                 
+    def __init__(self , infoCore, motors):              
 
-        self.info               = infoCore(modelPath=self.config.model_path,labelMap=self.config.label_map)
-        self.motor              = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
+        self.info               = infoCore
+        self.motor              = motors
 
         self.waypoints :list    = None
         
@@ -122,7 +119,12 @@ class waypointNav:
 
 
 if __name__ == "__main__":
-    mission = waypointNav()
+    config     = MissionHelper()
+    print("loading configs")
+    config.parse_config_data(config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json"))
+    info       = infoCore(modelPath=config["sign_model_path"],labelMap=config["sign_label_map"])
+    motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
+    mission    = waypointNav(infoCore=info, motors=motor)
     mission.start()
     try:
         mission.run()

@@ -10,12 +10,13 @@ import math
 class Rescue(MissionHelper):
     def __init__(self):
         # Init config
-        self.config = self.load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
-        self.parse_config_data(self.config)
+        self.config = MissionHelper()
+        print("loading configs")
+        self.config.parse_config_data(self.config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json"))
 
         self.info       = infoCore(modelPath=self.config["sign_model_path"],labelMap=self.config["sign_label_map"])
-        self.motor      = MotorCore()
-        self.wayPNav    = waypointNav()
+        self.motor      = MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
+        self.wayPNav    = waypointNav(infoCore=self.info, motors=self.motor)
         self.servo      = mini_maestro.MiniMaestro(self.servo_port)
 
         self.cross      = False
