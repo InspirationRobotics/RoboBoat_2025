@@ -63,6 +63,7 @@ class Rescue:
                     on = False # stop the while loop
 
             self.motor.rotate(0.2) # rotate to find target
+            time.sleep(0.05) # sampling rate
 
         print("mission finished")
 

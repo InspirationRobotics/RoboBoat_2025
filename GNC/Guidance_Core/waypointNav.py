@@ -34,7 +34,7 @@ class waypointNav:
             print(points)
 
     def loadWaypoints(self,points):
-        """This is used when waypoint nav is not reading waypoint"""
+        """This is used when waypoint nav is not readed from txt"""
         self.waypoints = list(points)
         pass
 
