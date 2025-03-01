@@ -5,7 +5,7 @@ from API.Motors import t200
 
 class MotorCore:
     def __init__(self, motor_port : str = "/dev/ttyACM2"):
-        self.motor = t200.T200(motor_port)
+        self.t200 = t200.T200(motor_port)
 
     def surge(self, magnitude):
         """Configures for forward (positive magnitude) or backward (negative magnitude) movement"""
