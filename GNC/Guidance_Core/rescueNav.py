@@ -30,21 +30,20 @@ class Rescue(MissionHelper):
         self.startTime = time.time()
 
         # # Maybe? declare mini maestro channel for water gun and racketball launcher also the PWM value
-        # self.racquetball_launcher_channel   = 0
-        # self.water_cannon_channel           = 0
-        # self.launchPWM                      = 1600
-        # self.nominalPWM                     = 1800
+        self.racquetball_launcher_channel   = 0
+        self.water_cannon_channel           = 0
+        self.launchPWM                      = 1600
+        self.nominalPWM                     = 1800
 
     def start(self):
-        # NOTE: Resolved -- TODO Here is a conflict, because we initialize info core in wayPNav object start method
-        # Solution: put everything in a big ass file never stop wayPNav until return, pass in info core to wayPNav ...
-        self.wayPNav.start()  
-        # self.info.start_collecting()
+        print("Background thread started")
+        self.info.start_collecting()
 
     def run(self):
         on = True
         while(on):
             gps, detections = self.info.getInfo()
+            print(detections)
             for object in detections:
                 label = object["label"]
                 self.objectDetected = True
@@ -80,5 +79,4 @@ class Rescue(MissionHelper):
         print("[RESCUE DELIVERIES] Mission finished.")
 
     def stop(self):
-        self.info.stop_collecting()
         self.wayPNav.stop()
