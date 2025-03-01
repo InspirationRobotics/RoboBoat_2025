@@ -4,7 +4,7 @@ This script only do certain motion, magnitude between 0 and 1
 from API.Motors import t200
 
 class MotorCore:
-    def __init__(self, motor_port : str = "/dev/ttyACM2"):
+    def __init__(self, motor_port : str = "/dev/ttyACM0"):
         self.t200 = t200.T200(motor_port)
 
     def surge(self, magnitude):
