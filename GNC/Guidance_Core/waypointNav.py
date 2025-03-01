@@ -1,7 +1,7 @@
 """
 This is the script for waypoint navigation
 """
-from GNC.Control_Core.motor_core_new  import MotorCore
+from GNC.Control_Core  import motor_core_new
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
 import GNC.Nav_Core.gis_funcs as gpsfunc
@@ -15,7 +15,7 @@ class waypointNav:
         self._loadConfig()                 
 
         self.info               = infoCore(modelPath=self.config.model_path,labelMap=self.config.label_map)
-        self.motor              = MotorCore("/dev/ttyACM0") # load with default port "/dev/ttyACM2"
+        self.motor              = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
 
         self.waypoints :list    = None
         
@@ -62,11 +62,13 @@ class waypointNav:
     def stop(self):
         self.info.stop_collecting()
         print("Background Threads stopped")
+        self.motor.stop()
+        print("Motors stoped")
 
     def run(self):
         """Main logic of waypoint navigation"""
         angleTolerance = 5.0/180    # 5 degrees tolerance  (I think we don't need this)
-        distanceTolerance = 3       # 3 meters tolerance
+        distanceTolerance = 1.5       # 3 meters tolerance
 
         for points in self.waypoints:
             
@@ -92,17 +94,19 @@ class waypointNav:
                 
                 # Equation: 1-|x^0.2| why? concave up and decreasing as angle increase
                 # TODO I think we need to add another varaible to slow down when distance is smaller
-                thrusterPower = MAXFRONT * (1 - abs(math.pow(abs(self.cur_ang), 0.2))) * (math.pow((self.cur_dis / initDis), 2))
-
+                thrusterPower = MAXFRONT * (1 - abs(math.pow(abs(self.cur_ang), 3))) * (self.cur_dis / (initDis-distanceTolerance))
                 # yaw base on angle and distance
                 # apply expoential relationship for turning power and angle
                 self.motor.yaw(thrusterPower,turningPower)
-
                 # 0.1 s interval
                 time.sleep(0.1)
 
                 # update information
                 self.updateDelta(lat=latin, lon=lonin)
+            
+            print("wapoint reached")
+
+        print("All points reached")
 
     def updateDelta(self,lat,lon):
         gpsdata = self.info.getGPSData()
@@ -120,4 +124,7 @@ class waypointNav:
 if __name__ == "__main__":
     mission = waypointNav()
     mission.start()
-    mission.run()
+    try:
+        mission.run()
+    except KeyboardInterrupt:
+        mission.stop()
