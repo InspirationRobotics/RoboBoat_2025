@@ -17,7 +17,7 @@ class Rescue(MissionHelper):
         self.info       = infoCore(modelPath=self.config["sign_model_path"],labelMap=self.config["sign_label_map"])
         self.motor      = MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
         self.wayPNav    = waypointNav(infoCore=self.info, motors=self.motor)
-        self.servo      = mini_maestro.MiniMaestro(self.servo_port)
+        self.servo      = mini_maestro.MiniMaestro(self.config["mini_maestro_port"])
 
         self.cross      = False
         self.triangle   = False
