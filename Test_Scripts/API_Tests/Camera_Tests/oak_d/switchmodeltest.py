@@ -18,18 +18,18 @@ LABELMAP_2 = config["sign_label_map"]
 def test_switch_model():
     """Test switching between two models."""
     print("\nInitializing CameraCore with the first model...")
-    camera = CameraCore(MODEL_1, LABELMAP_1)
+    camera = CameraCore(MODEL_2, LABELMAP_2)
     
     print("\nStarting camera...")
     camera.start()
     time.sleep(5)  # Let it run for a few seconds
 
     print("\nSwitching to the second model...")
-    camera.switchModel(MODEL_2,LABELMAP_2)
+    camera.switchModel(MODEL_1,LABELMAP_1)
     time.sleep(5)  # Allow time for the model switch to take effect
 
     print("\nSwitching back to the first model...")
-    camera.switchModel(MODEL_1,LABELMAP_1)
+    camera.switchModel(MODEL_2,LABELMAP_2)
     time.sleep(5)  # Ensure the camera restarts correctly
 
     print("\nStopping camera...")
