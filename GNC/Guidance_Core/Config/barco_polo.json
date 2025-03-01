@@ -36,7 +36,7 @@
     ],
 
 
-    "mini_maestro_port": "/dev/tty/USB1",
+    "mini_maestro_port": "/dev/ttyACM1",
     "racquetball_launcher_channel": "0",
     "water_cannon_channel": "1",
     "launch_PWM": "1800",
