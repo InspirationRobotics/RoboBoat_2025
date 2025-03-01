@@ -13,7 +13,7 @@ class Rescue(MissionHelper):
         self.config = self.load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
         self.parse_config_data(self.config)
 
-        self.info       = infoCore(modelPath=self.config["test_model_path"],labelMap=self.config["test_label_map"])
+        self.info       = infoCore(modelPath=self.config["sign_model_path"],labelMap=self.config["sign_label_map"])
         self.motor      = MotorCore()
         self.wayPNav    = waypointNav()
         self.servo      = mini_maestro.MiniMaestro(self.servo_port)

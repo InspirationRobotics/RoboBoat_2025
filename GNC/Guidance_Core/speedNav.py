@@ -6,7 +6,7 @@ from GNC.Guidance_Core.mission_helper import MissionHelper
 import time
 import math
 
-class SpeedChallenge:
+class SpeedChallenge(MissionHelper):
     def __init__(self):
         self.config     = MissionHelper().load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
         self.info       = infoCore(modelPath=self.config["test_model_path"],labelMap=self.config["test_label_map"])
@@ -15,7 +15,6 @@ class SpeedChallenge:
 
         self.initPos    = []    #(lat,lon,heading)
         
-
     def start(self):
         self.info.start_collecting()
         time.sleep(1)

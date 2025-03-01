@@ -25,13 +25,14 @@ class MotorCore:
         self.t200.set_thrusters(magnitude,-magnitude,magnitude,magnitude)
 
     def yaw(self, magnitudeF, magnitudeB):
-        """ Arguments:
-                magnitudeF : magnitude for front motors
-                magnitudeB : magnitude for back motors
+        """ 
+        Arguments:
+            magnitudeF : magnitude for front motors
+            magnitudeB : magnitude for back motors
 
-            Usage:
-                Positive magnitudeF is forward
-                Positive magnitudeB is clockwise
+        Usage:
+            Positive magnitudeF is forward
+            Positive magnitudeB is clockwise
         """
         self.t200.set_thrusters(-magnitudeF,-magnitudeF,magnitudeB,magnitudeB)
 
