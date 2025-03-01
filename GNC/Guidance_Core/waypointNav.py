@@ -62,6 +62,8 @@ class waypointNav:
     def stop(self):
         self.info.stop_collecting()
         print("Background Threads stopped")
+        self.motor.stop()
+        print("Motors stoped")
 
     def run(self):
         """Main logic of waypoint navigation"""
