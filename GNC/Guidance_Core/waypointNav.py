@@ -126,5 +126,6 @@ if __name__ == "__main__":
     mission.start()
     try:
         mission.run()
+        mission.stop()
     except KeyboardInterrupt:
         mission.stop()
