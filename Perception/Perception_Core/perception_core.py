@@ -154,7 +154,8 @@ class CameraCore:
         print(f"Switching model to: {modelPath}")
 
         self.stop()  # Stop camera capture
-
+        print("Wait for threads to code")
+        time.sleep(5)
         try:
             # Create a new OAKD_LR instance with the new model
             self.cam = OAKD_LR(model_path=modelPath, labelMap=labelMap)
