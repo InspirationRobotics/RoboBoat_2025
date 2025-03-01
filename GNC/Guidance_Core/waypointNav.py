@@ -105,12 +105,12 @@ class waypointNav:
                 self.updateDelta(lat=latin, lon=lonin)
 
     def updateDelta(self,lat,lon):
-        gpsdata = self.info.getGPSData
-        self.cur_ang =  gpsfunc.normalized_bearing_bearing(lat1=gpsdata.lat,lon1=gpsdata.lon,lat2=lat,lon2=lon,current_heading=gpsdata.heading)
+        gpsdata = self.info.getGPSData()
+        self.cur_ang =  gpsfunc.normalized_bearing(lat1=gpsdata.lat,lon1=gpsdata.lon,lat2=lat,lon2=lon,current_heading=gpsdata.heading)
         self.cur_dis =  gpsfunc.haversine(lat1=gpsdata.lat,lon1=gpsdata.lon,lat2=lat,lon2=lon) # this return angle to the range (-180,180)
         # normalize angle to value between 0 and 1
         self.cur_dis /= 180
-
+        print(f"delta ang: {self.cur_ang} | delta dis: {self.cur_dis}")
         return self.cur_ang, self.cur_dis
 
 
