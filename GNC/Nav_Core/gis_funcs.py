@@ -15,22 +15,24 @@ R = 6371000 # Earth's radius in meters.
 ---------------------------- TESTED FUNCTIONS --------------------------------------
 """
 
+
 def haversine(lat1, lon1, lat2, lon2) -> float:
     """
-    Calculate the great circle distance between two points
-    on the earth (specified in decimal degrees)
+    Calculate the great-circle distance between two points
+    on the Earth (specified in decimal degrees).
     Returns distance in meters.
     """
-    # convert decimal degrees to radians
+    # Convert decimal degrees to radians
     lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
 
-    # haversine formula
+    # Haversine formula
     dlon = lon2 - lon1
     dlat = lat2 - lat1
     a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
-    c = 2 * math.asin(math.sqrt(a))
-    r = 6371000 # Radius of earth in meters. Use 3956 for miles
-    return c * r
+    c = 2 * math.asin(a ** 0.5)  # Faster than math.sqrt(a)
+    r = 6371000  # Radius of Earth in meters (use 3956 for miles)
+    
+    return c * r  # Distance in meters
 
 def bearing(lat1, lon1, lat2, lon2) -> float:
     """
