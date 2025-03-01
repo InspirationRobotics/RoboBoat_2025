@@ -43,12 +43,12 @@ class Rescue(MissionHelper):
         on = True
         while(on):
             gps, detections = self.info.getInfo()
-            print(detections)
             self.objectDetected = False
             for object in detections:
+                print(object)
                 label = object["label"]
                 self.objectDetected = True
-                if(label=="cross" or label=="black boat"):
+                if(label=="Cross" or label=="Black boat"):
                     self.wayPNav.loadWaypoints([object["location"]])
                     self.wayPNav.run()
                     
@@ -58,7 +58,7 @@ class Rescue(MissionHelper):
                     self.servo.set_pwm(self.racquetball_launcher_channel, self.nominalPWM)
                     # self.cross = True
 
-                elif(label=="triangle"or label== "orange boat"):
+                elif(label=="Triangle"or label== "Orange boat"):
                     self.wayPNav.loadWaypoints([object["location"]])
                     self.wayPNav.run()
 
@@ -71,6 +71,8 @@ class Rescue(MissionHelper):
 
             if(self.objectDetected == False and self.duration > (time.time() - self.startTime)):
                 self.motor.rotate(0.2) # rotate to find target
+            else:
+                self.motor.stay()
             # else: 
             #     on = False # stop the while loop
 
