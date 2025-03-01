@@ -32,7 +32,7 @@ results = {"response time": 0, "lat":0.0,"lon":0.0,"heading":0.0,"detection":[]}
 # Logging results
 with open(LOG_FILE, mode="w", newline="") as file:
     writer = csv.writer(file)
-    writer.writerow(["Timestamp", "CPU Usage (%)", "Response Time (ms)", "lat", "lon", "heading", "detection"])
+    writer.writerow(["Timestamp", "CPU Usage (%)", "Response Time (ms)", "lat", "lon", "heading"])
 
     try:
         while True:
@@ -47,12 +47,10 @@ with open(LOG_FILE, mode="w", newline="") as file:
 
             # Extract GPS data
             lat, lon, heading = gpsdata.lat, gpsdata.lon, gpsdata.heading
-
-            # Convert detection list to a string
-            detection_str = ";".join(detect) if detect else "None"
+            
 
             # Write to CSV
-            writer.writerow([timestamp, cpu_usage, results["response time"], lat, lon, heading, detection_str])
+            writer.writerow([timestamp, cpu_usage, results["response time"], lat, lon, heading])
 
             print(f"{timestamp} | CPU: {cpu_usage}% | response time: {results['response time']}ms")
             print(detect) if len(detect)>0 else None
