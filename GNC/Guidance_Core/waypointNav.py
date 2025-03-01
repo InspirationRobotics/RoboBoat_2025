@@ -90,7 +90,7 @@ class waypointNav:
                 # Try ^2.5 for turning power
                 # Try ^0.4 for thruster power
                 # Equation: x^3 why? Higher turning power at a greater angle, decreases as angle decreases, also can be + or - depend on angle
-                turningPower = MAXBACK * (math.pow(self.cur_ang,3))
+                turningPower = MAXBACK * self.cur_ang
                 
                 # Equation: 1-|x^0.2| why? concave up and decreasing as angle increase
                 # TODO I think we need to add another varaible to slow down when distance is smaller
