@@ -119,4 +119,7 @@ class waypointNav:
 if __name__ == "__main__":
     mission = waypointNav()
     mission.start()
-    mission.run()
+    try:
+        mission.run()
+    except KeyboardInterrupt:
+        mission.stop()
