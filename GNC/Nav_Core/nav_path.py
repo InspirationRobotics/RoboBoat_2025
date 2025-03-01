@@ -1,5 +1,5 @@
 import time
-from typing import Tuple, Any
+from typing import Tuple
 
 class MissionLogic:
     def __init__(self):
@@ -39,7 +39,7 @@ class Nav_Path(MissionLogic):
             self.file.close()
         return value
     
-    def calculate_data(self, state : str, data) -> dict[Tuple, Any]:
+    def calculate_data(self, state : str, data) -> dict[Tuple]:
         if state == None or data == None:
             return None
         elif state == "rescue_deliveries":
@@ -47,7 +47,7 @@ class Nav_Path(MissionLogic):
 
         return command
 
-    def get_next_data(self, *, state : str = None, data = None) -> dict[Tuple, Any]:
+    def get_next_data(self, *, state : str = None, data = None) -> dict[Tuple]:
         """
         Get the next data based on the given map/state. Will be a flexible dictionary, where the first position 
         is always the next waypoint (lat, lon).
