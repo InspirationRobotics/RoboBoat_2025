@@ -14,7 +14,7 @@ class Arduino:
         port (str): Port to initiate serial connection with. Defaults to "/dev/tty/ACM0".
         baudrate (int): Baudrate to set serial connection to. Defaults to 115200.
     """
-    def __init__(self, port="/dev/ttyACM0", baudrate=9600):
+    def __init__(self, port="/dev/ttyACM2", baudrate=9600):
         self.arduino = serial.Serial(port=port, baudrate=baudrate, timeout = 0.1)
 
         self.send_PWM([1500] * 4)
@@ -43,7 +43,7 @@ class T200(Arduino):
         debug (bool): Mode of whether or not to execute functions or not (debug = no execution). Defaults to false.
     """
 
-    def __init__(self, port = "/dev/ttyACM0", debug = False):
+    def __init__(self, port = "/dev/ttyACM2", debug = False):
         self.debug = debug
 
         if not debug:
