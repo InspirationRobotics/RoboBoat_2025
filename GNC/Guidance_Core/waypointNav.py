@@ -96,7 +96,7 @@ class waypointNav:
 
                 # yaw base on angle and distance
                 # apply expoential relationship for turning power and angle
-                self.motor.yaw(thrusterPower,thrusterPower,turningPower,turningPower)
+                self.motor.yaw(thrusterPower,turningPower)
 
                 # 0.1 s interval
                 time.sleep(0.1)
