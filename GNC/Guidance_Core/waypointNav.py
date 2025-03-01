@@ -94,8 +94,7 @@ class waypointNav:
                 
                 # Equation: 1-|x^0.2| why? concave up and decreasing as angle increase
                 # TODO I think we need to add another varaible to slow down when distance is smaller
-                thrusterPower = MAXFRONT * (1 - abs(math.pow(abs(self.cur_ang), 0.2))) * (self.cur_dis / (initDis+distanceTolerance))
-
+                thrusterPower = MAXFRONT * (1 - abs(math.pow(abs(self.cur_ang), 0.2))) * (self.cur_dis / initDis)
                 # yaw base on angle and distance
                 # apply expoential relationship for turning power and angle
                 self.motor.yaw(thrusterPower,turningPower)
