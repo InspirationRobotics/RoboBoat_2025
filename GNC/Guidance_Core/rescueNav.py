@@ -80,3 +80,14 @@ class Rescue(MissionHelper):
 
     def stop(self):
         self.wayPNav.stop()
+        
+
+
+if __name__ == "__main__":
+    mission = Rescue()
+    try:
+        mission.start()
+        mission.run()
+        mission.stop()
+    except KeyboardInterrupt:
+        mission.stop()
