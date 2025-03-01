@@ -15,7 +15,7 @@ class waypointNav:
         self._loadConfig()                 
 
         self.info               = infoCore(modelPath=self.config.model_path,labelMap=self.config.label_map)
-        self.motor              = MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
+        self.motor              = MotorCore("/dev/ttyACM0") # load with default port "/dev/ttyACM2"
 
         self.waypoints :list    = None
         
