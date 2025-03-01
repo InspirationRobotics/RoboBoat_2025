@@ -49,7 +49,7 @@ class infoCore:
             lon_obj = boat_lon + math.degrees(delta_lon)
 
             # add location to dictionary
-            object["location"] = (lat_obj,lon_obj)  
+            object["location"] = {"lat":lat_obj,"lon":lon_obj}
 
         return gpsData, detections
     
