@@ -10,12 +10,19 @@ Sandbox file to make it convenient to see how code works/experiment with syntax.
 # m.parse_config_data(data)
 # print(m.mission_sequence)
 
-import math
+# var = True
+# code = False
 
-x, y = (0, 10)
-vector_distance = round(math.sqrt(x^2 + y^2), 2)
-vector_theta = round(math.degrees(math.atan2(y, (x + 0.001))), 2)
-print(vector_theta)
+# if(var == True '''and code == False'''):
+#     print("Hello")
+
+
+# import math
+
+# x, y = (0, 10)
+# vector_distance = round(math.sqrt(x^2 + y^2), 2)
+# vector_theta = round(math.degrees(math.atan2(y, (x + 0.001))), 2)
+# print(vector_theta)
 
 # def experiment(*, box):
 #     if box is not None and box == 1:
