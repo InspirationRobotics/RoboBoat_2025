@@ -9,13 +9,10 @@ import math
 import time
 
 class waypointNav:
-    def __init__(self):
-        self.config             = MissionHelper()
-        print("Loading Config file ...")
-        self._loadConfig()                 
+    def __init__(self , infoCore, motors):              
 
-        self.info               = infoCore(modelPath=self.config.model_path,labelMap=self.config.label_map)
-        self.motor              = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
+        self.info               = infoCore
+        self.motor              = motors
 
         self.waypoints :list    = None
         
@@ -49,10 +46,6 @@ class waypointNav:
         return lat_lon_list
 
     def start(self):
-        # start info core and load config
-        print("Starting background Threads...")
-        self.info.start_collecting()
-
         # load waypoints
         print("Loading waypoints...")
         self._loadWaypoints()
@@ -99,7 +92,7 @@ class waypointNav:
                 # apply expoential relationship for turning power and angle
                 self.motor.yaw(thrusterPower,turningPower)
                 # 0.1 s interval
-                time.sleep(0.1)
+                time.sleep(0.01)
 
                 # update information
                 self.updateDelta(lat=latin, lon=lonin)
@@ -122,7 +115,14 @@ class waypointNav:
 
 
 if __name__ == "__main__":
-    mission = waypointNav()
+    config     = MissionHelper()
+    print("loading configs")
+    config.parse_config_data(config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json"))
+    info       = infoCore(modelPath=config["sign_model_path"],labelMap=config["sign_label_map"])
+    print("start background threads")
+    info.start_collecting()
+    motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
+    mission    = waypointNav(infoCore=info, motors=motor)
     mission.start()
     try:
         mission.run()
