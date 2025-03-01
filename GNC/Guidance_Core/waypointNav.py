@@ -109,10 +109,10 @@ class waypointNav:
         print(f"waypoints| lat: {lat} | lon: {lon}")
         self.cur_ang =  gpsfunc.relative_bearing(lat1=gpsdata.lat,lon1=gpsdata.lon,lat2=lat,lon2=lon,current_heading=gpsdata.heading)
         self.cur_dis =  gpsfunc.haversine(lat1=gpsdata.lat,lon1=gpsdata.lon,lat2=lat,lon2=lon) # this return angle to the range (-180,180)
-        # normalize angle to value between 0 and 1
-        self.cur_dis /= 180
         print(f"abs head: {gpsdata.heading} | lat: {gpsdata.lat} | lon: {gpsdata.lon}")
         print(f"delta ang: {self.cur_ang} | delta dis: {self.cur_dis}")
+        # normalize angle to value between 0 and 1
+        self.cur_ang /= 180
         return self.cur_ang, self.cur_dis
 
 
