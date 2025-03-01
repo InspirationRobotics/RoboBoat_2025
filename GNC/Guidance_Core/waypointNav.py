@@ -1,7 +1,7 @@
 """
 This is the script for waypoint navigation
 """
-from GNC.Control_Core.motor_core_new  import MotorCore
+from GNC.Control_Core  import motor_core_new
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
 import GNC.Nav_Core.gis_funcs as gpsfunc
@@ -15,7 +15,7 @@ class waypointNav:
         self._loadConfig()                 
 
         self.info               = infoCore(modelPath=self.config.model_path,labelMap=self.config.label_map)
-        self.motor              = MotorCore("/dev/ttyACM0") # load with default port "/dev/ttyACM2"
+        self.motor              = motor_core_new.MotorCore("/dev/ttyACM0") # load with default port "/dev/ttyACM2"
 
         self.waypoints :list    = None
         
@@ -96,8 +96,8 @@ class waypointNav:
 
                 # yaw base on angle and distance
                 # apply expoential relationship for turning power and angle
-                self.motor.yaw(thrusterPower,turningPower)
-
+                #self.motor.yaw(thrusterPower,turningPower)
+                self.motor.surge(thrusterPower)
                 # 0.1 s interval
                 time.sleep(0.1)
 
