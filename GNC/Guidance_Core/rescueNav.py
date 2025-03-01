@@ -12,7 +12,7 @@ class Rescue(MissionHelper):
         # Init config
         self.config = MissionHelper()
         print("loading configs")
-        self.config = self.config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json"))
+        self.config = self.config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
 
         self.info       = infoCore(modelPath=self.config["sign_model_path"],labelMap=self.config["sign_label_map"])
         self.motor      = MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
