@@ -70,8 +70,8 @@ class waypointNav:
 
         for points in self.waypoints:
             
-            latin = points[0]
-            lonin = points[1]
+            latin = points["lat"]
+            lonin = points["lon"]
         
             # update bearing angle and distance
             self.updateDelta(lat=latin, lon=lonin)
