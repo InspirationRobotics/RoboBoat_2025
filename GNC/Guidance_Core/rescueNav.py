@@ -24,6 +24,10 @@ class Rescue(MissionHelper):
         self.crossObject    = []
         self.triangleObject = []
 
+        self.objectDetected = False
+        self.duration = 20
+        self.startTime = time.time()
+
         # # Maybe? declare mini maestro channel for water gun and racketball launcher also the PWM value
         # self.racquetball_launcher_channel   = 0
         # self.water_cannon_channel           = 0
@@ -42,6 +46,7 @@ class Rescue(MissionHelper):
             gps, detections = self.info.getInfo()
             for object in detections:
                 label = object["label"]
+                self.objectDetected = True
                 if(label=="cross" or label=="black boat"):
                     self.wayPNav.loadWaypoints([object["location"]])
                     self.wayPNav.run()
@@ -62,10 +67,13 @@ class Rescue(MissionHelper):
                     self.servo.set_pwm(self.water_cannon_channel, self.nominalPWM)
 
                     # self.triangle = True
-                
-            on = False # stop the while loop
 
-            self.motor.rotate(0.2) # rotate to find target
+            if(self.objectDetected == False and self.duration > (time.time() - self.startTime)):
+                self.motor.rotate(0.2) # rotate to find target
+            else: 
+                on = False # stop the while loop
+
+            
             time.sleep(0.05) # sampling rate
 
         print("[RESCUE DELIVERIES] Mission finished.")
