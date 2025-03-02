@@ -50,6 +50,7 @@ with open(LOG_FILE, mode="w", newline="") as file:
 
             # Extract GPS data
             lat, lon, heading = gpsdata.lat, gpsdata.lon, gpsdata.heading
+
             
             cv2.imshow("Frame",infocore.getFrame())
             # Write to CSV
@@ -59,6 +60,8 @@ with open(LOG_FILE, mode="w", newline="") as file:
             print(detect) if len(detect)>0 else None
             print(lat, lon, heading)
             print("\n")
+            for object in detect:
+                print(f"{object["label"]} | ang: {object["angle"]} | dis: {object["depth"]} | position: {object["location"]}")
             time.sleep(1)  # Log every second
 
     except KeyboardInterrupt:
