@@ -20,7 +20,7 @@ LABELMAP_1 = config["test_label_map"]
 LABELMAP_2 = config["sign_label_map"]
 
 # Initialize the camera core
-camera = CameraCore(model_path=MODEL_1, labelMap=LABELMAP_1)
+camera = CameraCore(model_path=MODEL_2, labelMap=LABELMAP_2)
 camera.start()
 
 # Create a queue to pass frames between threads
