@@ -37,6 +37,8 @@ with open(LOG_FILE, mode="w", newline="") as file:
 
     try:
         while True:
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
             cpu_usage = psutil.cpu_percent(interval=0)  # Instant CPU reading
 
