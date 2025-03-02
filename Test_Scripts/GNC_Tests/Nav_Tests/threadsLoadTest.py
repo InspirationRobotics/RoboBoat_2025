@@ -24,7 +24,7 @@ LABELMAP_1 = config["test_label_map"]
 LABELMAP_2 = config["sign_label_map"]
 
 # Initialize info Core
-infocore = infoCore(MODEL_1,LABELMAP_1)
+infocore = infoCore(MODEL_2,LABELMAP_2)
 infocore.start_collecting()  # Starts background threads
 
 # Logging results
