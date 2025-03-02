@@ -5,6 +5,7 @@ from GNC.Nav_Core.info_core import infoCore
 import time
 import psutil
 import csv
+import cv2
 from GNC.Guidance_Core.mission_helper import MissionHelper
 
 # Log file
@@ -48,7 +49,7 @@ with open(LOG_FILE, mode="w", newline="") as file:
             # Extract GPS data
             lat, lon, heading = gpsdata.lat, gpsdata.lon, gpsdata.heading
             
-
+            cv2.imshow("Frame",infocore.getFrame())
             # Write to CSV
             writer.writerow([timestamp, cpu_usage, results["response time"], lat, lon, heading])
 

@@ -186,6 +186,8 @@ class CameraCore:
                             cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
                 cv2.putText(rgb, f"{object['depth']:.2f} meters", (bbox[0] + 10, bbox[1] + 60),
                             cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
+                cv2.putText(rgb, f"{object['angle']:.2f} degrees", (bbox[0] + 10, bbox[1] + 80),
+                            cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
                 cv2.rectangle(rgb, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
         except Exception as e:
             print(f"Visualization Error: {e}")
