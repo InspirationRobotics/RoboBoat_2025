@@ -39,7 +39,7 @@ class infoCore:
         for object in detections:
             R = 6371000  # Earth radius in meters
             heading = math.radians((boat_heading + object["angle"]) % 360)     # abs heading [0,2pi]
-            distance = object["distance"]
+            distance = object["depth"]
             # Compute change in latitude and longitude
             delta_lat = (distance / R) * math.cos(heading)
             delta_lon = (distance / R) * math.sin(heading) / math.cos(math.radians(boat_lat)) # compute in radians
@@ -52,7 +52,10 @@ class infoCore:
             object["location"] = {"lat":lat_obj,"lon":lon_obj}
 
         return gpsData, detections
-    
+
+    def getFrame(self):
+        return self.Camera.visualize()        
+
     def getGPSData(self) ->GPSData:
         """DEPRECATED it's now integrated in getInfo"""
         return self.GPS.get_data()
