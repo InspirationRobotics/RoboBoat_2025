@@ -19,6 +19,8 @@ class waypointNav(MissionHelper):
             self.info = info
         if motor is None:
             self.motor              = motor_core_new(self.motor_port)
+        else:
+            self.motor              = motor
 
         self.waypoints :list    = None
         
@@ -129,7 +131,7 @@ if __name__ == "__main__":
     info.start_collecting()
     motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
 
-    mission    = waypointNav(infoCore=info, motors=motor)
+    mission    = waypointNav(info=info, motor=motor)
     mission.start()
     try:
         mission.run()
