@@ -21,11 +21,11 @@ class waypointNav:
 
 
     def _loadConfig(self,file_path:str = "GNC/Guidance_Core/Config/barco_polo.json"):
-        self.config.parse_config_data(self.config.load_json(path=file_path))
+        self.config = self.config.load_json(path=file_path)
 
     def _loadWaypoints(self):
-        print(f"path: {self.config.waypoint_file}")
-        self.waypoints = self.__readLatLon(self.config.waypoint_file)
+        print(f"path: {self.config['waypoint_file']}")
+        self.waypoints = self.__readLatLon(self.config['waypoint_file'])
         print("\nWaypoints: ")
         for points in self.waypoints:
             print(points)
