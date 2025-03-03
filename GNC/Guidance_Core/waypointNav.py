@@ -10,8 +10,6 @@ import time
 
 class waypointNav:
     def __init__(self , infoCore, motors):  
-        self.config             = MissionHelper()            
-
         self.info               = infoCore
         self.motor              = motors
 
@@ -22,9 +20,11 @@ class waypointNav:
 
 
     def _loadConfig(self,file_path:str = "GNC/Guidance_Core/Config/barco_polo.json"):
+        self.config = MissionHelper()
         self.config = self.config.load_json(path=file_path)
 
     def _loadWaypoints(self):
+        self._loadConfig()
         print(f"path: {self.config['waypoint_file']}")
         self.waypoints = self.__readLatLon(self.config['waypoint_file'])
         print("\nWaypoints: ")
