@@ -10,9 +10,6 @@ import time
 
 class waypointNav(MissionHelper):
     def __init__(self, *, info = None, motor = None):              
-        data = self.load_json(config)
-        self.parse_config_data(data)
-
         if info is None:
             self.info               = infoCore(modelPath=self.sign_model_path, labelMap=self.sign_label_map)
         else:
