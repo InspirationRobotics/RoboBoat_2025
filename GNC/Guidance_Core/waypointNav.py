@@ -9,7 +9,8 @@ import math
 import time
 
 class waypointNav:
-    def __init__(self , infoCore, motors):              
+    def __init__(self , infoCore, motors):  
+        self.config             = MissionHelper()            
 
         self.info               = infoCore
         self.motor              = motors
