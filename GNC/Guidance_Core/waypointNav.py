@@ -8,11 +8,17 @@ import GNC.Nav_Core.gis_funcs as gpsfunc
 import math
 import time
 
-class waypointNav:
-    def __init__(self , infoCore, motors):              
+class waypointNav(MissionHelper):
+    def __init__(self, *, info = None, motor = None):              
+        data = self.load_json(config)
+        self.parse_config_data(data)
 
-        self.info               = infoCore
-        self.motor              = motors
+        if info is None:
+            self.info               = infoCore(modelPath=self.sign_model_path, labelMap=self.sign_label_map)
+        else:
+            self.info = info
+        if motor is None:
+            self.motor              = motor_core_new(self.motor_port)
 
         self.waypoints :list    = None
         
@@ -21,11 +27,11 @@ class waypointNav:
 
 
     def _loadConfig(self,file_path:str = "GNC/Guidance_Core/Config/barco_polo.json"):
-        self.config.parse_config_data(self.config.load_json(path=file_path))
+        self.parse_config_data(self.load_json(path=file_path))
 
     def _loadWaypoints(self):
-        print(f"path: {self.config.waypoint_file}")
-        self.waypoints = self.__readLatLon(self.config.waypoint_file)
+        print(f"path: {self.waypoint_file}")
+        self.waypoints = self.__readLatLon(self.waypoint_file)
         print("\nWaypoints: ")
         for points in self.waypoints:
             print(points)
@@ -122,6 +128,7 @@ if __name__ == "__main__":
     print("start background threads")
     info.start_collecting()
     motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
+
     mission    = waypointNav(infoCore=info, motors=motor)
     mission.start()
     try:
