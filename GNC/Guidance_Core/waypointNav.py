@@ -117,7 +117,7 @@ class waypointNav:
 if __name__ == "__main__":
     config     = MissionHelper()
     print("loading configs")
-    config.parse_config_data(config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json"))
+    config     = config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
     info       = infoCore(modelPath=config["sign_model_path"],labelMap=config["sign_label_map"])
     print("start background threads")
     info.start_collecting()
