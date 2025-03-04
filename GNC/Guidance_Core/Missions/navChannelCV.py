@@ -83,7 +83,7 @@ try:
             motor.veer(0.8,-0.4)
         elif command == "Turn Right":
             print("turn right")
-            motor.veer(0.8,0.4)s
+            motor.veer(0.8,0.4)
         elif command == "Move Forward":
             print("surge")
             motor.surge(0.8)
