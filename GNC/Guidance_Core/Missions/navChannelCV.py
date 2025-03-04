@@ -71,6 +71,10 @@ def navigate_boat(frame):
             command = "Turn Right"
         else:
             command = "Move Forward"
+    elif green_buoy:
+        command = "Turn Left"
+    elif red_buoy:
+        command = "Turn Right"
     else:
         command = "Searching for buoys"
     
