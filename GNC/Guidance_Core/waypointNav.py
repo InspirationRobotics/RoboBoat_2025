@@ -95,51 +95,17 @@ class waypointNav:
             # Equation: 1-|x^0.2| why? concave up and decreasing as angle increase
             # TODO I think we need to add another varaible to slow down when distance is smaller
             thrusterPower = MAXFRONT * (1 - abs(math.pow(abs(self.cur_ang), 3))) * (self.cur_dis / (initDis-distanceTolerance))
-            # yaw base on angle and distance
+            # Veer based  on angle and distance
             # apply expoential relationship for turning power and angle
-            self.motor.yaw(thrusterPower,turningPower)
+            self.motor.veer(thrusterPower,turningPower)
             # 0.1 s interval
             time.sleep(0.01)
 
             # update information
             self.updateDelta(lat=latin, lon=lonin)
-<<<<<<< HEAD
-            
-            # store current distance
-            initDis = self.cur_dis
-
-            while(self.cur_dis>distanceTolerance):
-                # set max motor power pwm
-                MAXFRONT    = 0.8
-                MAXBACK     = 0.5
-
-                # TODO test different graph and its impact on the performance, 
-                # Try ^2.5 for turning power
-                # Try ^0.4 for thruster power
-                # Equation: x^3 why? Higher turning power at a greater angle, decreases as angle decreases, also can be + or - depend on angle
-                turningPower = MAXBACK * self.cur_ang
-                
-                # Equation: 1-|x^0.2| why? concave up and decreasing as angle increase
-                # TODO I think we need to add another varaible to slow down when distance is smaller
-                thrusterPower = MAXFRONT * (1 - abs(math.pow(abs(self.cur_ang), 3))) * (self.cur_dis / (initDis-distanceTolerance))
-                # yaw base on angle and distance
-                # apply expoential relationship for turning power and angle
-                self.motor.veer(thrusterPower,turningPower)
-                # 0.1 s interval
-                time.sleep(0.01)
-
-                # update information
-                self.updateDelta(lat=latin, lon=lonin)
-            
-            print("wapoint reached")
-
-        print("All points reached")
-
-=======
         
-        print("wapoint reached")
+        print("waypoint reached")
         
->>>>>>> 0668c83cae4a6cf5e311c8ad9fa745cc391b9c8a
     def updateDelta(self,lat,lon):
         gpsdata = self.info.getGPSData()
         print(f"waypoints| lat: {lat} | lon: {lon}")
