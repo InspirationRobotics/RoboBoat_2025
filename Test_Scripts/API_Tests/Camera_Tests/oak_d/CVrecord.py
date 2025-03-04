@@ -41,7 +41,8 @@ with dai.Device(pipeline) as device:
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for MP4
     fps = CAM_A.getFps()
     print(fps)
-    output_file = "docking_trial_two.mp4"
+    output_file = "test_contin.mp4"
+
 
     # Initialize VideoWriter
     out = cv2.VideoWriter(output_file, fourcc, fps, frame_size)
