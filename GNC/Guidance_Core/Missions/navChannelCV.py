@@ -69,7 +69,7 @@ GPS, _ = info.getInfo()
 calc_lat, calc_lon = gis_funcs.destination_point(GPS.lat, GPS.lon, GPS.heading, 15)
 while True:
     gps, detections = info.getInfo()
-    frame = info.getFrame
+    frame = info.getFrame()
     cv2.imshow("frame", frame)
     
     command, processed_frame = navigate_boat(frame)
