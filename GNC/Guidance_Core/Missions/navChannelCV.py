@@ -73,7 +73,7 @@ try:
     while True:
         gps, detections = info.getInfo()
         print(gps)
-        frame = info.getFrameRaw()
+        frame = info.getFrame()
         cv2.imshow("frame", frame)
         
         command, processed_frame = navigate_boat(frame)
