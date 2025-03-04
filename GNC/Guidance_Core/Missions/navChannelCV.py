@@ -83,7 +83,7 @@ config     = config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
 info       = infoCore(modelPath=config["sign_model_path"],labelMap=config["sign_label_map"])
 print("start background threads")
 info.start_collecting()
-motor      = motor_core_new.MotorCore("/dev/ttyACM2",debug=True) # load with default port "/dev/ttyACM2"
+motor      = motor_core_new.MotorCore("/dev/ttyACM2",debug=False) # load with default port "/dev/ttyACM2"
 time.sleep(2)
 print("rest 2 seconds")
 GPS, _ = info.getInfo()
