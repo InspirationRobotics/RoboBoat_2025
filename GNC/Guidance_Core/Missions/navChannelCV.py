@@ -21,7 +21,7 @@ def detect_buoy(frame, lower_bound, upper_bound):
     
     return None
 
-def detect_buoy_red(self, frame):
+def detect_buoy_red(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, np.array([0, 120, 70]), np.array([10, 255, 255])) + \
             cv2.inRange(hsv, np.array([170, 120, 70]), np.array([180, 255, 255]))
@@ -36,7 +36,7 @@ def detect_buoy_red(self, frame):
     return {"status": False, "xmin": None, "xmax": None, "ymin": None, "ymax": None}, frame
 
 
-def detect_buoy_green(self, frame):
+def detect_buoy_green(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
     # Define HSV range for green color
