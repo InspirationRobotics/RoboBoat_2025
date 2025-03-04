@@ -94,6 +94,8 @@ class FTP:
                     self.motors.veer(0.3, 0.3)
                 else:
                     self.motors.veer(0.3, -0.3)
+            else:
+                pass # TODO: Hit the final waypoint.
 
             # # First, split into right, left sides.
             # right_side = []
