@@ -5,6 +5,7 @@ from GNC.Control_Core  import motor_core_new
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
 import GNC.Nav_Core.gis_funcs as gpsfunc
+import threading
 import math
 import time
 
@@ -120,9 +121,12 @@ if __name__ == "__main__":
     mission    = waypointNav(infoCore=info, motors=motor)
     # load waypoints
     waypoints  = mission._readLatLon(file_path = config["waypoint_file"])
+    nav_thread = threading.Thread(target=mission.run,args=(waypoints,1.5))
     try:
         for p in waypoints:
-            mission.run(points=p)
+            nav_thread.start()
+        nav_thread.join()
         mission.stop()
     except KeyboardInterrupt:
+        nav_thread.join()
         mission.stop()
