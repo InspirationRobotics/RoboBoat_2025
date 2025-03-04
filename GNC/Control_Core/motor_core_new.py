@@ -24,8 +24,9 @@ class MotorCore:
         # NOTE: We want positive to be right, negative to be right.
         self.t200.set_thrusters(magnitude,-magnitude,magnitude,magnitude)
 
-    def yaw(self, magnitudeF, magnitudeB):
+    def veer(self, magnitudeF, magnitudeB):
         """ 
+        Move forward and yaw at the same time.
         Arguments:
             magnitudeF : magnitude for front motors
             magnitudeB : magnitude for back motors

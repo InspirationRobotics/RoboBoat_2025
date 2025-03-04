@@ -91,7 +91,7 @@ class waypointNav:
                 thrusterPower = MAXFRONT * (1 - abs(math.pow(abs(self.cur_ang), 3))) * (self.cur_dis / (initDis-distanceTolerance))
                 # yaw base on angle and distance
                 # apply expoential relationship for turning power and angle
-                self.motor.yaw(thrusterPower,turningPower)
+                self.motor.veer(thrusterPower,turningPower)
                 # 0.1 s interval
                 time.sleep(0.01)
 
