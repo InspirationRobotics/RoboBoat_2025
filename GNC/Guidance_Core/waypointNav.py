@@ -5,6 +5,7 @@ from GNC.Control_Core  import motor_core_new
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
 import GNC.Nav_Core.gis_funcs as gpsfunc
+import threading
 import math
 import time
 
@@ -18,6 +19,8 @@ class waypointNav:
         self.cur_ang            = None
         self.cur_dis            = None
 
+        self.stop_event = threading.Event()  # STOP event
+
 
     def _loadConfig(self,file_path:str = "GNC/Guidance_Core/Config/barco_polo.json"):
         self.config = MissionHelper()
@@ -26,7 +29,7 @@ class waypointNav:
     def _loadWaypoints(self):
         self._loadConfig()
         print(f"path: {self.config['waypoint_file']}")
-        self.waypoints = self.__readLatLon(self.config['waypoint_file'])
+        self.waypoints = self._readLatLon(self.config['waypoint_file'])
         print("\nWaypoints: ")
         for points in self.waypoints:
             print(points)
@@ -36,7 +39,7 @@ class waypointNav:
         self.waypoints = list(points)
         pass
 
-    def __readLatLon(self,file_path:str)->list:
+    def _readLatLon(self,file_path:str)->list:
         lat_lon_list = []
     
         with open(file_path, 'r') as file:
@@ -44,7 +47,7 @@ class waypointNav:
                 lat, lon = map(float, line.strip().split(','))
                 lat_lon_list.append({'lat': lat, 'lon': lon})
         
-        return lat_lon_list
+        return lat_lon_list  # dict in list
 
     def start(self):
         # load waypoints
@@ -59,18 +62,48 @@ class waypointNav:
         self.motor.stop()
         print("Motors stoped")
 
-    def run(self,tolerance:int = 1.5):
-        """Main logic of waypoint navigation"""
-        angleTolerance = 5.0/180    # 5 degrees tolerance  (I think we don't need this)
-        distanceTolerance = tolerance       # 3 meters tolerance
+    def stopThread(self):
+        self.stop_event.set()  # Signal thread to stop
+        print("Stop event set.")
 
-        for points in self.waypoints:
-            
-            latin = points["lat"]
-            lonin = points["lon"]
+    def run(self,points = None, tolerance:int = 1.5):
+        """Main logic of waypoint navigation"""
+        distanceTolerance = tolerance       # 3 meters tolerance
+        latin = points["lat"]  #lat
+        lonin = points["lon"]  #lon
+    
+        # update bearing angle and distance
+        self.updateDelta(lat=latin, lon=lonin)
         
-            # update bearing angle and distance
+        # store current distance
+        initDis = self.cur_dis
+
+        while(self.cur_dis>distanceTolerance):
+            if self.stop_event.is_set():  # Check if stop was requested
+                print("Stopping navigation thread.")
+                return  # Exit thread
+            # set max motor power pwm
+            MAXFRONT    = 1
+            MAXBACK     = 0.5
+
+            # TODO test different graph and its impact on the performance, 
+            # Try ^2.5 for turning power
+            # Try ^0.4 for thruster power
+            # Equation: x^3 why? Higher turning power at a greater angle, decreases as angle decreases, also can be + or - depend on angle
+            turningPower = MAXBACK * self.cur_ang
+            
+            # Equation: 1-|x^0.2| why? concave up and decreasing as angle increase
+            # TODO I think we need to add another varaible to slow down when distance is smaller
+            thrusterPower = MAXFRONT * (1 - abs(math.pow(abs(self.cur_ang), 3))) * (self.cur_dis / (initDis-distanceTolerance))
+            # yaw base on angle and distance
+            # apply expoential relationship for turning power and angle
+            self.motor.yaw(thrusterPower,turningPower)
+            # 0.1 s interval
+            time.sleep(0.01)
+
+            # update information
             self.updateDelta(lat=latin, lon=lonin)
+<<<<<<< HEAD
             
             # store current distance
             initDis = self.cur_dis
@@ -102,6 +135,11 @@ class waypointNav:
 
         print("All points reached")
 
+=======
+        
+        print("wapoint reached")
+        
+>>>>>>> 0668c83cae4a6cf5e311c8ad9fa745cc391b9c8a
     def updateDelta(self,lat,lon):
         gpsdata = self.info.getGPSData()
         print(f"waypoints| lat: {lat} | lon: {lon}")
@@ -124,9 +162,20 @@ if __name__ == "__main__":
     info.start_collecting()
     motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
     mission    = waypointNav(infoCore=info, motors=motor)
-    mission.start()
+
+    # load waypoints
+    waypoints  = mission._readLatLon(file_path = config["waypoint_file"])
+    
     try:
-        mission.run()
-        mission.stop()
+        for p in waypoints:
+            nav_thread = threading.Thread(target=mission.run, args=(p, 1.5), daemon=True)
+            nav_thread.start()
+            nav_thread.join()  # ✅ WAIT for thread to finish before stopping motors
+        mission.stop()  # ✅ Stop everything AFTER all waypoints are reached
     except KeyboardInterrupt:
-        mission.stop()
+        print("\n[!] KeyboardInterrupt detected! Stopping mission...")
+        mission.stopThread()  # ✅ Use stop event to signal stop
+        nav_thread.join()
+        mission.stop()  # Stop motors and background threads
+        print("[✔] Mission stopped cleanly.")
+
