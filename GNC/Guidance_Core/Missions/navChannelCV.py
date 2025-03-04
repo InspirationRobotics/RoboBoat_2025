@@ -27,7 +27,7 @@ def detect_buoy_red(frame):
             
             return (x, y), frame
 
-    return (center_x, 0), frame
+    return None, frame
 
 
 def detect_buoy_green(frame):
@@ -48,7 +48,7 @@ def detect_buoy_green(frame):
             
             return (x, y), frame
 
-    return (center_x, 0), frame
+    return None, frame
 
 
 def navigate_boat(frame):
