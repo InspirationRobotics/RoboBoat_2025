@@ -65,9 +65,9 @@ def navigate_boat(frame):
     if red_buoy and green_buoy:
         gate_center_x = (red_buoy[0] + green_buoy[0]) // 2
         
-        if gate_center_x < center_x - 50:
+        if gate_center_x < center_x - 40:
             command = "Turn Left"
-        elif gate_center_x > center_x + 50:
+        elif gate_center_x > center_x + 40:
             command = "Turn Right"
         else:
             command = "Move Forward"
@@ -109,10 +109,10 @@ try:
             motor.veer(0.8, 0.2)
         elif command == "Move Forward":
             print("Forward")
-            motor.surge(0.1)
+            motor.surge(0.5)
         elif command == "Searching for buoys":
             print("Lost")
-            motor.rotate(0.15)
+            motor.rotate(0.2)
 
         # TODO add stop statement
         if (gis_funcs.haversine(gps.lat,gps.lon,calc_lat,calc_lon)<=3): # 3 meter tolernace
