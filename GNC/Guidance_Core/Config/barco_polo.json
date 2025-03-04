@@ -10,7 +10,13 @@
     "camera_port": "None",
     "camera_mxid": "None",
     "camera_focal_length": "None",
-    "root_model_path": "Perception/Models",
+    "model_path": "Perception/Models/sign_model/sign_openvino_2022.1_6shave.blob",
+    "model_label_map": [
+        "Black Boat",
+        "Cross",
+        "Orange Boat",
+        "Triangle"
+    ],
 
     "test_model_path" : "Perception/Models/test_model/yolov8n_coco_640x352.blob",
     "test_label_map" :[

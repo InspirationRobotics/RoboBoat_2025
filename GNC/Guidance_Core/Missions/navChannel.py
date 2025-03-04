@@ -10,7 +10,7 @@ class navChannel:
         currentGPSData, _ = self.info.getInfo()
         currLat, currLon, currHeading = (currentGPSData.lat, currentGPSData.lon, currentGPSData.heading)
         calc_lat, calc_lon = gis_funcs.destination_point(currLat, currLon, currHeading, self.distance)
-        # TODO: Put lat, lon into waypointNav.
+        return calc_lat, calc_lon
     
         
         
