@@ -44,7 +44,7 @@ class waypointNav:
                 lat, lon = map(float, line.strip().split(','))
                 lat_lon_list.append({'lat': lat, 'lon': lon})
         
-        return lat_lon_list
+        return lat_lon_list  # dict in list
 
     def start(self):
         # load waypoints
@@ -62,8 +62,8 @@ class waypointNav:
     def run(self,points = None, tolerance:int = 1.5):
         """Main logic of waypoint navigation"""
         distanceTolerance = tolerance       # 3 meters tolerance
-        latin = points["lat"]
-        lonin = points["lon"]
+        latin = points["lat"]  #lat
+        lonin = points["lon"]  #lon
     
         # update bearing angle and distance
         self.updateDelta(lat=latin, lon=lonin)
@@ -121,7 +121,8 @@ if __name__ == "__main__":
     # load waypoints
     waypoints  = mission._readLatLon(file_path = config["waypoint_file"])
     try:
-        mission.run(points=waypoints)
+        for p in waypoints:
+            mission.run(points=p)
         mission.stop()
     except KeyboardInterrupt:
         mission.stop()
