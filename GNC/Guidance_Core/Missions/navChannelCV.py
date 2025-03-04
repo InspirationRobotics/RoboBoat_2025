@@ -67,25 +67,35 @@ time.sleep(2)
 print("rest 2 seconds")
 GPS, _ = info.getInfo()
 calc_lat, calc_lon = gis_funcs.destination_point(GPS.lat, GPS.lon, GPS.heading, 15)
-while True:
-    gps, detections = info.getInfo()
-    frame = info.getFrame()
-    cv2.imshow("frame", frame)
-    
-    command, processed_frame = navigate_boat(frame)
-    if command=="Turn Left":
-        motor.veer(0.8,-0.4)
-    elif command == "Turn Right":
-        motor.veer(0.8,0.4)
-    elif command == "Move Forward":
-        motor.surge(0.8)
 
-    # TODO add stop statement
-    if (gis_funcs.haversine(gps.lat,gps.lon,calc_lat,calc_lon)<=3): # 3 meter tolernace
-        print("mission finished")
-        motor.stay()
-        motor.stop()
-        break
+try:
+
+    while True:
+        gps, detections = info.getInfo()
+        print(gps)
+        frame = info.getFrame()
+        cv2.imshow("frame", frame)
+        
+        command, processed_frame = navigate_boat(frame)
+        if command=="Turn Left":
+            motor.veer(0.8,-0.4)
+        elif command == "Turn Right":
+            motor.veer(0.8,0.4)
+        elif command == "Move Forward":
+            motor.surge(0.8)
+
+        # TODO add stop statement
+        if (gis_funcs.haversine(gps.lat,gps.lon,calc_lat,calc_lon)<=3): # 3 meter tolernace
+            print("mission finished")
+            info.stop_collecting()
+            motor.stay()
+            motor.stop()
+            break
+except KeyboardInterrupt:
+    print("mission finished")
+    info.stop_collecting()
+    motor.stay()
+    motor.stop()
     
 
 
