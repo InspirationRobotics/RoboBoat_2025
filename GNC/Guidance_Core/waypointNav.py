@@ -59,7 +59,7 @@ class waypointNav:
         self.motor.stop()
         print("Motors stoped")
 
-    def run(self,tolerance:int = 1.5):
+    def run(self,waypoint = None, tolerance:int = 1.5):
         """Main logic of waypoint navigation"""
         angleTolerance = 5.0/180    # 5 degrees tolerance  (I think we don't need this)
         distanceTolerance = tolerance       # 3 meters tolerance
