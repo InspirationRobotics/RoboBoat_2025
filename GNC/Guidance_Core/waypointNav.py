@@ -66,7 +66,7 @@ class waypointNav:
         self.stop_event.set()  # Signal thread to stop
         print("Stop event set.")
 
-    def run(self,points = None, tolerance:int = 1.5):
+    def run(self,points : dict = None, tolerance:int = 1.5):
         """Main logic of waypoint navigation"""
         distanceTolerance = tolerance       # 3 meters tolerance
         latin = points["lat"]  #lat

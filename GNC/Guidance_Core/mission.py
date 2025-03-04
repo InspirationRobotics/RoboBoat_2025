@@ -19,3 +19,10 @@ info.start_collecting()
 motors     = motor_core_new.MotorCore(config["motor_port"]) 
 
 mission = navChannel.navChannel(infoCore=info, motors=motors)
+lat, lon = mission.run()
+waypoint = {"lat" : lat, "lon" : lon}
+
+nav_thread = threading.Thread(target=mission.run, args=(p, 1.5), daemon=True)
+nav_thread.start()
+nav_thread.join()
+
