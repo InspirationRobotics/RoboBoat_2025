@@ -71,12 +71,13 @@ calc_lat, calc_lon = gis_funcs.destination_point(GPS.lat, GPS.lon, GPS.heading, 
 try:
 
     while True:
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
         gps, detections = info.getInfo()
         print(gps)
-        frame = info.getFrame()
-        cv2.imshow("frame", frame)
+        cv2.imshow("Frame", info.getFrame())
         
-        command, processed_frame = navigate_boat(frame)
+        command, processed_frame = navigate_boat(info.getFrame())
         if command=="Turn Left":
             motor.veer(0.8,-0.4)
         elif command == "Turn Right":
