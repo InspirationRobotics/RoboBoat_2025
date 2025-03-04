@@ -4,6 +4,7 @@ from GNC.Control_Core import motor_core_new
 from GNC.Nav_Core import gis_funcs 
 import cv2
 import numpy as np
+import time
 
 def detect_buoy(frame, lower_bound, upper_bound):
     """Detects a buoy based on color range and returns its centroid."""
@@ -62,10 +63,14 @@ info       = infoCore(modelPath=config["sign_model_path"],labelMap=config["sign_
 print("start background threads")
 info.start_collecting()
 motor      = motor_core_new.MotorCore("/dev/ttyACM2",debug=True) # load with default port "/dev/ttyACM2"
+time.sleep(2)
+print("rest 2 seconds")
 GPS, _ = info.getInfo()
 calc_lat, calc_lon = gis_funcs.destination_point(GPS.lat, GPS.lon, GPS.heading, 15)
 while True:
-    gps, frame = info.getInfo()
+    gps, detections = info.getInfo()
+    frame = info.getFrame
+    cv2.imshow("frame", frame)
     
     command, processed_frame = navigate_boat(frame)
     if command=="Turn Left":
