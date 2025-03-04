@@ -106,10 +106,13 @@ try:
             motor.veer(0.8,-0.2)
         elif command == "Turn Right":
             print("turn right")
-            motor.veer(0.8,0.2)
+            motor.veer(0.8, 0.2)
         elif command == "Move Forward":
-            print("LOST")
-            motor.rotate(0.2)
+            print("Forward")
+            motor.surge(0.1)
+        elif command == "Searching for buoys":
+            print("Lost")
+            motor.rotate(0.15)
 
         # TODO add stop statement
         if (gis_funcs.haversine(gps.lat,gps.lon,calc_lat,calc_lon)<=3): # 3 meter tolernace
