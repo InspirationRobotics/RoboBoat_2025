@@ -26,7 +26,7 @@ class waypointNav:
     def _loadWaypoints(self):
         self._loadConfig()
         print(f"path: {self.config['waypoint_file']}")
-        self.waypoints = self.__readLatLon(self.config['waypoint_file'])
+        self.waypoints = self._readLatLon(self.config['waypoint_file'])
         print("\nWaypoints: ")
         for points in self.waypoints:
             print(points)
@@ -36,7 +36,7 @@ class waypointNav:
         self.waypoints = list(points)
         pass
 
-    def __readLatLon(self,file_path:str)->list:
+    def _readLatLon(self,file_path:str)->list:
         lat_lon_list = []
     
         with open(file_path, 'r') as file:
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
     mission    = waypointNav(infoCore=info, motors=motor)
     # load waypoints
-    waypoints  = mission.__readLatLon(file_path = config["waypoint_file"])
+    waypoints  = mission._readLatLon(file_path = config["waypoint_file"])
     try:
         mission.run(points=waypoints)
         mission.stop()
