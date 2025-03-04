@@ -26,5 +26,7 @@ NNAV = waypointNav(infoCore=info, motors=motors)
 
 nav_thread = threading.Thread(target=NNAV.run, args=(waypoint,1.5), daemon=True) # arguemnets: waypoint(dict), tolerance(float)->in meters
 nav_thread.start()
+time.sleep(10)
+print("should be finished")
 nav_thread.join()
 
