@@ -112,7 +112,8 @@ try:
             motor.surge(0.5)
         elif command == "Searching for buoys":
             print("Lost")
-            motor.rotate(0.2)
+            motor.rotate(0.1)
+            time.sleep(0.1)
 
         # TODO add stop statement
         if (gis_funcs.haversine(gps.lat,gps.lon,calc_lat,calc_lon)<=3): # 3 meter tolernace
