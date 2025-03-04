@@ -24,34 +24,32 @@ def detect_buoy(frame, lower_bound, upper_bound):
 def detect_buoy_red(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, np.array([0, 120, 70]), np.array([10, 255, 255])) + \
-            cv2.inRange(hsv, np.array([170, 120, 70]), np.array([180, 255, 255]))
+           cv2.inRange(hsv, np.array([170, 120, 70]), np.array([180, 255, 255]))
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
         if cv2.contourArea(largest_contour) > 0:
-            x, y, w, h = cv2.boundingRect(largest_contour)
-            # ymin is top left corner of bounding box, ymax is bottom right
-            #return {"status": True, "xmin": x, "xmax": x + w, "ymin": y, "ymax": y + h}, frame
-            return ((x+0.5*w),(y+0.5*h))
-    return (0,0)
+            lowest_point = max(largest_contour, key=lambda point: point[0][1])  # Find point with max y-coordinate
+            return tuple(lowest_point[0])  # (x, y)
 
+    return (0, 0)
 
 def detect_buoy_green(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
     # Define HSV range for green color
     mask = cv2.inRange(hsv, np.array([40, 40, 40]), np.array([80, 255, 255]))
-    
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    
+
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
         if cv2.contourArea(largest_contour) > 0:
-            x, y, w, h = cv2.boundingRect(largest_contour)
-            return ((x+0.5*w),(y+0.5*h))
-            #return {"status": True, "xmin": x, "xmax": x + w, "ymin": y, "ymax": y + h}, frame
-    
-    return (0,0)
+            lowest_point = max(largest_contour, key=lambda point: point[0][1])  # Find point with max y-coordinate
+            return tuple(lowest_point[0])  # (x, y)
+
+    return (0, 0)
+
 
 def navigate_boat(frame):
     """Processes the frame to detect buoys and determine navigation instructions."""
@@ -71,7 +69,7 @@ def navigate_boat(frame):
     
     print(red_buoy)
     print(green_buoy)
-    
+
     h, w, _ = frame.shape
     center_x = w // 2
     
@@ -112,10 +110,10 @@ try:
         cv2.imshow("Frame", info.getFrame())
         
         command, processed_frame = navigate_boat(info.getFrame())
-        if command=="Turn Left":
+        if command=="Turn Rigt":
             print("turn left")
             motor.veer(0.8,-0.4)
-        elif command == "Turn Right":
+        elif command == "Turn Left":
             print("turn right")
             motor.veer(0.8,0.4)
         elif command == "Move Forward":
