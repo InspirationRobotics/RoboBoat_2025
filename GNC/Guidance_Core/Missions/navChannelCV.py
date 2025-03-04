@@ -33,7 +33,7 @@ def detect_buoy_red(frame):
             # ymin is top left corner of bounding box, ymax is bottom right
             #return {"status": True, "xmin": x, "xmax": x + w, "ymin": y, "ymax": y + h}, frame
             return ((x+0.5*w),(y+0.5*h))
-    return {"status": False, "xmin": None, "xmax": None, "ymin": None, "ymax": None}, frame
+    return (0,0)
 
 
 def detect_buoy_green(frame):
@@ -51,8 +51,7 @@ def detect_buoy_green(frame):
             return ((x+0.5*w),(y+0.5*h))
             #return {"status": True, "xmin": x, "xmax": x + w, "ymin": y, "ymax": y + h}, frame
     
-    return {"status": False, "xmin": None, "xmax": None, "ymin": None, "ymax": None}, frame
-
+    return (0,0)
 
 def navigate_boat(frame):
     """Processes the frame to detect buoys and determine navigation instructions."""
@@ -69,6 +68,9 @@ def navigate_boat(frame):
     # Detect red and green buoys
     red_buoy = detect_buoy_red(frame)
     green_buoy = detect_buoy_green(frame)
+    
+    print(red_buoy)
+    print(green_buoy)
     
     h, w, _ = frame.shape
     center_x = w // 2
