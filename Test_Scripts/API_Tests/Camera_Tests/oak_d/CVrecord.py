@@ -56,7 +56,6 @@ with dai.Device(pipeline) as device:
         camA_frame = msg_A.getCvFrame()
 
         # Display image
-        cv2.imshow("Left Color Camera", camA_frame)
         out.write(camA_frame)
 
         if cv2.waitKey(1) == ord('q'):
