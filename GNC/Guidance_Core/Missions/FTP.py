@@ -1,3 +1,5 @@
+import time
+import queue
 
 class FTP:
     def __init__(self, *, infoCore, motors):
@@ -11,7 +13,7 @@ class FTP:
         self.endPosition = (None, None)
         self.end = False
 
-    def run(self):
+    def run(self, queue):
         # Find the two closest objects that are lowest on the screen.
         # Find the midpoint of both objects(pixel values).
         # If the difference between one midpoint is greater than the other, yaw to force the values to be within equal within a certain 
@@ -95,7 +97,11 @@ class FTP:
                 else:
                     self.motors.veer(0.3, -0.3)
             else:
-                pass # TODO: Hit the final waypoint.
+                self.end = True # TODO: Hit the final waypoint.
+                queue.put(self.endPosition)
+                break
+            
+            time.sleep(0.1)
 
             # # First, split into right, left sides.
             # right_side = []

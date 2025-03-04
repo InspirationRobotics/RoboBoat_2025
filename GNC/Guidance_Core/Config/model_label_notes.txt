@@ -1,0 +1,10 @@
+CompModel (generalized for NavChannel, FTP, Rescue Deliveries):
+
+green_buoy
+red_buoy
+yellow_buoy
+black_buoy
+cross
+triangle
+green_pylon
+red_pylon
