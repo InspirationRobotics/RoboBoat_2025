@@ -21,6 +21,37 @@ def detect_buoy(frame, lower_bound, upper_bound):
     
     return None
 
+def detect_buoy_red(self, frame):
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, np.array([0, 120, 70]), np.array([10, 255, 255])) + \
+            cv2.inRange(hsv, np.array([170, 120, 70]), np.array([180, 255, 255]))
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    if contours:
+        largest_contour = max(contours, key=cv2.contourArea)
+        if cv2.contourArea(largest_contour) > 0:
+            x, y, w, h = cv2.boundingRect(largest_contour)
+            # ymin is top left corner of bounding box, ymax is bottom right
+            return {"status": True, "xmin": x, "xmax": x + w, "ymin": y, "ymax": y + h}, frame
+    return {"status": False, "xmin": None, "xmax": None, "ymin": None, "ymax": None}, frame
+
+
+def detect_buoy_green(self, frame):
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    
+    # Define HSV range for green color
+    mask = cv2.inRange(hsv, np.array([40, 40, 40]), np.array([80, 255, 255]))
+    
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    
+    if contours:
+        largest_contour = max(contours, key=cv2.contourArea)
+        if cv2.contourArea(largest_contour) > 0:
+            x, y, w, h = cv2.boundingRect(largest_contour)
+            return {"status": True, "xmin": x, "xmax": x + w, "ymin": y, "ymax": y + h}, frame
+    
+    return {"status": False, "xmin": None, "xmax": None, "ymin": None, "ymax": None}, frame
+
+
 def navigate_boat(frame):
     """Processes the frame to detect buoys and determine navigation instructions."""
     # Convert frame to HSV
@@ -35,8 +66,8 @@ def navigate_boat(frame):
     upper_green = np.array([80, 255, 255])
     
     # Detect red and green buoys
-    red_buoy = detect_buoy(hsv, lower_red1, upper_red1) or detect_buoy(hsv, lower_red2, upper_red2)
-    green_buoy = detect_buoy(hsv, lower_green, upper_green)
+    red_buoy = detect_buoy_red(hsv)
+    green_buoy = detect_buoy_green(hsv)
     
     h, w, _ = frame.shape
     center_x = w // 2
@@ -101,6 +132,10 @@ except KeyboardInterrupt:
     info.stop_collecting()
     motor.stay()
     motor.stop()
+
+info.stop_collecting()
+motor.stay()
+motor.stop()
     
 
 
