@@ -6,69 +6,54 @@ import cv2
 import numpy as np
 import time
 
-def detect_buoy(frame, lower_bound, upper_bound):
-    """Detects a buoy based on color range and returns its centroid."""
-    mask = cv2.inRange(frame, lower_bound, upper_bound)
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    if contours:
-        largest_contour = max(contours, key=cv2.contourArea)
-        M = cv2.moments(largest_contour)
-        if M["m00"] != 0:
-            cx = int(M["m10"] / M["m00"])
-            cy = int(M["m01"] / M["m00"])
-            return (cx, cy)
-    
-    return None
-
 def detect_buoy_red(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, np.array([0, 120, 70]), np.array([10, 255, 255])) + \
            cv2.inRange(hsv, np.array([170, 120, 70]), np.array([180, 255, 255]))
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
+    
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
         if cv2.contourArea(largest_contour) > 0:
             lowest_point = max(largest_contour, key=lambda point: point[0][1])  # Find point with max y-coordinate
-            return tuple(lowest_point[0])  # (x, y)
+            x, y = tuple(lowest_point[0])  # (x, y)
+            
+            # Draw contours and the lowest point
+            cv2.drawContours(frame, [largest_contour], -1, (0, 0, 255), 2)  # Red contours
+            cv2.circle(frame, (x, y), 5, (0, 0, 255), -1)  # Red dot at lowest point
+            
+            return (x, y), frame
 
-    return (0, 0)
+    return (0, 0), frame
+
 
 def detect_buoy_green(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    
-    # Define HSV range for green color
     mask = cv2.inRange(hsv, np.array([40, 40, 40]), np.array([80, 255, 255]))
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
+    
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
         if cv2.contourArea(largest_contour) > 0:
             lowest_point = max(largest_contour, key=lambda point: point[0][1])  # Find point with max y-coordinate
-            return tuple(lowest_point[0])  # (x, y)
+            x, y = tuple(lowest_point[0])  # (x, y)
+            
+            # Draw contours and the lowest point
+            cv2.drawContours(frame, [largest_contour], -1, (0, 255, 0), 2)  # Green contours
+            cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)  # Green dot at lowest point
+            
+            return (x, y), frame
 
-    return (0, 0)
+    return (0, 0), frame
 
 
 def navigate_boat(frame):
     """Processes the frame to detect buoys and determine navigation instructions."""
-    # Convert frame to HSV
+    red_buoy, frame = detect_buoy_red(frame)
+    green_buoy, frame = detect_buoy_green(frame)
     
-    # Define color ranges for red and green buoys
-    lower_red1 = np.array([0, 120, 70])
-    upper_red1 = np.array([10, 255, 255])
-    lower_red2 = np.array([170, 120, 70])
-    upper_red2 = np.array([180, 255, 255])
-    lower_green = np.array([40, 40, 40])
-    upper_green = np.array([80, 255, 255])
-    
-    # Detect red and green buoys
-    red_buoy = detect_buoy_red(frame)
-    green_buoy = detect_buoy_green(frame)
-    
-    print(red_buoy)
-    print(green_buoy)
+    print("Red Buoy:", red_buoy)
+    print("Green Buoy:", green_buoy)
 
     h, w, _ = frame.shape
     center_x = w // 2
@@ -85,7 +70,11 @@ def navigate_boat(frame):
     else:
         command = "Searching for buoys"
     
+    # Show the frame with contours
+    cv2.imshow("Buoy Detection", frame)
+    
     return command, frame
+
 
 """***"""
 config     = MissionHelper()
@@ -106,9 +95,9 @@ try:
         if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         gps, detections = info.getInfo()
-        # cv2.imshow("Frame", info.getFrame())
         
         command, processed_frame = navigate_boat(info.getFrame())
+        cv2.imshow("Frame", processed_frame)
         if command=="Turn Left":
             print("turn left")
             motor.veer(0.8,-0.4)
