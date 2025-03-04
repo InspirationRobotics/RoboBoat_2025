@@ -106,11 +106,10 @@ try:
         if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         gps, detections = info.getInfo()
-        print(gps)
-        cv2.imshow("Frame", info.getFrame())
+        # cv2.imshow("Frame", info.getFrame())
         
         command, processed_frame = navigate_boat(info.getFrame())
-        if command=="Turn Rigt":
+        if command=="Turn Right":
             print("turn left")
             motor.veer(0.8,-0.4)
         elif command == "Turn Left":
