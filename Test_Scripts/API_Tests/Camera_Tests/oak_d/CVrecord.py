@@ -45,22 +45,22 @@ with dai.Device(pipeline) as device:
 
     # Initialize VideoWriter
     out = cv2.VideoWriter(output_file, fourcc, fps, frame_size)
+    try:
+        while True:
+            # Get frames safely
+            msg_A = CAM_A_q.get()
+            if msg_A is None:
+                print("Warning: No frame from CAM_A, skipping...")
+                continue
+            
+            camA_frame = msg_A.getCvFrame()
 
-    while True:
-        # Get frames safely
-        msg_A = CAM_A_q.get()
-        if msg_A is None:
-            print("Warning: No frame from CAM_A, skipping...")
-            continue
-        
-        camA_frame = msg_A.getCvFrame()
+            # Display image
+            out.write(camA_frame)
 
-        # Display image
-        out.write(camA_frame)
-
-        if cv2.waitKey(1) == ord('q'):
-            break
+            if cv2.waitKey(1) == ord('q'):
+                break
     
-    # Cleanup
-    cv2.destroyAllWindows()
-    out.release()
+    except KeyboardInterrupt:
+        cv2.destroyAllWindows()
+        out.release()
