@@ -19,6 +19,8 @@ class waypointNav:
         self.cur_ang            = None
         self.cur_dis            = None
 
+        self.stop_event = threading.Event()  # STOP event
+
 
     def _loadConfig(self,file_path:str = "GNC/Guidance_Core/Config/barco_polo.json"):
         self.config = MissionHelper()
@@ -60,6 +62,10 @@ class waypointNav:
         self.motor.stop()
         print("Motors stoped")
 
+    def stopThread(self):
+        self.stop_event.set()  # Signal thread to stop
+        print("Stop event set.")
+
     def run(self,points = None, tolerance:int = 1.5):
         """Main logic of waypoint navigation"""
         distanceTolerance = tolerance       # 3 meters tolerance
@@ -73,6 +79,9 @@ class waypointNav:
         initDis = self.cur_dis
 
         while(self.cur_dis>distanceTolerance):
+            if self.stop_event.is_set():  # Check if stop was requested
+                print("Stopping navigation thread.")
+                return  # Exit thread
             # set max motor power pwm
             MAXFRONT    = 1
             MAXBACK     = 0.5
@@ -125,8 +134,8 @@ if __name__ == "__main__":
         for p in waypoints:
             nav_thread = threading.Thread(target=mission.run,args=(p,1.5),daemon = True)
             nav_thread.start()
+            mission.stop()
             nav_thread.join()
-        mission.stop()
     except KeyboardInterrupt:
-        nav_thread.join()
         mission.stop()
+        nav_thread.join()
