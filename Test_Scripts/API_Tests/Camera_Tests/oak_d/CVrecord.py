@@ -1,63 +1,65 @@
 import cv2
 import depthai as dai
-import numpy as np
 
-# Create a DepthAI pipeline
+# Create DepthAI pipeline
 pipeline = dai.Pipeline()
 
-# Create nodes for left, right, and color cameras
+# Create a node for the left color camera
 CAM_A = pipeline.create(dai.node.ColorCamera)
-CAM_B= pipeline.create(dai.node.ColorCamera)
-CAM_C = pipeline.create(dai.node.ColorCamera)
 
-# Create output nodes
+# Create an output node
 xout_A = pipeline.create(dai.node.XLinkOut)
-xout_B = pipeline.create(dai.node.XLinkOut)
-xout_C = pipeline.create(dai.node.XLinkOut)
-
-# Set stream names
 xout_A.setStreamName("CAM_A")
-xout_B.setStreamName("CAM_B")
-xout_C.setStreamName("CAM_C")
 
+# Configure the color camera (Left)
+CAM_A.setBoardSocket(dai.CameraBoardSocket.CAM_A)  # Use CAM_A for the left camera
+CAM_A.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
+CAM_A.setIspScale(2, 3)  # Reduce resolution if needed
+CAM_A.setFps(30)
 
-# Configure color camera
-CAM_A.setBoardSocket(dai.CameraBoardSocket.CAM_A)
-# CAM_A.setIspScale(2, 3)  # Reduce resolution if needed
-CAM_C.setBoardSocket(dai.CameraBoardSocket.CAM_C)
-CAM_B.setBoardSocket(dai.CameraBoardSocket.CAM_B)
-
+# Link the camera output
 CAM_A.isp.link(xout_A.input)
-CAM_B.isp.link(xout_B.input)
-CAM_C.isp.link(xout_C.input)
 
 # Connect to the device and start the pipeline
 with dai.Device(pipeline) as device:
     CAM_A_q = device.getOutputQueue(name="CAM_A", maxSize=4, blocking=False)
-    CAM_B_q = device.getOutputQueue(name="CAM_B", maxSize=4, blocking=False)
-    CAM_C_q = device.getOutputQueue(name="CAM_C", maxSize=4, blocking=False)
 
     print("Capturing images...")
+
+    # Wait for the first frame to determine resolution
+    first_msg = CAM_A_q.get()
+    if first_msg is None:
+        print("Error: No frames received from CAM_A!")
+        exit(1)
+    
+    first_frame = first_msg.getCvFrame()
+    height, width = first_frame.shape[:2]
+    frame_size = (width, height)
+
     # Define video output parameters
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for MP4
     fps = 30.0  # Frames per second
-    frame_size = (1920, 1200)  # Width x Height
-    output_file = "output.mp4"
+    output_file = "testOutput.mp4"
 
     # Initialize VideoWriter
     out = cv2.VideoWriter(output_file, fourcc, fps, frame_size)
-    while (True):
-        # Get frames
-        camA_frame = CAM_A_q.get().getCvFrame()
-        # camB_frame = CAM_B_q.get().getCvFrame()
-        # camC_frame = CAM_C_q.get().getCvFrame()
 
-        # Display images (optional)
-        cv2.imshow("Left Camera", camA_frame)
-        # cv2.imshow("Right Camera", camB_frame)
-        # cv2.imshow("Color Camera", camC_frame)
+    while True:
+        # Get frames safely
+        msg_A = CAM_A_q.get()
+        if msg_A is None:
+            print("Warning: No frame from CAM_A, skipping...")
+            continue
+        
+        camA_frame = msg_A.getCvFrame()
+
+        # Display image
+        cv2.imshow("Left Color Camera", camA_frame)
         out.write(camA_frame)
+
         if cv2.waitKey(1) == ord('q'):
             break
     
+    # Cleanup
     cv2.destroyAllWindows()
+    out.release()
