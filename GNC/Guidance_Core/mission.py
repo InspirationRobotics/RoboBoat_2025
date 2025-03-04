@@ -22,7 +22,9 @@ mission = navChannel.navChannel(infoCore=info, motors=motors)
 lat, lon = mission.run()
 waypoint = {"lat" : lat, "lon" : lon}
 
-nav_thread = threading.Thread(target=mission.run, daemon=True) # arguemnets: waypoint(dict), tolerance(float)->in meters
+NNAV = waypointNav(infoCore=info, motors=motors)
+
+nav_thread = threading.Thread(target=NNAV.run, args=(waypoint,1.5), daemon=True) # arguemnets: waypoint(dict), tolerance(float)->in meters
 nav_thread.start()
 nav_thread.join()
 
