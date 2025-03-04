@@ -134,6 +134,7 @@ class CameraCore:
             # Convert perpendicular depth to actual distance
             distance = abs(avg_depth_meters/(math.cos(angle_rad)))
             # Append the result
+            # Top left corner is xmin, ymin, lower right corner is xmax, ymax.
             depth_data.append({
                 "label": self.labelMap[detection.label],
                 "confidence":detection.confidence,
