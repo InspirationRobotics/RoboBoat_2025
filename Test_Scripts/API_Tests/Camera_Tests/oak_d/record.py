@@ -15,7 +15,6 @@ xout.setStreamName('h265')
 # Properties
 camRgb.setBoardSocket(dai.CameraBoardSocket.CAM_A)
 camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1200_P)
-camRgb.setFps(30)  # Set FPS to 30
 videoEnc.setDefaultProfilePreset(30, dai.VideoEncoderProperties.Profile.H265_MAIN)
 
 # Linking
@@ -33,16 +32,13 @@ with dai.Device(pipeline) as device:
         print("Press Ctrl+C to stop encoding...")
         try:
             while True:
-                h265Packet = q.get()  # Blocking call, will wait until new data arrives
-                cvFrame = h265Packet.getCvFrame()  # This gets the raw frame from the camera
-                cv2.imshow("camera", cvFrame)  # Display the decoded frame
-                
-                # Write the encoded H265 data to file
-                h265Packet.getData().tofile(videoFile)
-
+                h265Packet = q.get()  # Blocking call, will wait until a new data has arrived
+                cvFrame = h265Packet.getCvFrame()
+                h265Packet.getData().tofile(videoFile)  # Appends the packet data to the opened file
         except KeyboardInterrupt:
-            print("Encoding stopped by user.")
-    
+            # Keyboard interrupt (Ctrl + C) detected
+            pass
+
     print("To view the encoded data, convert the stream file (.h265) into a video file (.mp4) using a command below:")
     print("ffmpeg -framerate 30 -i video.h265 -c copy video_h265.mp4")
     print("To convert .h265 type mp4 to .h264 (.mp4) using a command below")
