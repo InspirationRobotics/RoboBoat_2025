@@ -6,6 +6,8 @@ import cv2
 import numpy as np
 import time
 
+threshold = 100
+
 def detect_buoy_red(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, np.array([0, 120, 70]), np.array([10, 255, 255])) + \
@@ -15,7 +17,7 @@ def detect_buoy_red(frame):
     center_x = w // 2
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
-        if cv2.contourArea(largest_contour) > 0:
+        if cv2.contourArea(largest_contour) > threshold:
             lowest_point = max(largest_contour, key=lambda point: point[0][1])  # Find point with max y-coordinate
             x, y = tuple(lowest_point[0])  # (x, y)
             
@@ -36,7 +38,7 @@ def detect_buoy_green(frame):
     center_x = w // 2
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
-        if cv2.contourArea(largest_contour) > 0:
+        if cv2.contourArea(largest_contour) > threshold:
             lowest_point = max(largest_contour, key=lambda point: point[0][1])  # Find point with max y-coordinate
             x, y = tuple(lowest_point[0])  # (x, y)
             
