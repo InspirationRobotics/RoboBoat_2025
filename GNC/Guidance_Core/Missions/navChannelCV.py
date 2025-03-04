@@ -31,7 +31,8 @@ def detect_buoy_red(self, frame):
         if cv2.contourArea(largest_contour) > 0:
             x, y, w, h = cv2.boundingRect(largest_contour)
             # ymin is top left corner of bounding box, ymax is bottom right
-            return {"status": True, "xmin": x, "xmax": x + w, "ymin": y, "ymax": y + h}, frame
+            #return {"status": True, "xmin": x, "xmax": x + w, "ymin": y, "ymax": y + h}, frame
+            return ((x+0.5*w),(y+0.5*h))
     return {"status": False, "xmin": None, "xmax": None, "ymin": None, "ymax": None}, frame
 
 
@@ -47,7 +48,8 @@ def detect_buoy_green(self, frame):
         largest_contour = max(contours, key=cv2.contourArea)
         if cv2.contourArea(largest_contour) > 0:
             x, y, w, h = cv2.boundingRect(largest_contour)
-            return {"status": True, "xmin": x, "xmax": x + w, "ymin": y, "ymax": y + h}, frame
+            return ((x+0.5*w),(y+0.5*h))
+            #return {"status": True, "xmin": x, "xmax": x + w, "ymin": y, "ymax": y + h}, frame
     
     return {"status": False, "xmin": None, "xmax": None, "ymin": None, "ymax": None}, frame
 
