@@ -107,17 +107,17 @@ try:
         command, processed_frame = navigate_boat(info.getFrame())
         if command=="Turn Left":
             print("turn left")
-            motor.veer(0.8,-0.2)
+            motor.veer(0.6,-0.15)
         elif command == "Turn Right":
             print("turn right")
-            motor.veer(0.8, 0.2)
+            motor.veer(0.6, 0.15)
         elif command == "Move Forward":
             print("Forward")
-            motor.surge(0.5)
+            motor.surge(0.8)
         elif command == "Searching for buoys":
             print("Lost")
             motor.rotate(0.1)
-            time.sleep(0.1)
+        time.sleep(0.1)
 
         # TODO add stop statement
         if (gis_funcs.haversine(gps.lat,gps.lon,calc_lat,calc_lon)<=3): # 3 meter tolernace
