@@ -4,7 +4,7 @@ class navChannel:
     def __init__(self, *, infoCore, motors):
         self.info = infoCore
         self.motors = motors
-        self.distance = 15 # How far to move from the initial position (meters)
+        self.distance = 12 # How far to move from the initial position (meters)
 
     def run(self):
         currentGPSData, _ = self.info.getInfo()

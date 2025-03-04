@@ -1,7 +1,7 @@
 from GNC.Control_Core  import motor_core_new
 from GNC.Nav_Core.info_core import infoCore
 import GNC.Nav_Core.gis_funcs as gpsfunc
-from GNC.Guidance_Core import waypointNav
+from GNC.Guidance_Core.waypointNav import waypointNav
 from GNC.Guidance_Core.mission_helper import MissionHelper
 from GNC.Guidance_Core.Missions import navChannel
 import threading
@@ -22,7 +22,10 @@ mission = navChannel.navChannel(infoCore=info, motors=motors)
 lat, lon = mission.run()
 waypoint = {"lat" : lat, "lon" : lon}
 
-nav_thread = threading.Thread(target=mission.run, daemon=True) # arguemnets: waypoint(dict), tolerance(float)->in meters
+NNAV = waypointNav(infoCore = info,motors = motors)
+nav_thread = threading.Thread(target= NNAV.run, args = (waypoint,1.5), daemon=True) # arguemnets: waypoint(dict), tolerance(float)->in meters
 nav_thread.start()
+time.sleep(10)
+print("stoped")
 nav_thread.join()
-
+NNAV.stop()
