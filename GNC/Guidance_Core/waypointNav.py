@@ -121,11 +121,11 @@ if __name__ == "__main__":
     mission    = waypointNav(infoCore=info, motors=motor)
     # load waypoints
     waypoints  = mission._readLatLon(file_path = config["waypoint_file"])
-    nav_thread = threading.Thread(target=mission.run,args=(waypoints,1.5))
     try:
         for p in waypoints:
+            nav_thread = threading.Thread(target=mission.run,args=(waypoints,1.5))
             nav_thread.start()
-        nav_thread.join()
+            nav_thread.join()
         mission.stop()
     except KeyboardInterrupt:
         nav_thread.join()
