@@ -57,7 +57,6 @@ def detect_buoy_green(self, frame):
 def navigate_boat(frame):
     """Processes the frame to detect buoys and determine navigation instructions."""
     # Convert frame to HSV
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
     # Define color ranges for red and green buoys
     lower_red1 = np.array([0, 120, 70])
@@ -68,8 +67,8 @@ def navigate_boat(frame):
     upper_green = np.array([80, 255, 255])
     
     # Detect red and green buoys
-    red_buoy = detect_buoy_red(hsv)
-    green_buoy = detect_buoy_green(hsv)
+    red_buoy = detect_buoy_red(frame)
+    green_buoy = detect_buoy_green(frame)
     
     h, w, _ = frame.shape
     center_x = w // 2
