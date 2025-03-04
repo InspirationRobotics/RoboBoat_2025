@@ -34,7 +34,6 @@ with dai.Device(pipeline) as device:
             while True:
                 h265Packet = q.get()  # Blocking call, will wait until a new data has arrived
                 cvFrame = h265Packet.getCvFrame()
-                cv2.imshow("camera", cvFrame)
                 h265Packet.getData().tofile(videoFile)  # Appends the packet data to the opened file
         except KeyboardInterrupt:
             # Keyboard interrupt (Ctrl + C) detected
