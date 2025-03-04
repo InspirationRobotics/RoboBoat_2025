@@ -38,7 +38,7 @@ with dai.Device(pipeline) as device:
 
     # Define video output parameters
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for MP4
-    fps = 30.0  # Frames per second
+    fps = CAM_A.getFps()
     output_file = "testOutput.mp4"
 
     # Initialize VideoWriter
