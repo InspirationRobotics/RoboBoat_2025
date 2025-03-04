@@ -168,7 +168,9 @@ class CameraCore:
             print(f"Error switching model: {e}")
             self.start()  # Restart with the previous model if switch fails
 
-
+    def getFrameRaw(self):
+        return self.cam.getLatestBuffers()
+        pass
     def visualize(self):
         """Return a labeled OpenCV frame with bounding boxes and labels."""
         rgb, _ = self.get_latest_frames()

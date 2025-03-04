@@ -54,7 +54,10 @@ class infoCore:
         return gpsData, detections
 
     def getFrame(self):
-        return self.Camera.visualize()        
+        return self.Camera.visualize()  
+
+    def getFrameRaw(self):
+        return self.Camera.getFrameRaw()    
 
     def getGPSData(self) ->GPSData:
         """DEPRECATED it's now integrated in getInfo"""

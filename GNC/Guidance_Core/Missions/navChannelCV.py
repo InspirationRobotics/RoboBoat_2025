@@ -73,7 +73,7 @@ try:
     while True:
         gps, detections = info.getInfo()
         print(gps)
-        frame = info.getFrame()
+        frame = info.getFrameRaw()
         cv2.imshow("frame", frame)
         
         command, processed_frame = navigate_boat(frame)
@@ -91,6 +91,7 @@ try:
             motor.stay()
             motor.stop()
             break
+
 except KeyboardInterrupt:
     print("mission finished")
     info.stop_collecting()
