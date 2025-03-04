@@ -121,7 +121,7 @@ if __name__ == "__main__":
     # load waypoints
     waypoints  = mission.__readLatLon(file_path = config["waypoint_file"])
     try:
-        mission.run()
+        mission.run(points=waypoints)
         mission.stop()
     except KeyboardInterrupt:
         mission.stop()
