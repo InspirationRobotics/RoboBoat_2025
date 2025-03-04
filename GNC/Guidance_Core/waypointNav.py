@@ -128,14 +128,20 @@ if __name__ == "__main__":
     info.start_collecting()
     motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
     mission    = waypointNav(infoCore=info, motors=motor)
+
     # load waypoints
     waypoints  = mission._readLatLon(file_path = config["waypoint_file"])
+    
     try:
         for p in waypoints:
-            nav_thread = threading.Thread(target=mission.run,args=(p,1.5),daemon = True)
+            nav_thread = threading.Thread(target=mission.run, args=(p, 1.5), daemon=True)
             nav_thread.start()
-            mission.stop()
-            nav_thread.join()
+            nav_thread.join()  # ✅ WAIT for thread to finish before stopping motors
+        mission.stop()  # ✅ Stop everything AFTER all waypoints are reached
     except KeyboardInterrupt:
-        mission.stop()
+        print("\n[!] KeyboardInterrupt detected! Stopping mission...")
+        mission.stopThread()  # ✅ Use stop event to signal stop
         nav_thread.join()
+        mission.stop()  # Stop motors and background threads
+        print("[✔] Mission stopped cleanly.")
+
