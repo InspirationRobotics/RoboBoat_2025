@@ -123,7 +123,7 @@ if __name__ == "__main__":
     waypoints  = mission._readLatLon(file_path = config["waypoint_file"])
     try:
         for p in waypoints:
-            nav_thread = threading.Thread(target=mission.run,args=(p,1.5))
+            nav_thread = threading.Thread(target=mission.run,args=(p,1.5),daemon = True)
             nav_thread.start()
             nav_thread.join()
         mission.stop()
