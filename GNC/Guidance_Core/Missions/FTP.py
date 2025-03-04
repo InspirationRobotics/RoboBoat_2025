@@ -35,17 +35,17 @@ class FTP:
             target_green, target_red, target_yellow, target_cross, target_min = (None, None, None, None, None)
 
             for detection in detections:
-                if detection["type"] == "green":
+                if detection["type"] == "green_buoy":
                     if detection["bbox"][2] > green_min and detection["bbox"][2] < self.threshold:
                         green_min = detection["bbox"][2]
                         target_green = detection
 
-                elif detection["type"] == "red" and detection["bbox"][2] < self.threshold:
+                elif detection["type"] == "red_buoy" and detection["bbox"][2] < self.threshold:
                     if detection["bbox"][2] > red_min:
                         red_min = detection["bbox"][2]
                         target_red = detection
 
-                elif detection["type"] == "yellow" and detection["bbox"][2] < self.threshold:
+                elif detection["type"] == "yellow_buoy" and detection["bbox"][2] < self.threshold:
                     if detection["bbox"][2] > yellow_min:
                         yellow_min = detection["bbox"][2]
                         target_yellow = detection

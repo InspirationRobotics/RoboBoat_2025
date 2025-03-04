@@ -4,6 +4,8 @@ green_buoy
 red_buoy
 yellow_buoy
 black_buoy
+black_buoy
+blue_buoy
 cross
 triangle
 green_pylon
