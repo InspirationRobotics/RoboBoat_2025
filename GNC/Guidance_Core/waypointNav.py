@@ -59,49 +59,43 @@ class waypointNav:
         self.motor.stop()
         print("Motors stoped")
 
-    def run(self,waypoint = None, tolerance:int = 1.5):
+    def run(self,points = None, tolerance:int = 1.5):
         """Main logic of waypoint navigation"""
-        angleTolerance = 5.0/180    # 5 degrees tolerance  (I think we don't need this)
         distanceTolerance = tolerance       # 3 meters tolerance
-
-        for points in self.waypoints:
-            
-            latin = points["lat"]
-            lonin = points["lon"]
+        latin = points["lat"]
+        lonin = points["lon"]
+    
+        # update bearing angle and distance
+        self.updateDelta(lat=latin, lon=lonin)
         
-            # update bearing angle and distance
+        # store current distance
+        initDis = self.cur_dis
+
+        while(self.cur_dis>distanceTolerance):
+            # set max motor power pwm
+            MAXFRONT    = 1
+            MAXBACK     = 0.5
+
+            # TODO test different graph and its impact on the performance, 
+            # Try ^2.5 for turning power
+            # Try ^0.4 for thruster power
+            # Equation: x^3 why? Higher turning power at a greater angle, decreases as angle decreases, also can be + or - depend on angle
+            turningPower = MAXBACK * self.cur_ang
+            
+            # Equation: 1-|x^0.2| why? concave up and decreasing as angle increase
+            # TODO I think we need to add another varaible to slow down when distance is smaller
+            thrusterPower = MAXFRONT * (1 - abs(math.pow(abs(self.cur_ang), 3))) * (self.cur_dis / (initDis-distanceTolerance))
+            # yaw base on angle and distance
+            # apply expoential relationship for turning power and angle
+            self.motor.yaw(thrusterPower,turningPower)
+            # 0.1 s interval
+            time.sleep(0.01)
+
+            # update information
             self.updateDelta(lat=latin, lon=lonin)
-            
-            # store current distance
-            initDis = self.cur_dis
-
-            while(self.cur_dis>distanceTolerance):
-                # set max motor power pwm
-                MAXFRONT    = 0.8
-                MAXBACK     = 0.5
-
-                # TODO test different graph and its impact on the performance, 
-                # Try ^2.5 for turning power
-                # Try ^0.4 for thruster power
-                # Equation: x^3 why? Higher turning power at a greater angle, decreases as angle decreases, also can be + or - depend on angle
-                turningPower = MAXBACK * self.cur_ang
-                
-                # Equation: 1-|x^0.2| why? concave up and decreasing as angle increase
-                # TODO I think we need to add another varaible to slow down when distance is smaller
-                thrusterPower = MAXFRONT * (1 - abs(math.pow(abs(self.cur_ang), 3))) * (self.cur_dis / (initDis-distanceTolerance))
-                # yaw base on angle and distance
-                # apply expoential relationship for turning power and angle
-                self.motor.yaw(thrusterPower,turningPower)
-                # 0.1 s interval
-                time.sleep(0.01)
-
-                # update information
-                self.updateDelta(lat=latin, lon=lonin)
-            
-            print("wapoint reached")
-
-        print("All points reached")
-
+        
+        print("wapoint reached")
+        
     def updateDelta(self,lat,lon):
         gpsdata = self.info.getGPSData()
         print(f"waypoints| lat: {lat} | lon: {lon}")
@@ -124,7 +118,8 @@ if __name__ == "__main__":
     info.start_collecting()
     motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
     mission    = waypointNav(infoCore=info, motors=motor)
-    mission.start()
+    # load waypoints
+    waypoints  = mission.__readLatLon(file_path = config["waypoint_file"])
     try:
         mission.run()
         mission.stop()
