@@ -79,10 +79,13 @@ try:
         
         command, processed_frame = navigate_boat(info.getFrame())
         if command=="Turn Left":
+            print("turn left")
             motor.veer(0.8,-0.4)
         elif command == "Turn Right":
-            motor.veer(0.8,0.4)
+            print("turn right")
+            motor.veer(0.8,0.4)s
         elif command == "Move Forward":
+            print("surge")
             motor.surge(0.8)
 
         # TODO add stop statement
