@@ -97,7 +97,6 @@ try:
         gps, detections = info.getInfo()
         
         command, processed_frame = navigate_boat(info.getFrame())
-        cv2.imshow("Frame", processed_frame)
         if command=="Turn Left":
             print("turn left")
             motor.veer(0.8,-0.4)
