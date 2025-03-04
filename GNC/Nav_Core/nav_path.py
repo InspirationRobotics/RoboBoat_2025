@@ -47,7 +47,7 @@ class Nav_Path(MissionLogic):
 
         return command
 
-    def get_next_data(self, *, state : str = None, data = None) -> dict[Tuple]:
+    def get_next_data(self, *, state : str = None, data = None):
         """
         Get the next data based on the given map/state. Will be a flexible dictionary, where the first position 
         is always the next waypoint (lat, lon).
