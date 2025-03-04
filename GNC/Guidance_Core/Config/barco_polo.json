@@ -1,8 +1,8 @@
 {
     "boat": "Barco Polo",
     "mission_plan": "GNC/Guidance_Core/Config/mission_plan.json",
-    "motor_port": "/dev/tty/ACM2",
-    "gps_port": "/dev/tty/USB0",
+    "motor_port": "/dev/ttyACM2",
+    "gps_port": "/dev/ttyUSB0",
 
     "waypoint_generation_method": "hardcode",
     "waypoint_file": "GNC/Guidance_Core/Config/waypoints.txt",
