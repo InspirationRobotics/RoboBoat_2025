@@ -11,7 +11,8 @@ def detect_buoy_red(frame):
     mask = cv2.inRange(hsv, np.array([0, 120, 70]), np.array([10, 255, 255])) + \
            cv2.inRange(hsv, np.array([170, 120, 70]), np.array([180, 255, 255]))
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    
+    h, w, _ = frame.shape
+    center_x = w // 2
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
         if cv2.contourArea(largest_contour) > 0:
@@ -24,14 +25,15 @@ def detect_buoy_red(frame):
             
             return (x, y), frame
 
-    return (0, 0), frame
+    return (center_x, 0), frame
 
 
 def detect_buoy_green(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, np.array([40, 40, 40]), np.array([80, 255, 255]))
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    
+    h, w, _ = frame.shape
+    center_x = w // 2
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
         if cv2.contourArea(largest_contour) > 0:
@@ -44,7 +46,7 @@ def detect_buoy_green(frame):
             
             return (x, y), frame
 
-    return (0, 0), frame
+    return (center_x, 0), frame
 
 
 def navigate_boat(frame):
@@ -97,7 +99,6 @@ try:
         gps, detections = info.getInfo()
         
         command, processed_frame = navigate_boat(info.getFrame())
-        cv2.imshow("Frame", processed_frame)
         if command=="Turn Left":
             print("turn left")
             motor.veer(0.8,-0.4)
