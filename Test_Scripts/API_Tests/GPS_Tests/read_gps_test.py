@@ -21,9 +21,11 @@ def log_gps():
 
     gps = GPS('/dev/ttyUSB0', 115200, callback=callback)
 
+    rate = 2 # Period
+    print(f"Beginning logging process @ one waypoint every {rate} seconds")
     while True:
         try:
-            time.sleep(1)
+            time.sleep(rate)
         except KeyboardInterrupt:
             break
 
