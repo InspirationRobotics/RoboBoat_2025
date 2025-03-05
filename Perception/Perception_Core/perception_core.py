@@ -75,8 +75,8 @@ class CameraCore:
         with self.cam_lock:
             if self.rgb_frame is None or self.depth_frame is None:
                 print("Warning: Frames are not available.")
-            print(type(self.rgb_frame))
-            print(self.rgb_frame)
+            # print(type(self.rgb_frame))
+            # print(self.rgb_frame)
             balanced_frame = self._balance(self.rgb_frame)
             return balanced_frame, self.depth_frame
     
