@@ -52,7 +52,7 @@ with open(LOG_FILE, mode="w", newline="") as file:
             lat, lon, heading = gpsdata.lat, gpsdata.lon, gpsdata.heading
 
             
-            #cv2.imshow("Frame",infocore.getFrame())
+            cv2.imshow("Frame",infocore.getFrame())
             # Write to CSV
             writer.writerow([timestamp, cpu_usage, results["response time"], lat, lon, heading])
 
