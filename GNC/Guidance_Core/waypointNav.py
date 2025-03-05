@@ -146,7 +146,7 @@ if __name__ == "__main__":
         mission.stop()  # Stop motors and background threads
         print("[✔] Mission stopped cleanly.")
 
-    maestro = MiniMaestro(port="dev/ttyACM1")
+    maestro = MiniMaestro(port="/dev/ttyACM1")
 
     print("water gun")
 
