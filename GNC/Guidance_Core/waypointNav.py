@@ -8,6 +8,7 @@ import GNC.Nav_Core.gis_funcs as gpsfunc
 import threading
 import math
 import time
+from API.Servos.mini_maestro import MiniMaestro
 
 class waypointNav:
     def __init__(self , infoCore, motors):  
@@ -144,4 +145,18 @@ if __name__ == "__main__":
         nav_thread.join()
         mission.stop()  # Stop motors and background threads
         print("[✔] Mission stopped cleanly.")
+
+    maestro = MiniMaestro(port="dev/ttyACM1")
+
+    print("water gun")
+
+    maestro.set_pwm(1, 1500)  # Move servo on channel 1
+    time.sleep(1)
+    maestro.set_pwm(1, 1800)  # Move servo on channel 1   
+    time.sleep(5)
+    maestro.set_pwm(1, 1500)  # Move servo on channel 1
+    time.sleep(1)
+
+    print("program finished")
+
 
