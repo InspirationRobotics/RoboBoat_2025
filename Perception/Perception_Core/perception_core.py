@@ -34,6 +34,8 @@ class CameraCore:
                 return
         except RuntimeError as e:
             print(f"ERROR Device not found {e}")
+        
+        time.sleep(5)
         self.capture_thread = Thread(target=self._capture_loop, daemon=True)
         self.capture_thread.start()
         print("Camera capture started.")
