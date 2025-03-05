@@ -76,7 +76,15 @@ class CameraCore:
         with self.cam_lock:
             if self.rgb_frame is None or self.depth_frame is None:
                 print("Warning: Frames are not available.")
+                return None, None  # Return early to avoid processing None frames
+
+            # Ensure the frame is a valid numpy array
+            if not isinstance(self.rgb_frame, np.ndarray):
+                print(f"Error: rgb_frame is not a numpy array! Type: {type(self.rgb_frame)}")
+                return None, None
+
             return self._balance(self.rgb_frame), self.depth_frame
+
     
     def get_latest_detections(self):
         """Retrieve the latest object detections."""
