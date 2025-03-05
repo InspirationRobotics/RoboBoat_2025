@@ -4,6 +4,38 @@ Sandbox file to make it convenient to see how code works/experiment with syntax.
 # import time
 # from GNC.Guidance_Core import mission_helper
 
+import re
+
+class WaypointLogger:
+    def __init__(self, lat, lon, heading):
+        self.lat = lat
+        self.lon = lon
+        self.heading = heading
+
+    def parse_coordinates(self, fstring):
+        # Use regex to extract latitude and longitude
+        match = re.search(r"Lat: ([\d\.\-]+), Lon: ([\d\.\-]+)", fstring)
+        if match:
+            lat, lon = match.groups()
+            return float(lat), float(lon)
+        return None
+
+    def save_waypoint(self, filename="waypoints.txt"):
+        with open(filename, "w") as file:
+            file.write(f"{self.lat}, {self.lon}\n")
+
+# Example usage
+waypoint = WaypointLogger(0, 0, 90)
+fstring_output = f"Lat: {waypoint.lat}, Lon: {waypoint.lon}, Heading: {waypoint.heading}"
+
+# Parse coordinates
+lat_lon = waypoint.parse_coordinates(fstring_output)
+if lat_lon:
+    print(f"Extracted Coordinates: {lat_lon}")
+    waypoint.save_waypoint()
+else:
+    print("Failed to extract coordinates.")
+
 # start_time = time.time()
 # m = mission_helper.MissionHelper()
 # data = m.load_json(r"GNC/Guidance_Core/Config/barco_polo.json")
