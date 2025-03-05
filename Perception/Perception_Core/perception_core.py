@@ -75,7 +75,7 @@ class CameraCore:
         with self.cam_lock:
             if self.rgb_frame is None or self.depth_frame is None:
                 print("Warning: Frames are not available.")
-            return self.rgb_frame, self.depth_frame
+            return self._balance(self.rgb_frame), self.depth_frame
     
     def get_latest_detections(self):
         """Retrieve the latest object detections."""
@@ -169,7 +169,7 @@ class CameraCore:
             self.start()  # Restart with the previous model if switch fails
 
     def getFrameRaw(self):
-        return self.cam.getLatestBuffers()
+        return self._balance(self.cam.getLatestBuffers())
         pass
     def visualize(self):
         """Return a labeled OpenCV frame with bounding boxes and labels."""
@@ -195,8 +195,25 @@ class CameraCore:
         except Exception as e:
             print(f"Visualization Error: {e}")
         
-        return rgb
-    
+        return self._balance(rgb)
+    def _balance(frame,reference_Y_mean=244.41758007812504):
+        # Convert full frame to YCrCb
+        ycrcb = cv2.cvtColor(frame, cv2.COLOR_BGR2YCrCb)
+
+        # Compute current frame brightness
+        current_Y_mean = ycrcb[:, :, 0].mean()
+
+        # Compute brightness adjustment factor
+        if reference_Y_mean is not None and current_Y_mean > 0:
+            gamma = reference_Y_mean / current_Y_mean  # Gamma correction factor
+            invGamma = 1.0 / gamma
+            table = np.array([(i / 255.0) ** invGamma * 255 for i in range(256)]).astype("uint8")
+            ycrcb[:, :, 0] = cv2.LUT(ycrcb[:, :, 0], table)
+
+        # Convert back to BGR
+        balanced = cv2.cvtColor(ycrcb, cv2.COLOR_YCrCb2BGR)
+
+        return balanced
     def _frame_norm(self, frame, bbox):
         """Normalize bounding box coordinates to match frame size."""
         try:
