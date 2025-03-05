@@ -43,6 +43,7 @@ with dai.Device(pipeline) as device:
     print(fps)
     output_file = "test_contin.mp4"
 
+
     # Initialize VideoWriter
     out = cv2.VideoWriter(output_file, fourcc, fps, frame_size)
     try:
