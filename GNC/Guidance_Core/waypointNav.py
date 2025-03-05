@@ -134,7 +134,7 @@ if __name__ == "__main__":
     
     try:
         for p in waypoints:
-            nav_thread = threading.Thread(target=mission.run, args=(p, 1.5), daemon=True)
+            nav_thread = threading.Thread(target=mission.run, args=(p, 1.0), daemon=True)
             nav_thread.start()
             nav_thread.join()  # ✅ WAIT for thread to finish before stopping motors
         mission.stop()  # ✅ Stop everything AFTER all waypoints are reached
