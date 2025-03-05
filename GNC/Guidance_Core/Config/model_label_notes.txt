@@ -10,3 +10,22 @@ cross
 triangle
 green_pylon
 red_pylon
+
+CompetitionSpeedChallenge:
+
+blue_buoy
+yellow_buoy
+black_buoy
+red_buoy
+green_buoy
+tower (will do CV to determine color)
+
+CompetitionDocking (low priority):
+
+dock_circle
+dock_square
+dock_triangle
+cross
+triangle
+
+

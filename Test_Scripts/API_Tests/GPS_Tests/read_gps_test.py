@@ -13,7 +13,8 @@ from API.GPS.gps_api import GPS, GPSData
 import time
 
 def log_gps():
-    log = open(f'Test_Scripts/API_Tests/GPS_Tests/GPSLogs/GPSlog_{int(time.time())}.txt', "w")
+    # log = open(f'Test_Scripts/API_Tests/GPS_Tests/GPSLogs/GPSlog_{int(time.time())}.txt', "w")
+    log = open(f'GNC/Guidance_Core/config/waypoints{int(time.time())}.txt', "w")
 
     def callback(data : GPSData):
         log.write(str(data) + '\n')
