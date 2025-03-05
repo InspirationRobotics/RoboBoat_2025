@@ -35,7 +35,6 @@ class CameraCore:
         except RuntimeError as e:
             print(f"ERROR Device not found {e}")
         
-        time.sleep(5)
         self.capture_thread = Thread(target=self._capture_loop, daemon=True)
         self.capture_thread.start()
         print("Camera capture started.")
@@ -202,24 +201,26 @@ class CameraCore:
         if frame is None:
             print("Error: Received None frame in _balance")
             return None  # Explicitly return None
+        try:
+            # Convert full frame to YCrCb
+            ycrcb = cv2.cvtColor(frame, cv2.COLOR_BGR2YCrCb)
 
-        # Convert full frame to YCrCb
-        ycrcb = cv2.cvtColor(frame, cv2.COLOR_BGR2YCrCb)
+            # Compute current frame brightness
+            current_Y_mean = ycrcb[:, :, 0].mean()
 
-        # Compute current frame brightness
-        current_Y_mean = ycrcb[:, :, 0].mean()
+            # Compute brightness adjustment factor
+            if reference_Y_mean is not None and current_Y_mean > 0:
+                gamma = reference_Y_mean / current_Y_mean  # Gamma correction factor
+                invGamma = 1.0 / gamma
+                table = np.array([(i / 255.0) ** invGamma * 255 for i in range(256)]).astype("uint8")
+                ycrcb[:, :, 0] = cv2.LUT(ycrcb[:, :, 0], table)
 
-        # Compute brightness adjustment factor
-        if reference_Y_mean is not None and current_Y_mean > 0:
-            gamma = reference_Y_mean / current_Y_mean  # Gamma correction factor
-            invGamma = 1.0 / gamma
-            table = np.array([(i / 255.0) ** invGamma * 255 for i in range(256)]).astype("uint8")
-            ycrcb[:, :, 0] = cv2.LUT(ycrcb[:, :, 0], table)
+            # Convert back to BGR
+            balanced = cv2.cvtColor(ycrcb, cv2.COLOR_YCrCb2BGR)
 
-        # Convert back to BGR
-        balanced = cv2.cvtColor(ycrcb, cv2.COLOR_YCrCb2BGR)
-
-        return balanced
+            return balanced
+        except :
+            return None
 
         
     def _frame_norm(self, frame, bbox):
