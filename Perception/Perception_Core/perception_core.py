@@ -196,27 +196,29 @@ class CameraCore:
             print(f"Visualization Error: {e}")
         
         return self._balance(rgb)
-    def _balance(frame,reference_Y_mean=244.41758007812504):
-        if frame is not None:
-            # Convert full frame to YCrCb
-            ycrcb = cv2.cvtColor(frame, cv2.COLOR_BGR2YCrCb)
+    def _balance(frame, reference_Y_mean=244.41758007812504):
+        if frame is None:
+            print("Error: Received None frame in _balance")
+            return None  # Explicitly return None
 
-            # Compute current frame brightness
-            current_Y_mean = ycrcb[:, :, 0].mean()
+        # Convert full frame to YCrCb
+        ycrcb = cv2.cvtColor(frame, cv2.COLOR_BGR2YCrCb)
 
-            # Compute brightness adjustment factor
-            if reference_Y_mean is not None and current_Y_mean > 0:
-                gamma = reference_Y_mean / current_Y_mean  # Gamma correction factor
-                invGamma = 1.0 / gamma
-                table = np.array([(i / 255.0) ** invGamma * 255 for i in range(256)]).astype("uint8")
-                ycrcb[:, :, 0] = cv2.LUT(ycrcb[:, :, 0], table)
+        # Compute current frame brightness
+        current_Y_mean = ycrcb[:, :, 0].mean()
 
-            # Convert back to BGR
-            balanced = cv2.cvtColor(ycrcb, cv2.COLOR_YCrCb2BGR)
+        # Compute brightness adjustment factor
+        if reference_Y_mean is not None and current_Y_mean > 0:
+            gamma = reference_Y_mean / current_Y_mean  # Gamma correction factor
+            invGamma = 1.0 / gamma
+            table = np.array([(i / 255.0) ** invGamma * 255 for i in range(256)]).astype("uint8")
+            ycrcb[:, :, 0] = cv2.LUT(ycrcb[:, :, 0], table)
 
-            return balanced
-        else:
-            return frame
+        # Convert back to BGR
+        balanced = cv2.cvtColor(ycrcb, cv2.COLOR_YCrCb2BGR)
+
+        return balanced
+
         
     def _frame_norm(self, frame, bbox):
         """Normalize bounding box coordinates to match frame size."""
