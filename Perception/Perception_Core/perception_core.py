@@ -83,7 +83,7 @@ class CameraCore:
                 print(f"Error: rgb_frame is not a numpy array! Type: {type(self.rgb_frame)}")
                 return None, None
 
-            return self._balance(self.rgb_frame), self.depth_frame
+            return self.rgb_frame, self.depth_frame
 
     
     def get_latest_detections(self):
