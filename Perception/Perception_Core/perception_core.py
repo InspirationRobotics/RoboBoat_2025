@@ -75,6 +75,8 @@ class CameraCore:
         with self.cam_lock:
             if self.rgb_frame is None or self.depth_frame is None:
                 print("Warning: Frames are not available.")
+            print(type(self.rgb_frame))
+            print(self.rgb_frame)
             return self.rgb_frame, self.depth_frame
     
     def get_latest_detections(self):
