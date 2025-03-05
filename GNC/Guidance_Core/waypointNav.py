@@ -153,7 +153,7 @@ if __name__ == "__main__":
     maestro.set_pwm(1, 1500)  # Move servo on channel 1
     time.sleep(1)
     maestro.set_pwm(1, 1800)  # Move servo on channel 1   
-    time.sleep(5)
+    time.sleep(10)
     maestro.set_pwm(1, 1500)  # Move servo on channel 1
     time.sleep(1)
 
