@@ -77,7 +77,8 @@ class CameraCore:
                 print("Warning: Frames are not available.")
             print(type(self.rgb_frame))
             print(self.rgb_frame)
-            return self.rgb_frame, self.depth_frame
+            balanced_frame = self._balance(self.rgb_frame)
+            return balanced_frame, self.depth_frame
     
     def get_latest_detections(self):
         """Retrieve the latest object detections."""
@@ -198,7 +199,21 @@ class CameraCore:
             print(f"Visualization Error: {e}")
         
         return rgb
-    def _balance(frame,reference_Y_mean=244.41758007812504):
+    def _balance(self, frame, reference_Y_mean=244.41758007812504):
+        if frame is None:
+            print("Error: Frame is None!")
+            return None
+
+        # Ensure frame is a valid numpy array
+        if not isinstance(frame, np.ndarray):
+            print(f"Error: Frame is not a numpy array! Type: {type(frame)}")
+            return None
+
+        # Ensure frame is 3D (H, W, 3) and not grayscale or empty
+        if len(frame.shape) != 3 or frame.shape[2] != 3:
+            print(f"Error: Frame shape is invalid! Expected (H, W, 3), got {frame.shape}")
+            return None
+
         # Convert full frame to YCrCb
         ycrcb = cv2.cvtColor(frame, cv2.COLOR_BGR2YCrCb)
 
@@ -216,6 +231,8 @@ class CameraCore:
         balanced = cv2.cvtColor(ycrcb, cv2.COLOR_YCrCb2BGR)
 
         return balanced
+
+    
     def _frame_norm(self, frame, bbox):
         """Normalize bounding box coordinates to match frame size."""
         try:
