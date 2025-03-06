@@ -117,7 +117,7 @@ if __name__ == "__main__":
     mission    = FTP(infoCore=info, motors=motor)
 
     try:
-        mission.run(endpoint=config["FTP_end_point"],tolerance=1.5)
+        mission.run(endpoint=config["FTP_endpoint"],tolerance=1.5)
         mission.stop()
     except KeyboardInterrupt:
         mission.stop()

@@ -74,5 +74,7 @@
     "racquetball_launcher_channel": "0",
     "water_cannon_channel": "1",
     "launch_PWM": "1800",
-    "nominal_PWM": "1500"
+    "nominal_PWM": "1500",
+
+    "FTP_endpoint": [27.373445998456045, -82.45309426603173]
 }
