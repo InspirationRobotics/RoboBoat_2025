@@ -34,14 +34,14 @@ def start_waypoint(point, tolerance : float = 1.0):
 
 start_waypoint(nav_point)
 
-# FTP Block
-folow_the_path_queue = queue.Queue()
-follow_the_path = FTP.FTP(infoCore=info, motors=motors)
-FTP_thread = threading.Thread(target=follow_the_path.run, args=(folow_the_path_queue,), daemon=True)
-FTP_thread.start()
-FTP_thread.join()
-FTP_point = folow_the_path_queue.get()
-FTP_point = {"lat" : FTP_point[0], "lon": FTP_point[1]}
+# # # FTP Block
+# # folow_the_path_queue = queue.Queue()
+# # follow_the_path = FTP.FTP(infoCore=info, motors=motors)
+# # FTP_thread = threading.Thread(target=follow_the_path.run, args=(folow_the_path_queue,), daemon=True)
+# # FTP_thread.start()
+# # FTP_thread.join()
+# # FTP_point = folow_the_path_queue.get()
+# # FTP_point = {"lat" : FTP_point[0], "lon": FTP_point[1]}
 
-start_waypoint(FTP_point)
+# start_waypoint(FTP_point)
 
