@@ -56,7 +56,7 @@ class FTP:
             red_detected = False
             green_detected = False
             threshold = 0.9
-            if len(detections) and detections is not None>=1:
+            if len(detections)>=1 and detections is not None:
                 # collect objects
                 for detection in detections:
                     if detection["label"] == "green_buoy" or detection["label"] == "green_pole_buoy":
