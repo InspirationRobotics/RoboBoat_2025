@@ -64,7 +64,6 @@ class OAKD_LR:
         self.leftCam.setIspScale(2, 3)
         self.leftCam.setPreviewSize(640, 352) # the size should be 640,400 for future models
         self.leftCam.setCamera("left")
-        self.leftCam.initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_A)
         self.leftCam.setResolution(self.COLOR_RESOLUTION)
         self.leftCam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
         self.leftCam.setFps(self.FPS)
@@ -72,7 +71,6 @@ class OAKD_LR:
         self.rightCam.setIspScale(2, 3)
         self.rightCam.setPreviewSize(640, 352)
         self.rightCam.setCamera("right")
-        self.rightCam.initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_B)
         self.rightCam.setResolution(self.COLOR_RESOLUTION)
         self.rightCam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
         self.rightCam.setFps(self.FPS)
