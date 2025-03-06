@@ -58,18 +58,18 @@ if __name__ == "__main__":
     time.sleep(2)    
     print("finished launching")
 
-    # maestro.set_pwm(1, 1500)  # Move servo on channel 1
-    # print("water gun")
-    # time.sleep(2)
-    # maestro.set_pwm(1, 1800)  # Move servo on channel 1   
+    maestro.set_pwm(1, 1500)  # Move servo on channel 1
+    print("water gun")
+    time.sleep(2)
+    maestro.set_pwm(1, 1800)  # Move servo on channel 1   
 
-    # time.sleep(2)
-    # maestro.set_pwm(1, 1500)  # Move servo on channel 1
-    # time.sleep(2)
-    # print("finished")
+    time.sleep(2)
+    maestro.set_pwm(1, 1500)  # Move servo on channel 1
+    time.sleep(2)
+    print("finished")
 
-    # maestro.set_pwm(1, 1200)  # Move servo on channel 1
-    # maestro.set_pwm(2, 1800)  # Move servo on channel 2
+    maestro.set_pwm(1, 1200)  # Move servo on channel 1
+    maestro.set_pwm(2, 1800)  # Move servo on channel 2
 
     # Close connection when done
     maestro.close()
