@@ -85,10 +85,10 @@ class FTP:
                 red_center      = (red_min_detection["bbox"][0] + red_min_detection["bbox"][2])/2 if red_detected else 0
                 green_center    = (green_min_detection["bbox"][0] + green_min_detection["bbox"][2])/2 if green_detected else 1
                 path_center     = (red_center + green_center)/2
+                print(f"Red : {red_center}, Green : {green_center}")
             else:
                 path_center = 0.5
 
-            # NOTE: Do not understand these center values.
             # control the motor
             midpoint = 0.5
             screen_tolerance = 0.15
