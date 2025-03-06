@@ -1,4 +1,12 @@
 from GNC.Nav_Core import gis_funcs
+from GNC.Control_Core  import motor_core_new
+from GNC.Nav_Core.info_core import infoCore
+from GNC.Guidance_Core.mission_helper import MissionHelper
+import GNC.Nav_Core.gis_funcs as gpsfunc
+import threading
+import math
+import time
+from API.Servos.mini_maestro import MiniMaestro
 class FTP:
     def __init__(self, *, infoCore, motors):
         self.info = infoCore
@@ -34,7 +42,7 @@ class FTP:
             gpsData, detections = self.info.getInfo()
             # Find the lowest two detections.
             # Going down the screen will actually increase the value, so lowest will be 1.
-            # Going across the screen decreases the value (xmax -> xmin).
+            # Going across the screen increases the value (xmin -> xmax).
 
             # Find the lowest of each type.
             # Types are "green", "red", "yellow", "cross", "triangle"
@@ -46,7 +54,7 @@ class FTP:
             # collect objects
             for detection in detections:
                 if detection["type"] == "green_buoy" or detection["type"] == "green_pole_buoy":
-                    green_object_list.apend(detection)
+                    green_object_list.append(detection)
 
                 if detection["type"] == "red_buoy" or detection["type"] == "red_pole_buoy" and detection["bbox"][2] < self.threshold:
                     red_object_list.append(detection)
@@ -69,14 +77,19 @@ class FTP:
             green_center    = green_min_detection["bbox"][0] + green_min_detection["bbox"][2]
             path_center     = (red_center + green_center)/2
 
+            # NOTE: Do not understand these center values.
             # control the motor
-            delta_center = path_center - 0.5
-            if(delta_center>40):
+            midpoint = 0.5
+            screen_tolerance = 0.15
+            delta_center = path_center - midpoint
+            if(delta_center > screen_tolerance):
                 """turn left"""
                 self.motors.veer(0.8,-0.5)
-            elif(delta_center<-40):
+            elif(delta_center < -screen_tolerance):
                 """turn right"""
                 self.motors.veer(0.8, 0.5)
+            else:
+                self.motors.surge(1)
 
             # update del dis
             self.cur_ang,self.cur_dis = self.updateDelta(gpsData.lat,gpsData.lon)
@@ -84,7 +97,30 @@ class FTP:
             # check stop statement 
             if(self.cur_dis < tolerance):
                 print("FTP finished")
+                self.end = True
                 break
+
+        # NOTE: Need to write an actual executable file.
+    def stop(self):
+        self.info.stop_collecting()
+        print("Background Threads stopped")
+        self.motors.stop()
+        print("Motors stoped")
+if __name__ == "__main__":
+    config     = MissionHelper()
+    print("loading configs")
+    config     = config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
+    info       = infoCore(modelPath=config["sign_model_path"],labelMap=config["sign_label_map"])
+    print("start background threads")
+    info.start_collecting()
+    motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
+    mission    = FTP(infoCore=info, motors=motor)
+
+    try:
+        mission.run(endpoint=config["FTP_end_point"],tolerance=1.5)
+        mission.stop()
+    except KeyboardInterrupt:
+        mission.stop()
 
 
             
