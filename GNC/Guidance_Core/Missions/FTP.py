@@ -52,32 +52,34 @@ class FTP:
 
             red_object_list = []
             green_object_list = []
+            if len(detections)>=1:
+                # collect objects
+                for detection in detections:
+                    if detection["type"] == "green_buoy" or detection["type"] == "green_pole_buoy":
+                        green_object_list.append(detection)
 
-            # collect objects
-            for detection in detections:
-                if detection["type"] == "green_buoy" or detection["type"] == "green_pole_buoy":
-                    green_object_list.append(detection)
+                    if detection["type"] == "red_buoy" or detection["type"] == "red_pole_buoy" and detection["bbox"][2] < self.threshold:
+                        red_object_list.append(detection)
 
-                if detection["type"] == "red_buoy" or detection["type"] == "red_pole_buoy" and detection["bbox"][2] < self.threshold:
-                    red_object_list.append(detection)
+                # find min
+                red_min = 0
+                red_min_detection = None
+                green_min = 0
+                green_min_detection = None
 
-            # find min
-            red_min = 0
-            red_min_detection = None
-            green_min = 0
-            green_min_detection = None
+                for object in red_object_list:
+                    if(object["bbox"][3]>red_min):
+                        red_min_detection = object
+                for object in green_object_list:
+                    if(object["bbox"][3]>green_min):
+                        green_min_detection = object
 
-            for object in red_object_list:
-                if(object["bbox"][3]>red_min):
-                    red_min_detection = object
-            for object in green_object_list:
-                if(object["bbox"][3]>green_min):
-                    green_min_detection = object
-
-            # find midpoint
-            red_center      = red_min_detection["bbox"][0] + red_min_detection["bbox"][2]
-            green_center    = green_min_detection["bbox"][0] + green_min_detection["bbox"][2]
-            path_center     = (red_center + green_center)/2
+                # find midpoint
+                red_center      = red_min_detection["bbox"][0] + red_min_detection["bbox"][2]
+                green_center    = green_min_detection["bbox"][0] + green_min_detection["bbox"][2]
+                path_center     = (red_center + green_center)/2
+            else:
+                path_center = 0.5
 
             # NOTE: Do not understand these center values.
             # control the motor
@@ -95,7 +97,7 @@ class FTP:
 
             # update del dis
             self.cur_ang,self.cur_dis = self.updateDelta(gpsData.lat,gpsData.lon)
-            
+
             print(f"ang: {self.cur_ang} | dis: {self.cur_dis}")
             time.sleep(0.05)
 
