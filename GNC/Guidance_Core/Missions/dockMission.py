@@ -34,7 +34,8 @@ try:
 
     mission.stop()
     print("program ended")
-except:
+    
+except KeyboardInterrupt:
     print("ending...")
     mission.stop()
 
