@@ -47,12 +47,12 @@ if __name__ == "__main__":
     maestro = MiniMaestro(port="/dev/ttyACM0")
 
     # Move servos to new positions
-    maestro.set_pwm(0, 1500)  # Move servo on channel 0
-    time.sleep(2)
+    #maestro.set_pwm(0, 1500)  # Move servo on channel 0
+    #time.sleep(2)
 
-    print("ball launched")
-    maestro.set_pwm(0, 1800)  # Move servo on channel 0   
-    time.sleep(0.35)
+    #print("ball launched")
+    #maestro.set_pwm(0, 1800)  # Move servo on channel 0   
+    #time.sleep(0.35)
     
     maestro.set_pwm(0, 1500)  # Move servo on channel 0
     time.sleep(2)    
