@@ -53,8 +53,10 @@ class FTP:
             red_object_list = []
             green_object_list = []
 
+            red_detected = False
+            green_detected = False
             threshold = 0.9
-            if len(detections)>=1:
+            if len(detections) and detections is not None>=1:
                 # collect objects
                 for detection in detections:
                     if detection["label"] == "green_buoy" or detection["label"] == "green_pole_buoy":
@@ -64,21 +66,24 @@ class FTP:
                         red_object_list.append(detection)
 
                 # find min
-                red_min = 0
+                red_min = -1
                 red_min_detection = None
-                green_min = 0
+                green_min = -1
                 green_min_detection = None
 
                 for object in red_object_list:
                     if(object["bbox"][3]>red_min   and object["bbox"][3]<threshold):
                         red_min_detection = object
+                        red_detected = True
+
                 for object in green_object_list:
                     if(object["bbox"][3]>green_min and object["bbox"][3]<threshold):
                         green_min_detection = object
+                        green_detected = True
 
                 # find midpoint
-                red_center      = red_min_detection["bbox"][0] + red_min_detection["bbox"][2]
-                green_center    = green_min_detection["bbox"][0] + green_min_detection["bbox"][2]
+                red_center      = red_min_detection["bbox"][0] + red_min_detection["bbox"][2] if red_detected else 0.5
+                green_center    = green_min_detection["bbox"][0] + green_min_detection["bbox"][2] if green_detected else 0.5
                 path_center     = (red_center + green_center)/2
             else:
                 path_center = 0.5
@@ -97,6 +102,7 @@ class FTP:
                 print("\nturn right")
                 self.motors.veer(0.8, 0.5)
             else:
+                print("\nsurge")
                 self.motors.surge(1)
 
             # update del dis
