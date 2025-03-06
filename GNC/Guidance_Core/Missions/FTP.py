@@ -57,10 +57,10 @@ class FTP:
             if len(detections)>=1:
                 # collect objects
                 for detection in detections:
-                    if detection["label"] == "green_buoy" or detection["type"] == "green_pole_buoy":
+                    if detection["label"] == "green_buoy" or detection["label"] == "green_pole_buoy":
                         green_object_list.append(detection)
 
-                    if detection["label"] == "red_buoy" or detection["type"] == "red_pole_buoy":
+                    if detection["label"] == "red_buoy" or detection["label"] == "red_pole_buoy":
                         red_object_list.append(detection)
 
                 # find min
@@ -90,9 +90,11 @@ class FTP:
             delta_center = path_center - midpoint
             if(delta_center > screen_tolerance):
                 """turn left"""
+                print("\nturn left")
                 self.motors.veer(0.8,-0.5)
             elif(delta_center < -screen_tolerance):
                 """turn right"""
+                print("\nturn right")
                 self.motors.veer(0.8, 0.5)
             else:
                 self.motors.surge(1)
@@ -100,7 +102,6 @@ class FTP:
             # update del dis
             self.cur_ang,self.cur_dis = self.updateDelta(gpsData.lat,gpsData.lon)
 
-            print(f"ang: {self.cur_ang} | dis: {self.cur_dis}")
             time.sleep(0.05)
 
         # NOTE: Need to write an actual executable file.
