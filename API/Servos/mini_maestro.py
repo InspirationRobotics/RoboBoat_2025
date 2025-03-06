@@ -48,14 +48,15 @@ if __name__ == "__main__":
 
     # Move servos to new positions
     maestro.set_pwm(0, 1500)  # Move servo on channel 0
-    print("ball launched")
     time.sleep(2)
-    maestro.set_pwm(0, 1800)  # Move servo on channel 0   
 
+    print("ball launched")
+    maestro.set_pwm(0, 1800)  # Move servo on channel 0   
     time.sleep(0.35)
+    
     maestro.set_pwm(0, 1500)  # Move servo on channel 0
     time.sleep(2)    
-    print("finished lanching")
+    print("finished launching")
 
     maestro.set_pwm(1, 1500)  # Move servo on channel 1
     print("water gun")
@@ -67,8 +68,8 @@ if __name__ == "__main__":
     time.sleep(2)
     print("finished")
 
-    #maestro.set_pwm(1, 1200)  # Move servo on channel 1
-    #maestro.set_pwm(2, 1800)  # Move servo on channel 2
+    maestro.set_pwm(1, 1200)  # Move servo on channel 1
+    maestro.set_pwm(2, 1800)  # Move servo on channel 2
 
     # Close connection when done
     maestro.close()
