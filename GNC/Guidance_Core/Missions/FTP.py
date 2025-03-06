@@ -57,10 +57,10 @@ class FTP:
             if len(detections)>=1:
                 # collect objects
                 for detection in detections:
-                    if detection["label"] == "green_buoy" or detection["type"] == "green_pole_buoy":
+                    if detection["label"] == "green_buoy" or detection["label"] == "green_pole_buoy":
                         green_object_list.append(detection)
 
-                    if detection["label"] == "red_buoy" or detection["type"] == "red_pole_buoy":
+                    if detection["label"] == "red_buoy" or detection["label"] == "red_pole_buoy":
                         red_object_list.append(detection)
 
                 # find min
