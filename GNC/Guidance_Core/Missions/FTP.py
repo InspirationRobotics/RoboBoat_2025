@@ -40,7 +40,7 @@ class FTP:
         gpsData, detections = self.info.getInfo()
         
         self.cur_ang,self.cur_dis = self.updateDelta(gpsData.lat,gpsData.lon)
-        while self.end == False:
+        while self.cur_dis<tolerance:
             gpsData, detections = self.info.getInfo()
             # Find the lowest two detections.
             # Going down the screen will actually increase the value, so lowest will be 1.
@@ -95,12 +95,7 @@ class FTP:
 
             # update del dis
             self.cur_ang,self.cur_dis = self.updateDelta(gpsData.lat,gpsData.lon)
-
-            # check stop statement 
-            if(self.cur_dis < tolerance):
-                print("FTP finished")
-                self.end = True
-                break
+            
             print(f"ang: {self.cur_ang} | dis: {self.cur_dis}")
             time.sleep(0.05)
 
