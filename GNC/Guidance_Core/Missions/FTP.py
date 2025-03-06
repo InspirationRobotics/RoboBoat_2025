@@ -7,6 +7,8 @@ import threading
 import math
 import time
 from API.Servos.mini_maestro import MiniMaestro
+import cv2
+import numpy as np
 class FTP:
     def __init__(self, *, infoCore, motors):
         self.info = infoCore
@@ -99,6 +101,8 @@ class FTP:
                 print("FTP finished")
                 self.end = True
                 break
+            print(f"ang: {self.cur_ang} | dis: {self.cur_dis}")
+            time.sleep(0.05)
 
         # NOTE: Need to write an actual executable file.
     def stop(self):
@@ -113,7 +117,7 @@ if __name__ == "__main__":
     info       = infoCore(modelPath=config["competition_model_path"],labelMap=config["comptition_label_map"])
     print("start background threads")
     info.start_collecting()
-    motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
+    motor      = motor_core_new.MotorCore("/dev/ttyACM2", debug=True) # load with default port "/dev/ttyACM2"
     mission    = FTP(infoCore=info, motors=motor)
 
     try:
