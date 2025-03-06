@@ -21,7 +21,12 @@ motors     = motor_core_new.MotorCore(config.motor_port)
 # NAV Block
 mission = navChannel.navChannel(infoCore=info, motors=motors)
 lat, lon = mission.run()
-nav_point = {"lat" : lat, "lon" : lon}
+nav_lat, nav_lon = gpsfunc.destination_point(lat, lon, 270, 35)
+return_lat, return_lon = gpsfunc.destination_point(lat, lon, 0, 20)
+
+first_point = {"lat" : lat, "lon" : lon}
+nav_point = {"lat" : nav_lat, "lon" : nav_lon}
+return_point = {"lat" : return_lat, "lon" : return_lon}
 
 NNAV = waypointNav(infoCore=info, motors=motors)
 
@@ -29,10 +34,13 @@ def start_waypoint(point, tolerance : float = 1.0):
     nav_thread = threading.Thread(target=NNAV.run, args=(point, tolerance), daemon=True) # arguemnets: waypoint(dict), tolerance(float)->in meters
     nav_thread.start()
     nav_thread.join()
-    NNAV.stop()
     print("[Mission] Waypoint reached.")
 
 start_waypoint(nav_point)
+start_waypoint(return_point)
+start_waypoint(first_point)
+
+NNAV.stop()
 
 # # # FTP Block
 # # folow_the_path_queue = queue.Queue()
