@@ -24,11 +24,15 @@ lat, lon = mission.run()
 nav_lat, nav_lon = gpsfunc.destination_point(lat, lon, 270, 35)
 return_lat, return_lon = gpsfunc.destination_point(lat, lon, 0, 20)
 
+# Initial point
 first_point = {"lat" : lat, "lon" : lon}
+# Point on other end of NAV
 nav_point = {"lat" : nav_lat, "lon" : nav_lon}
+# Point near the black buoy gates
 return_point = {"lat" : return_lat, "lon" : return_lon}
 
 NNAV = waypointNav(infoCore=info, motors=motors)
+tolerance = 1.5
 
 def start_waypoint(point, tolerance : float = 1.0):
     nav_thread = threading.Thread(target=NNAV.run, args=(point, tolerance), daemon=True) # arguemnets: waypoint(dict), tolerance(float)->in meters

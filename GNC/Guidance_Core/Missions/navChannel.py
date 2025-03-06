@@ -7,6 +7,9 @@ class navChannel:
         self.distance = 35 # How far to move from the initial position (meters)
 
     def run(self):
+        """
+        Returns the current lat, lon.
+        """
         currentGPSData, _ = self.info.getInfo()
         currLat, currLon, currHeading = (currentGPSData.lat, currentGPSData.lon, currentGPSData.heading)
         # calc_lat, calc_lon = gis_funcs.destination_point(currLat, currLon, 270, self.distance)
