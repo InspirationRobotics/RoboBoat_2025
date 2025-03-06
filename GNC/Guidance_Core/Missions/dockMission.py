@@ -20,11 +20,11 @@ try:
     waypoints  = mission._readLatLon(file_path = config["waypoint_file"])
         
 
-    nav_thread = threading.Thread(target=mission.run, args=(waypoints[0], 1.0), daemon=True)
+    nav_thread = threading.Thread(target=mission.run, args=(waypoints[0], 0.5), daemon=True)
     nav_thread.start()
     nav_thread.join()  # ✅ WAIT for thread to finish before stopping motors
 
-    nav_thread = threading.Thread(target=mission.run, args=(waypoints[1], 1.0), daemon=True)
+    nav_thread = threading.Thread(target=mission.run, args=(waypoints[1], 0.5), daemon=True)
     nav_thread.start()
     nav_thread.join()  # ✅ WAIT for thread to finish before stopping motors
 
