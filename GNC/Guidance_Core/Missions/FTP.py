@@ -52,13 +52,15 @@ class FTP:
 
             red_object_list = []
             green_object_list = []
+
+            threshold = 0.9
             if len(detections)>=1:
                 # collect objects
                 for detection in detections:
-                    if detection["type"] == "green_buoy" or detection["type"] == "green_pole_buoy":
+                    if detection["label"] == "green_buoy" or detection["type"] == "green_pole_buoy":
                         green_object_list.append(detection)
 
-                    if detection["type"] == "red_buoy" or detection["type"] == "red_pole_buoy" and detection["bbox"][2] < self.threshold:
+                    if detection["label"] == "red_buoy" or detection["type"] == "red_pole_buoy":
                         red_object_list.append(detection)
 
                 # find min
@@ -68,10 +70,10 @@ class FTP:
                 green_min_detection = None
 
                 for object in red_object_list:
-                    if(object["bbox"][3]>red_min):
+                    if(object["bbox"][3]>red_min   and object["bbox"][3]<threshold):
                         red_min_detection = object
                 for object in green_object_list:
-                    if(object["bbox"][3]>green_min):
+                    if(object["bbox"][3]>green_min and object["bbox"][3]<threshold):
                         green_min_detection = object
 
                 # find midpoint
