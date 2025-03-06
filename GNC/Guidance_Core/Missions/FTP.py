@@ -123,7 +123,7 @@ if __name__ == "__main__":
     info       = infoCore(modelPath=config["competition_model_path"],labelMap=config["competition_label_map"])
     print("start background threads")
     info.start_collecting()
-    motor      = motor_core_new.MotorCore("/dev/ttyACM2", debug=True) # load with default port "/dev/ttyACM2"
+    motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
     mission    = FTP(infoCore=info, motors=motor)
 
     try:
