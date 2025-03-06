@@ -59,9 +59,12 @@ class OAKD_LR:
         self.xoutYolo.setStreamName("yolo")
 
     def _setProperties(self):
+#         cam['cam_b'].initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_A)
+# cam['cam_c'].initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_A)
         self.leftCam.setIspScale(2, 3)
         self.leftCam.setPreviewSize(640, 352) # the size should be 640,400 for future models
         self.leftCam.setCamera("left")
+        self.leftCam.initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_A)
         self.leftCam.setResolution(self.COLOR_RESOLUTION)
         self.leftCam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
         self.leftCam.setFps(self.FPS)
@@ -69,6 +72,7 @@ class OAKD_LR:
         self.rightCam.setIspScale(2, 3)
         self.rightCam.setPreviewSize(640, 352)
         self.rightCam.setCamera("right")
+        self.rightCam.initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_B)
         self.rightCam.setResolution(self.COLOR_RESOLUTION)
         self.rightCam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
         self.rightCam.setFps(self.FPS)
@@ -96,8 +100,6 @@ class OAKD_LR:
 
         self.manip.initialConfig.setResize(640, 352)
         self.manip.initialConfig.setCropRect(0, 0, 640, 352)
-        self.manip.initialConfig.setContrast(1.5)  # Increase contrast
-        self.manip.initialConfig.setBrightness(-5)  # Adjust brightness
         self.manip.setFrameType(dai.ImgFrame.Type.BGR888p)
 
     def _linkStereo(self):
