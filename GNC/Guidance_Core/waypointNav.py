@@ -124,7 +124,7 @@ if __name__ == "__main__":
     config     = MissionHelper()
     print("loading configs")
     config     = config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
-    info       = infoCore(modelPath=config["sign_model_path"],labelMap=config["sign_label_map"])
+    info       = infoCore(modelPath=config["competition_model_path"],labelMap=config["competition_label_map"])
     print("start background threads")
     info.start_collecting()
     motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
