@@ -96,6 +96,8 @@ class OAKD_LR:
 
         self.manip.initialConfig.setResize(640, 352)
         self.manip.initialConfig.setCropRect(0, 0, 640, 352)
+        self.manip.initialConfig.setContrast(1.5)  # Increase contrast
+        self.manip.initialConfig.setBrightness(-5)  # Adjust brightness
         self.manip.setFrameType(dai.ImgFrame.Type.BGR888p)
 
     def _linkStereo(self):
@@ -104,8 +106,9 @@ class OAKD_LR:
         self.stereo.depth.link(self.xoutDepth.input)
 
     def _linkNN(self):
-        self.leftCam.preview.link(self.manip.inputImage)
+        self.centerCam.preview.link(self.manip.inputImage)
         self.manip.out.link(self.detection.input)
+        
         if self.syncNN:
             self.detection.passthrough.link(self.xoutRgb.input)
         else:

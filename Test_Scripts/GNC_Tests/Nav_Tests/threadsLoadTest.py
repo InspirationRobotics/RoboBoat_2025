@@ -17,11 +17,11 @@ config = MissionHelper().load_json(path="GNC/Guidance_Core/Config/barco_polo.jso
 
 # Define paths to models
 MODEL_1 = config["test_model_path"]
-MODEL_2 = config["sign_model_path"]
+MODEL_2 = config["competition_model_path"]
 
 # Label Map (Ensure it matches your detection classes)
 LABELMAP_1 = config["test_label_map"]
-LABELMAP_2 = config["sign_label_map"]
+LABELMAP_2 = config["competition_label_map"]
 
 # Initialize info Core
 infocore = infoCore(MODEL_2,LABELMAP_2)

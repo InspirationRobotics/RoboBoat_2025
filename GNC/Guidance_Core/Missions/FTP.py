@@ -7,6 +7,8 @@ import threading
 import math
 import time
 from API.Servos.mini_maestro import MiniMaestro
+import cv2
+import numpy as np
 class FTP:
     def __init__(self, *, infoCore, motors):
         self.info = infoCore
@@ -38,7 +40,7 @@ class FTP:
         gpsData, detections = self.info.getInfo()
         
         self.cur_ang,self.cur_dis = self.updateDelta(gpsData.lat,gpsData.lon)
-        while self.end == False:
+        while self.cur_dis<tolerance:
             gpsData, detections = self.info.getInfo()
             # Find the lowest two detections.
             # Going down the screen will actually increase the value, so lowest will be 1.
@@ -51,54 +53,62 @@ class FTP:
             red_object_list = []
             green_object_list = []
 
-            # collect objects
-            for detection in detections:
-                if detection["type"] == "green_buoy" or detection["type"] == "green_pole_buoy":
-                    green_object_list.append(detection)
+            red_detected = False
+            green_detected = False
+            threshold = 0.9
+            if len(detections)>=1 and detections is not None:
+                # collect objects
+                for detection in detections:
+                    if detection["label"] == "green_buoy" or detection["label"] == "green_pole_buoy":
+                        green_object_list.append(detection)
 
-                if detection["type"] == "red_buoy" or detection["type"] == "red_pole_buoy" and detection["bbox"][2] < self.threshold:
-                    red_object_list.append(detection)
+                    if detection["label"] == "red_buoy" or detection["label"] == "red_pole_buoy":
+                        red_object_list.append(detection)
 
-            # find min
-            red_min = 0
-            red_min_detection = None
-            green_min = 0
-            green_min_detection = None
+                # find min
+                red_min = -1
+                red_min_detection = None
+                green_min = -1
+                green_min_detection = None
 
-            for object in red_object_list:
-                if(object["bbox"][3]>red_min):
-                    red_min_detection = object
-            for object in green_object_list:
-                if(object["bbox"][3]>green_min):
-                    green_min_detection = object
+                for object in red_object_list:
+                    if(object["bbox"][3]>red_min   and object["bbox"][3]<threshold):
+                        red_min_detection = object
+                        red_detected = True
 
-            # find midpoint
-            red_center      = red_min_detection["bbox"][0] + red_min_detection["bbox"][2]
-            green_center    = green_min_detection["bbox"][0] + green_min_detection["bbox"][2]
-            path_center     = (red_center + green_center)/2
+                for object in green_object_list:
+                    if(object["bbox"][3]>green_min and object["bbox"][3]<threshold):
+                        green_min_detection = object
+                        green_detected = True
 
-            # NOTE: Do not understand these center values.
+                # find midpoint
+                red_center      = (red_min_detection["bbox"][0] + red_min_detection["bbox"][2])/2 if red_detected else 0
+                green_center    = (green_min_detection["bbox"][0] + green_min_detection["bbox"][2])/2 if green_detected else 1
+                path_center     = (red_center + green_center)/2
+                print(f"Red : {red_center}, Green : {green_center}")
+            else:
+                path_center = 0.5
+
             # control the motor
             midpoint = 0.5
             screen_tolerance = 0.15
             delta_center = path_center - midpoint
             if(delta_center > screen_tolerance):
                 """turn left"""
+                print("\nturn left")
                 self.motors.veer(0.8,-0.5)
             elif(delta_center < -screen_tolerance):
                 """turn right"""
+                print("\nturn right")
                 self.motors.veer(0.8, 0.5)
             else:
+                print("\nsurge")
                 self.motors.surge(1)
 
             # update del dis
             self.cur_ang,self.cur_dis = self.updateDelta(gpsData.lat,gpsData.lon)
 
-            # check stop statement 
-            if(self.cur_dis < tolerance):
-                print("FTP finished")
-                self.end = True
-                break
+            time.sleep(0.05)
 
         # NOTE: Need to write an actual executable file.
     def stop(self):
@@ -110,10 +120,10 @@ if __name__ == "__main__":
     config     = MissionHelper()
     print("loading configs")
     config     = config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
-    info       = infoCore(modelPath=config["competition_model_path"],labelMap=config["comptition_label_map"])
+    info       = infoCore(modelPath=config["competition_model_path"],labelMap=config["competition_label_map"])
     print("start background threads")
     info.start_collecting()
-    motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
+    motor      = motor_core_new.MotorCore("/dev/ttyACM2", debug=True) # load with default port "/dev/ttyACM2"
     mission    = FTP(infoCore=info, motors=motor)
 
     try:
