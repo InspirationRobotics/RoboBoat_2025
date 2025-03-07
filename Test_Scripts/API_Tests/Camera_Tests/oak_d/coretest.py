@@ -5,7 +5,7 @@ import time
 import threading
 import queue
 from pathlib import Path
-from Perception.Perception_Core.perception_core import CameraCore  # Adjust path if needed
+from Perception.Perception_Core.new_core import CameraCore  # Adjust path if needed
 from GNC.Guidance_Core.mission_helper import MissionHelper
 
 # Load config
@@ -37,6 +37,7 @@ def capture_frames():
         depth = camera.get_object_depth(scale=0.2)
         print(depth)
         frame = camera.visualize()
+        cv2.imshow("frame",frame)
         end_time = time.time_ns()
         print(f"Used {((end_time - start_time) / 1e9):.2f} s to get frame")
 
