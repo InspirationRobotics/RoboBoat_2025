@@ -31,5 +31,9 @@ while True:
     end_time = time.time_ns()
     print(f"Used {((end_time - start_time) / 1e9):.2f} s to get frame")
 
-    cv2.imshow("rgb", frame)
+    if frame is not None:
+        frame = cv2.UMat(frame)
+        cv2.imshow("rgb", frame)
+    else:
+        print("Frame is none")
     time.sleep(1 / 20)  # Adjust to match the FPS (20 FPS)
