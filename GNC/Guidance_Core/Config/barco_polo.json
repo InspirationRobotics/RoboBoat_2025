@@ -70,6 +70,8 @@
         "yellow_racquet_ball"
     ],
 
+    "MHS_SEALS_MODEL" : "Perception/Models/MHS_SEALS_V14.pt",
+
     "mini_maestro_port": "/dev/ttyACM1",
     "racquetball_launcher_channel": "0",
     "water_cannon_channel": "1",

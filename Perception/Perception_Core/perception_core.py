@@ -5,11 +5,15 @@ import time
 import math
 from API.Camera.oakd_poe_lr.oakd_api import OAKD_LR
 
+from ultralytics import YOLO
+
 class CameraCore:
     def __init__(self, model_path: str, labelMap: list):
         self.cam = OAKD_LR(model_path=model_path, labelMap=labelMap)
         self.cam_lock = Lock()
         self.labelMap = labelMap
+
+        self.native_model = YOLO(model_path)
         
         # Shared resources (protected by lock)
         self.rgb_frame = None
@@ -98,7 +102,7 @@ class CameraCore:
         """
         depth_data = []
         self.rgb_frame, self.depth_frame = self.get_latest_frames()
-        detections = self.get_latest_detections()
+        detections = self.native_model(self.rgb_frame)
 
         if self.depth_frame is None or detections is None:
             # print("Error: Depth frame or detections are not available.")
