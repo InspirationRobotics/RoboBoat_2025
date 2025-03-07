@@ -135,7 +135,7 @@ class CameraCore:
             # Assuming detection.names maps class index to label and detection.probs contains confidence
             class_id = detection.boxes.cls[0]  # Get the class ID of the first detected object
             label = detection.names[int(class_id)]  # Get the label for the class ID
-            confidence = detection.confidence  # Get confidence
+            confidence = detection.probs[0]  # Get confidence
             
             depth_data.append({
                 "label": label,
