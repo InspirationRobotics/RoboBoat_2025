@@ -26,5 +26,5 @@ def process_waypoints(file_path, dx, dy):
 
 # Example usage
 file_path = "GNC/Guidance_Core/Config/waypoints.txt"  # Replace with actual file path
-dx, dy = -10, 0 # Offset in meters
+dx, dy = 10, 0 # Offset in meters
 process_waypoints(file_path, dx, dy)
