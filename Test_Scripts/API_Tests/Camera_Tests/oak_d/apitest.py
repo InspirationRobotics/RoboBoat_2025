@@ -20,7 +20,7 @@ while(True):
         # print(detections)
         h1, w1, _ = frame_rgb.shape
         h2, w2 = depth_frame.shape
-        print(f"{h1} {w1} | {h2} {w2}")
+        # print(f"{h1} {w1} | {h2} {w2}")
         disp = (depth_frame * (255.0 / np.max(depth_frame))).astype(np.uint8)
         disp = cv2.applyColorMap(disp, cv2.COLORMAP_JET)
         conct = cv2.vconcat([frame_rgb,disp])

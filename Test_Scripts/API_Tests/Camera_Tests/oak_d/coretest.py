@@ -61,6 +61,7 @@ def display_frames(window_name):
             print(f"Used {((ee - ss) / 1e9):.2f} s to display")
 
         # Check for the 'q' key to exit
+        time.sleep(1)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             on.clear()  # Signal the thread to stop
             break
