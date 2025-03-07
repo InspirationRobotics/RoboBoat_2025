@@ -2,13 +2,12 @@ from GNC.Nav_Core import gis_funcs
 from GNC.Control_Core  import motor_core_new
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
-import GNC.Nav_Core.gis_funcs as gpsfunc
 import threading
 import math
 import time
-from API.Servos.mini_maestro import MiniMaestro
 import cv2
 import numpy as np
+
 class FTP:
     def __init__(self, *, infoCore, motors):
         self.info = infoCore
@@ -31,7 +30,7 @@ class FTP:
         self.cur_ang /= 180
         return self.cur_ang, self.cur_dis
     
-    def run(self,endpoint,tolerance=1.5):
+    def run(self, tolerance=1.5):
         # Find the two closest objects that are lowest on the screen.
         # Find the midpoint of both objects(pixel values).
         # If the difference between one midpoint is greater than the other, yaw to force the values to be within equal within a certain 
@@ -110,12 +109,12 @@ class FTP:
 
             time.sleep(0.05)
 
-        # NOTE: Need to write an actual executable file.
     def stop(self):
         self.info.stop_collecting()
         print("Background Threads stopped")
         self.motors.stop()
         print("Motors stopped")
+
 if __name__ == "__main__":
     config     = MissionHelper()
     print("loading configs")
