@@ -37,10 +37,10 @@ def capture_frames():
         depth = camera.get_object_depth(scale=0.2)
         print(depth)
         frame = camera.visualize()
+        # return frame
         cv2.imshow("frame",frame)
         end_time = time.time_ns()
         print(f"Used {((end_time - start_time) / 1e9):.2f} s to get frame")
-
         
         time.sleep(2)  # Adjust to match the FPS (20 FPS)
         if cv2.waitKey(1) & 0xFF == ord('q'):  # Exit on pressing 'q'
@@ -51,25 +51,26 @@ capture_thread = threading.Thread(target=capture_frames, daemon=True)
 capture_thread.start()
 
 # Main loop to display frames
-def display_frames(window_name):
-    while on.is_set():
-        if not frame_queue.empty():
-            frame = frame_queue.get()
-            ss = time.time_ns()
-            cv2.imshow(window_name, frame)
-            ee = time.time_ns()
-            print(f"Used {((ee - ss) / 1e9):.2f} s to display")
+# def display_frames(window_name):
+#     while on.is_set():
+#         if not frame_queue.empty():
+#             frame = frame_queue.get()
+#             ss = time.time_ns()
+#             cv2.imshow(window_name, frame)
+#             ee = time.time_ns()
+#             print(f"Used {((ee - ss) / 1e9):.2f} s to display")
 
-        # Check for the 'q' key to exit
-        time.sleep(1)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            on.clear()  # Signal the thread to stop
-            break
+#         # Check for the 'q' key to exit
+#         time.sleep(1)
+#         if cv2.waitKey(1) & 0xFF == ord('q'):
+#             on.clear()  # Signal the thread to stop
+#             break
 
 # Display frames for model 1
 try:
-    display_frames("rgb_model1")
+    # display_frames("rgb_model1")
     # Stop capturing before switching models
+    time.sleep(20)
     on.clear()
     capture_thread.join()
     camera.stop()
