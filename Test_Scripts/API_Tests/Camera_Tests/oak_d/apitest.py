@@ -34,25 +34,29 @@ def frameNorm(frame, bbox):
 
 def displayFrame(name, frame):
         color = (255, 0, 0)
-        for detection in detections:
-            # TODO: Investigate into the label index.
-            # print(f"label index: {detection.label}")
-            bbox = frameNorm(frame, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
-            # print(bbox)
-            cv2.putText(frame, labelMap[detection.label], (bbox[0] + 10, bbox[1] + 20), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)  # I added -1 because the label is one whne I only have one detect object
-            cv2.putText(frame, f"{int(detection.confidence * 100)}%", (bbox[0] + 10, bbox[1] + 40), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
-            cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
-        # Show the frame
+
+        if not cam.native:
+            for detection in detections:
+                # TODO: Investigate into the label index.
+                # print(f"label index: {detection.label}")
+                bbox = frameNorm(frame, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
+                # print(bbox)
+                cv2.putText(frame, labelMap[detection.label], (bbox[0] + 10, bbox[1] + 20), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)  # I added -1 because the label is one whne I only have one detect object
+                cv2.putText(frame, f"{int(detection.confidence * 100)}%", (bbox[0] + 10, bbox[1] + 40), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
+                cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
+            # Show the frame
         cv2.imshow(name, frame)
+
 while(True):
+    # time.sleep(1)
     try:
         frame_rgb, _ = cam.getLatestBuffers()  # Get RGB frame and depth frame
         if frame_rgb is None:
             print("No frame received")
             continue
         
-        detections = cam.getLatestDetection()  # Get object detections
-        print(detections)
+        # detections = cam.getLatestDetection()  # Get object detections
+        # print(detections)
           
         displayFrame("camera",frame=frame_rgb)
         if cv2.waitKey(1) & 0xFF == ord('q'):  # Exit on pressing 'q'
