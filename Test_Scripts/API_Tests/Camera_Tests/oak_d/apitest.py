@@ -46,12 +46,12 @@ def displayFrame(name, frame):
         cv2.imshow(name, frame)
 while(True):
     try:
-        frame_rgb, _ = cam.getBuffers()  # Get RGB frame and depth frame
+        frame_rgb, _ = cam.getLatestBuffers()  # Get RGB frame and depth frame
         if frame_rgb is None:
             print("No frame received")
             continue
         
-        detections = cam.getDetection()  # Get object detections
+        detections = cam.getLatestDetection()  # Get object detections
         print(detections)
           
         displayFrame("camera",frame=frame_rgb)
