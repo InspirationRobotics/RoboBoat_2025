@@ -27,14 +27,15 @@ camera.start()
 
 while True:
     start_time = time.time_ns()
-    frame, depth_frame = camera.getFrameRaw()
+    rgb_frame, depth_frame = camera.getFrameRaw()
     end_time = time.time_ns()
     print(f"Used {((end_time - start_time) / 1e9):.2f} s to get frame")
-    print(type(frame))
+    print(type(rgb_frame))
 
-    if frame is not None:
+    if rgb_frame is not None:
         # frame = cv2.UMat(frame)
-        cv2.imshow("rgb", frame)
+        print(f"RGB Frame shape: {rgb_frame.shape}, Type: {type(rgb_frame)}")
+        cv2.imshow("rgb", rgb_frame)
     else:
         print("Frame is none")
     time.sleep(1)  # Adjust to match the FPS (20 FPS)

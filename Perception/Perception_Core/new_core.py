@@ -177,28 +177,29 @@ class CameraCore:
         rgb, _ = self.process_frames()  # Use process_frames to get the latest frames
         print(rgb.shape)
         return rgb
-        depth = self.get_object_depth(scale=0.5)
-        if rgb is None:
-            print("Error: RGB frame is not available for visualization.")
-            return None
+    
+        # depth = self.get_object_depth(scale=0.5)
+        # if rgb is None:
+        #     print("Error: RGB frame is not available for visualization.")
+        #     return None
         
-        color = (255, 0, 0)
-        try:
-            for object in depth:
-                bbox = self._frame_norm(rgb, (object["bbox"][0], object["bbox"][1], object["bbox"][2], object["bbox"][3]))
-                cv2.putText(rgb, object["label"], (bbox[0] + 10, bbox[1] + 20), 
-                            cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
-                cv2.putText(rgb, f"{int(object['confidence'] * 100)}%", (bbox[0] + 10, bbox[1] + 40),
-                            cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
-                cv2.putText(rgb, f"{object['depth']:.2f} meters", (bbox[0] + 10, bbox[1] + 60),
-                            cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
-                cv2.putText(rgb, f"{object['angle']:.2f} degrees", (bbox[0] + 10, bbox[1] + 80),
-                            cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
-                cv2.rectangle(rgb, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
-        except Exception as e:
-            print(f"Visualization Error: {e}")
+        # color = (255, 0, 0)
+        # try:
+        #     for object in depth:
+        #         bbox = self._frame_norm(rgb, (object["bbox"][0], object["bbox"][1], object["bbox"][2], object["bbox"][3]))
+        #         cv2.putText(rgb, object["label"], (bbox[0] + 10, bbox[1] + 20), 
+        #                     cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
+        #         cv2.putText(rgb, f"{int(object['confidence'] * 100)}%", (bbox[0] + 10, bbox[1] + 40),
+        #                     cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
+        #         cv2.putText(rgb, f"{object['depth']:.2f} meters", (bbox[0] + 10, bbox[1] + 60),
+        #                     cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
+        #         cv2.putText(rgb, f"{object['angle']:.2f} degrees", (bbox[0] + 10, bbox[1] + 80),
+        #                     cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
+        #         cv2.rectangle(rgb, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
+        # except Exception as e:
+        #     print(f"Visualization Error: {e}")
         
-        return rgb
+        # return rgb
 
     def _balance(self, frame, reference_Y_mean=244.41758007812504):
         if frame is None:
