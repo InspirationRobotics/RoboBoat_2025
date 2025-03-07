@@ -21,20 +21,21 @@ NNAV    = waypointNav.waypointNav(infoCore=info, motors=motor)
 # load waypoints
 nav = navChannel.navChannel(infoCore=info, motors=motor)
 lat, lon = nav.run()
-nav_lat, nav_lon = gpsfunc.destination_point(lat, lon, 270, 35)
+nav_lat, nav_lon = gpsfunc.destination_point(lat, lon, 318, 35)
+tolerance = 1.5 # Meters
 
-def start_waypoint(point, tolerance : float = 1.0):
-    nav_thread = threading.Thread(target=NNAV.run, args=(point, tolerance), daemon=True) # arguemnets: waypoint(dict), tolerance(float)->in meters
-    nav_thread.start()
-    nav_thread.join()
-    print("[Mission] Waypoint reached.")
+# def start_waypoint(point, tolerance : float = 1.0):
+#     nav_thread = threading.Thread(target=NNAV.run, args=(point, tolerance), daemon=True) # arguemnets: waypoint(dict), tolerance(float)->in meters
+#     nav_thread.start()
+#     nav_thread.join()
+#     print("[Mission] Waypoint reached.")
 
 waypoints  = NNAV._readLatLon(file_path = config["waypoint_file"])
 waypoints.insert({"lat" : nav_lat, "lon" : nav_lon},0)
 
 try:
     for p in waypoints:
-        nav_thread = threading.Thread(target=NNAV.run, args=(p, 1.0), daemon=True)
+        nav_thread = threading.Thread(target=NNAV.run, args=(p, 1.5), daemon=True)
         nav_thread.start()
         nav_thread.join()  # ✅ WAIT for thread to finish before stopping motors
     NNAV.stop()  # ✅ Stop everything AFTER all waypoints are reached
