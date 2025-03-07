@@ -33,7 +33,7 @@ while True:
     print(type(frame))
 
     if frame is not None:
-        frame = cv2.UMat(frame)
+        # frame = cv2.UMat(frame)
         cv2.imshow("rgb", frame)
     else:
         print("Frame is none")
