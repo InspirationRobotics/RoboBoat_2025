@@ -27,7 +27,7 @@ camera.start()
 
 while True:
     start_time = time.time_ns()
-    frame = camera.getFrameRaw()
+    frame, depth_frame = camera.getFrameRaw()
     end_time = time.time_ns()
     print(f"Used {((end_time - start_time) / 1e9):.2f} s to get frame")
     print(type(frame))
