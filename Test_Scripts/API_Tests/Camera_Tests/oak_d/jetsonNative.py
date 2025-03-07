@@ -30,6 +30,7 @@ while True:
     frame = camera.getFrameRaw()
     end_time = time.time_ns()
     print(f"Used {((end_time - start_time) / 1e9):.2f} s to get frame")
+    print(type(frame))
 
     if frame is not None:
         frame = cv2.UMat(frame)
