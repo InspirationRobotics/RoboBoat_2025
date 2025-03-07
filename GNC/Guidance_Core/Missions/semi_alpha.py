@@ -21,7 +21,7 @@ NNAV    = waypointNav.waypointNav(infoCore=info, motors=motor)
 # load waypoints
 nav = navChannel.navChannel(infoCore=info, motors=motor)
 lat, lon = nav.run()
-nav_lat, nav_lon = gpsfunc.destination_point(lat, lon, 318, 35)
+nav_lat, nav_lon = gpsfunc.destination_point(lat, lon, 313, 25)
 tolerance = 1.5 # Meters
 
 # def start_waypoint(point, tolerance : float = 1.0):
