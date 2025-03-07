@@ -18,12 +18,14 @@ while(True):
         
         # detections = cam.getLatestDetection()  # Get object detections
         # print(detections)
-          
-        cv2.imshow("rgb",frame_rgb)
-        cv2.imshow("depth", depth_frame)
+        h1, w1, _ = frame_rgb.shape
+        h2, w2 = depth_frame.shape
+        print(f"{h1} {w1} | {h2} {w2}")
         disp = (depth_frame * (255.0 / np.max(depth_frame))).astype(np.uint8)
         disp = cv2.applyColorMap(disp, cv2.COLORMAP_JET)
-        cv2.imshow("normalized", disp)
+        conct = cv2.vconcat([frame_rgb,disp])
+        cv2.imshow("rgb", frame_rgb)
+        cv2.imshow("combined",conct)
         if cv2.waitKey(1) & 0xFF == ord('q'):  # Exit on pressing 'q'
             break
     except Exception as e:

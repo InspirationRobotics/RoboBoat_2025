@@ -41,7 +41,7 @@
         "Triangle"
     ],
 
-    "competition_model_path" : "Perception/Models/competition_model/competition_openvino_2022.1_6shave.blob",
+    "competition_model_path" : "Perception/Models/competition_model/competition.pt",
     "competition_label_map" : [
         "black_buoy",
         "black_circle",

@@ -68,8 +68,6 @@ class OAKD_LR:
         self.xoutYolo.setStreamName("yolo")
 
     def _setProperties(self):
-#         cam['cam_b'].initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_A)
-# cam['cam_c'].initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_A)
         self.leftCam.setIspScale(2, 3)
         self.leftCam.setCamera("left")
         self.leftCam.setResolution(self.COLOR_RESOLUTION)
@@ -142,8 +140,7 @@ class OAKD_LR:
             # inDet = self.qDet.get()
 
             if inRgb and inDepth:
-                frame = (inRgb.getCvFrame(), inDepth.getCvFrame())
-
+                frame = (inRgb.getCvFrame()[10:800,0:1280-20], inDepth.getCvFrame()[0:800-10,20:1280])
                 # Store the latest frame safely
                 with self.lock:
                     if self.frame_queue.full():

@@ -13,14 +13,14 @@ config = MissionHelper().load_json(path="GNC/Guidance_Core/Config/barco_polo.jso
 
 # Define paths to models
 MODEL_1 = config["test_model_path"]
-MODEL_2 = config["sign_model_path"]
+MODEL_2 = config["competition_model_path"]
 
 # Label Map (Ensure it matches your detection classes)
 LABELMAP_1 = config["test_label_map"]
-LABELMAP_2 = config["sign_label_map"]
+LABELMAP_2 = config["competition_label_map"]
 
 # Initialize the camera core
-camera = CameraCore(model_path=MODEL_2, labelMap=LABELMAP_2)
+camera = CameraCore(model_path=MODEL_2,native=True)
 camera.start()
 
 # Create a queue to pass frames between threads
@@ -35,19 +35,15 @@ def capture_frames():
     while on.is_set():
         start_time = time.time_ns()
         depth = camera.get_object_depth(scale=0.2)
+        print(depth)
         frame = camera.visualize()
         end_time = time.time_ns()
         print(f"Used {((end_time - start_time) / 1e9):.2f} s to get frame")
 
-        # Put the captured frame into the queue
-        with lock:
-            try:
-                if frame_queue.full():
-                    frame_queue.get_nowait()  # Remove the oldest frame
-                frame_queue.put_nowait(frame)
-            except queue.Empty:
-                pass
+        
         time.sleep(1 / 20)  # Adjust to match the FPS (20 FPS)
+        if cv2.waitKey(1) & 0xFF == ord('q'):  # Exit on pressing 'q'
+            break
 
 # Start the capture thread
 capture_thread = threading.Thread(target=capture_frames, daemon=True)
@@ -69,13 +65,18 @@ def display_frames(window_name):
             break
 
 # Display frames for model 1
-display_frames("rgb_model1")
-
-# Stop capturing before switching models
-on.clear()
-capture_thread.join()
-camera.stop()
-
+try:
+    display_frames("rgb_model1")
+    # Stop capturing before switching models
+    on.clear()
+    capture_thread.join()
+    camera.stop()
+except KeyboardInterrupt:
+    # Stop capturing before switching models
+    on.clear()
+    capture_thread.join()
+    camera.stop()
+"""
 # Switch to model 2
 print("Switching model...")
 camera.switchModel(modelPath=MODEL_2, labelMap=LABELMAP_2)
@@ -95,3 +96,4 @@ camera.stop()
 on.clear()
 capture_thread.join()
 cv2.destroyAllWindows()
+"""
