@@ -37,4 +37,4 @@ while True:
         cv2.imshow("rgb", frame)
     else:
         print("Frame is none")
-    time.sleep(1 / 20)  # Adjust to match the FPS (20 FPS)
+    time.sleep(1)  # Adjust to match the FPS (20 FPS)
