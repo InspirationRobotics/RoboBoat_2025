@@ -56,3 +56,15 @@ try:
     FTP_mission.stop()
 except KeyboardInterrupt:
     FTP_mission.stop()
+
+try:
+    start_waypoint(nav_point)
+    FTP_Thread = threading.Thread(target=FTP_mission.run,args=(1.5),daemon=True)
+    FTP_Thread.start()
+    time.sleep(20)
+    FTP_Thread.join()
+    start_waypoint(return_point)
+    start_waypoint(first_point)
+    FTP_mission.stop()
+except:
+    FTP_mission.stop()
