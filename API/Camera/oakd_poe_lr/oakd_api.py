@@ -6,7 +6,7 @@ import queue
 import time
 
 class OAKD_LR:
-    def __init__(self, model_path: str, labelMap: list):
+    def __init__(self, model_path: str = "", labelMap: list = [],enableNN:bool = False):
         self.FPS = 20
         self.extended_disparity = True
         self.subpixel = True
