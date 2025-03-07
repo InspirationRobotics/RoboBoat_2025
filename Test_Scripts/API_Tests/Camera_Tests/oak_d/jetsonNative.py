@@ -3,6 +3,7 @@
 import cv2
 import time
 import threading
+import numpy as np
 import queue
 from pathlib import Path
 from Perception.Perception_Core.new_core import CameraCore  # Adjust path if needed
@@ -34,6 +35,9 @@ while True:
 
     if rgb_frame is not None:
         # frame = cv2.UMat(frame)
+        disp = (depth_frame * (255.0 / np.max(depth_frame))).astype(np.uint8)
+        disp = cv2.applyColorMap(disp, cv2.COLORMAP_JET)
+        conct = cv2.vconcat([rgb_frame,disp])
         print(f"RGB Frame shape: {rgb_frame.shape}, Type: {type(rgb_frame)}")
         cv2.imshow("rgb", rgb_frame)
     else:
