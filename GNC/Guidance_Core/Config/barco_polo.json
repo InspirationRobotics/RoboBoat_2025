@@ -41,7 +41,7 @@
         "Triangle"
     ],
 
-    "competition_model_path" : "Perception/Models/competition_model/competition_openvino_2022.1_6shave.blob",
+    "competition_model_path" : "Perception/Models/competition_model/competition.pt",
     "competition_label_map" : [
         "black_buoy",
         "black_circle",
@@ -69,6 +69,8 @@
         "yellow_buoy",
         "yellow_racquet_ball"
     ],
+
+    "MHS_SEALS_MODEL" : "Perception/Models/MHS_SEALS_V14.pt",
 
     "mini_maestro_port": "/dev/ttyACM1",
     "racquetball_launcher_channel": "0",

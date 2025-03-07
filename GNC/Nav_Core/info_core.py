@@ -13,7 +13,7 @@ from threading import Thread, Lock
 from queue import Queue
 import math
 class infoCore:
-    def __init__(self,modelPath:str ,labelMap:list):
+    def __init__(self,modelPath:str ,labelMap:list = None):
         # Stop event to control the manager core and background threads
         self.manager_stop_event = None
         

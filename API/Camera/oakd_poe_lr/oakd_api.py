@@ -6,16 +6,24 @@ import queue
 import time
 
 class OAKD_LR:
-    def __init__(self, model_path: str, labelMap: list):
+    def __init__(self, model_path: str="", labelMap: list=[],native:bool = True):
+        self.native = native
+
         self.FPS = 20
         self.extended_disparity = True
         self.subpixel = True
         self.lr_check = True
 
-        self.syncNN = True
-        self.nnPath = model_path
-        self.labelMap = labelMap
-        self.confidenceThreshold = 0.5
+        if self.native:
+            self.syncNN = True
+            self.nnPath = model_path
+            self.labelMap = labelMap
+            self.confidenceThreshold = 0.5
+        else:
+            self.syncNN = False
+            self.nnPath = model_path
+            self.labelMap = labelMap
+            self.confidenceThreshold = 0.5
 
         if(self._findCamera()):
             self.device = dai.Device()
@@ -45,8 +53,9 @@ class OAKD_LR:
         self.stereo = self.pipeline.create(dai.node.StereoDepth)
 
         # Neural network
-        self.detection = self.pipeline.create(dai.node.YoloDetectionNetwork)
-        self.manip = self.pipeline.create(dai.node.ImageManip)
+        if not self.native:
+            self.detection = self.pipeline.create(dai.node.YoloDetectionNetwork)
+            self.manip = self.pipeline.create(dai.node.ImageManip)
 
         # Out put node
         self.xoutRgb = self.pipeline.create(dai.node.XLinkOut)
@@ -59,46 +68,42 @@ class OAKD_LR:
         self.xoutYolo.setStreamName("yolo")
 
     def _setProperties(self):
-#         cam['cam_b'].initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_A)
-# cam['cam_c'].initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_A)
         self.leftCam.setIspScale(2, 3)
-        self.leftCam.setPreviewSize(640, 352) # the size should be 640,400 for future models
         self.leftCam.setCamera("left")
         self.leftCam.setResolution(self.COLOR_RESOLUTION)
         self.leftCam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
         self.leftCam.setFps(self.FPS)
 
         self.rightCam.setIspScale(2, 3)
-        self.rightCam.setPreviewSize(640, 352)
         self.rightCam.setCamera("right")
         self.rightCam.setResolution(self.COLOR_RESOLUTION)
         self.rightCam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
         self.rightCam.setFps(self.FPS)
 
         self.centerCam.setIspScale(2, 3)
-        self.centerCam.setPreviewSize(640, 352)
         self.centerCam.setCamera("center")
         self.centerCam.setResolution(self.COLOR_RESOLUTION)
         self.centerCam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
         self.centerCam.setFps(self.FPS)
 
-        self.stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
+        #self.stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT) # this make the window smaller for some reason
         self.stereo.initialConfig.setMedianFilter(dai.MedianFilter.MEDIAN_OFF)
         self.stereo.setLeftRightCheck(self.lr_check)
         self.stereo.setExtendedDisparity(self.extended_disparity)
         self.stereo.setSubpixel(self.subpixel)
 
-        self.detection.setConfidenceThreshold(self.confidenceThreshold)
-        self.detection.setNumClasses(len(self.labelMap))
-        self.detection.setCoordinateSize(4)
-        self.detection.setIouThreshold(0.5)
-        self.detection.setBlobPath(self.nnPath)
-        self.detection.setNumInferenceThreads(2)
-        self.detection.input.setBlocking(False)
+        if not self.native:
+            self.detection.setConfidenceThreshold(self.confidenceThreshold)
+            self.detection.setNumClasses(len(self.labelMap))
+            self.detection.setCoordinateSize(4)
+            self.detection.setIouThreshold(0.5)
+            self.detection.setBlobPath(self.nnPath)
+            self.detection.setNumInferenceThreads(2)
+            self.detection.input.setBlocking(False)
 
-        self.manip.initialConfig.setResize(640, 352)
-        self.manip.initialConfig.setCropRect(0, 0, 640, 352)
-        self.manip.setFrameType(dai.ImgFrame.Type.BGR888p)
+            self.manip.initialConfig.setResize(640, 352)
+            self.manip.initialConfig.setCropRect(0, 0, 640, 352)
+            self.manip.setFrameType(dai.ImgFrame.Type.BGR888p)
 
     def _linkStereo(self):
         self.leftCam.isp.link(self.stereo.left)
@@ -106,42 +111,49 @@ class OAKD_LR:
         self.stereo.depth.link(self.xoutDepth.input)
 
     def _linkNN(self):
-        self.centerCam.preview.link(self.manip.inputImage)
-        self.manip.out.link(self.detection.input)
-        
-        if self.syncNN:
-            self.detection.passthrough.link(self.xoutRgb.input)
-        else:
-            self.leftCam.preview.link(self.xoutRgb.input)
+        if not self.native:
+            self.centerCam.isp.link(self.manip.inputImage)
+            self.manip.out.link(self.detection.input)
+            
+            if self.syncNN:
+                self.detection.passthrough.link(self.xoutRgb.input)
+            else:
+                self.centerCam.isp.link(self.xoutRgb.input)
 
-        self.detection.out.link(self.xoutYolo.input)
+            self.detection.out.link(self.xoutYolo.input)
+
+        else:
+            self.centerCam.isp.link(self.xoutRgb.input)
 
     def _initQueues(self):
         self.qRgb = self.device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
-        self.qDet = self.device.getOutputQueue(name="yolo", maxSize=4, blocking=False)
         self.qDepth = self.device.getOutputQueue(name="depth", maxSize=4, blocking=False)
+
+        if not self.native: 
+            self.qDet = self.device.getOutputQueue(name="yolo", maxSize=4, blocking=False)
 
     def _captureLoop(self):
         """ Threaded function to continuously grab frames """
         while self.running:
             inRgb = self.qRgb.get()
             inDepth = self.qDepth.get()
-            inDet = self.qDet.get()
+            # inDet = self.qDet.get()
 
             if inRgb and inDepth:
-                frame = (inRgb.getCvFrame(), inDepth.getCvFrame())
-
+                frame = (inRgb.getCvFrame()[10:800,0:1280-20], inDepth.getCvFrame()[0:800-10,20:1280])
                 # Store the latest frame safely
                 with self.lock:
                     if self.frame_queue.full():
                         self.frame_queue.get()
                     self.frame_queue.put(frame)
 
-            if inDet:
-                with self.lock:
-                    if self.det_queue.full():
-                        self.det_queue.get()
-                    self.det_queue.put(inDet.detections)
+            if not self.native:
+                inDet = self.qDet.get()
+                if inDet:
+                    with self.lock:
+                        if self.det_queue.full():
+                            self.det_queue.get()
+                        self.det_queue.put(inDet.detections)
 
             time.sleep(1 / self.FPS)  # Sleep to match frame rate
     def _findCamera(self) -> bool:
