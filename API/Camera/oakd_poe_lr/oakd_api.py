@@ -6,8 +6,8 @@ import queue
 import time
 
 class OAKD_LR:
-    def __init__(self, model_path: str, labelMap: list):
-        self.native = True
+    def __init__(self, model_path: str="", labelMap: list=[],native:bool = True):
+        self.native = native
 
         self.FPS = 20
         self.extended_disparity = True
@@ -71,27 +71,24 @@ class OAKD_LR:
 #         cam['cam_b'].initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_A)
 # cam['cam_c'].initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_A)
         self.leftCam.setIspScale(2, 3)
-        self.leftCam.setPreviewSize(640, 352) # the size should be 640,400 for future models
         self.leftCam.setCamera("left")
         self.leftCam.setResolution(self.COLOR_RESOLUTION)
         self.leftCam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
         self.leftCam.setFps(self.FPS)
 
         self.rightCam.setIspScale(2, 3)
-        self.rightCam.setPreviewSize(640, 352)
         self.rightCam.setCamera("right")
         self.rightCam.setResolution(self.COLOR_RESOLUTION)
         self.rightCam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
         self.rightCam.setFps(self.FPS)
 
         self.centerCam.setIspScale(2, 3)
-        self.centerCam.setPreviewSize(640, 352)
         self.centerCam.setCamera("center")
         self.centerCam.setResolution(self.COLOR_RESOLUTION)
         self.centerCam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
         self.centerCam.setFps(self.FPS)
 
-        # self.stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
+        #self.stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT) # this make the window smaller for some reason
         self.stereo.initialConfig.setMedianFilter(dai.MedianFilter.MEDIAN_OFF)
         self.stereo.setLeftRightCheck(self.lr_check)
         self.stereo.setExtendedDisparity(self.extended_disparity)
@@ -117,18 +114,18 @@ class OAKD_LR:
 
     def _linkNN(self):
         if not self.native:
-            self.centerCam.preview.link(self.manip.inputImage)
+            self.centerCam.isp.link(self.manip.inputImage)
             self.manip.out.link(self.detection.input)
             
             if self.syncNN:
                 self.detection.passthrough.link(self.xoutRgb.input)
             else:
-                self.leftCam.preview.link(self.xoutRgb.input)
+                self.centerCam.isp.link(self.xoutRgb.input)
 
             self.detection.out.link(self.xoutYolo.input)
 
         else:
-            self.centerCam.preview.link(self.xoutRgb.input)
+            self.centerCam.isp.link(self.xoutRgb.input)
 
     def _initQueues(self):
         self.qRgb = self.device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
