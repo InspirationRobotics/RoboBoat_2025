@@ -20,7 +20,7 @@ from API.Servos.mini_maestro import MiniMaestro
 config     = mission_helper.MissionHelper()
 print("Loading configs...")
 config     = config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
-info       = infoCore(modelPath=config["MHS_SEALS_MODELV14"])
+info       = infoCore(modelPath=config["competition_model_path"])
 print("Starting background threads...")
 info.start_collecting()
 motors      = motor_core_new.MotorCore("/dev/ttyACM2", debug=True) # load with default port "/dev/ttyACM2"
