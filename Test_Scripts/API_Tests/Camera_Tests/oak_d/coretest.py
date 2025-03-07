@@ -42,7 +42,7 @@ def capture_frames():
         print(f"Used {((end_time - start_time) / 1e9):.2f} s to get frame")
 
         
-        time.sleep(1 / 20)  # Adjust to match the FPS (20 FPS)
+        time.sleep(2)  # Adjust to match the FPS (20 FPS)
         if cv2.waitKey(1) & 0xFF == ord('q'):  # Exit on pressing 'q'
             break
 

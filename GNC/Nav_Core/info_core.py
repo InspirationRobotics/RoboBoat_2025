@@ -8,7 +8,7 @@ object location base on perception and heading.
 """
 
 from API.GPS.gps_api import GPS, GPSData
-from Perception.Perception_Core.perception_core import CameraCore
+from Perception.Perception_Core.new_core import CameraCore
 from threading import Thread, Lock
 from queue import Queue
 import math
