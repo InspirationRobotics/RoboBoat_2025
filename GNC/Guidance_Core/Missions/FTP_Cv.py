@@ -213,8 +213,8 @@ class cvCore:
             _ ,green_buoy = find_largest(green_mask)
 
             # normalizing
-            red_buoy = red_buoy/640
-            green_buoy = green_buoy/640
+            red_buoy = red_buoy[0]/640
+            green_buoy = green_buoy[0]/640
 
             # see both, use midpoint to navigate
             if(red_buoy is not None and green_buoy is not None):
