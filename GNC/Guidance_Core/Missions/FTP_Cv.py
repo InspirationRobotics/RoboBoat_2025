@@ -227,9 +227,9 @@ class cvCore:
                     # in 4 section
                     if green_buoy >0.5:
                         if green_buoy > 0.75:
-                            motor.veer(0.6,-0.2)
+                            motor.surge(0.6)
                         else:
-                            motor.veer(0.6,-0.3)
+                            motor.veer(0.6,-0.2)
                     else:
                         if green_buoy < 0.25:
                             motor.veer(0.6,-0.5)
@@ -245,12 +245,9 @@ class cvCore:
                             motor.veer(0.6,0.4)
                     else:
                         if red_buoy > 0.25:
-                            motor.veer(0.6,0.3)
-                        else:
                             motor.veer(0.6,0.2)
-            else:
-                motor.surge(0.9)
-
+                        else:
+                            motor.surge(0.6,0.0)
             if debug:
                 combined = red_mask + green_mask
                 cv2.imshow("mask", combined)
