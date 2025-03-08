@@ -6,24 +6,11 @@ import queue
 import time
 
 class OAKD_LR:
-    def __init__(self, model_path: str="", labelMap: list=[],native:bool = True):
-        self.native = native
-
+    def __init__(self):
         self.FPS = 20
         self.extended_disparity = True
         self.subpixel = True
         self.lr_check = True
-
-        if self.native:
-            self.syncNN = True
-            self.nnPath = model_path
-            self.labelMap = labelMap
-            self.confidenceThreshold = 0.5
-        else:
-            self.syncNN = False
-            self.nnPath = model_path
-            self.labelMap = labelMap
-            self.confidenceThreshold = 0.5
 
         if(self._findCamera()):
             self.device = dai.Device()
@@ -52,20 +39,15 @@ class OAKD_LR:
         # depth map
         self.stereo = self.pipeline.create(dai.node.StereoDepth)
 
-        # Neural network
-        if not self.native:
-            self.detection = self.pipeline.create(dai.node.YoloDetectionNetwork)
-            self.manip = self.pipeline.create(dai.node.ImageManip)
-
         # Out put node
         self.xoutRgb = self.pipeline.create(dai.node.XLinkOut)
         self.xoutDepth = self.pipeline.create(dai.node.XLinkOut)
-        self.xoutYolo = self.pipeline.create(dai.node.XLinkOut)
+
 
         # set stream name
         self.xoutRgb.setStreamName("rgb")
         self.xoutDepth.setStreamName("depth")
-        self.xoutYolo.setStreamName("yolo")
+
 
     def _setProperties(self):
         self.leftCam.setIspScale(2, 3)
@@ -92,70 +74,18 @@ class OAKD_LR:
         self.stereo.setExtendedDisparity(self.extended_disparity)
         self.stereo.setSubpixel(self.subpixel)
 
-        if not self.native:
-            self.detection.setConfidenceThreshold(self.confidenceThreshold)
-            self.detection.setNumClasses(len(self.labelMap))
-            self.detection.setCoordinateSize(4)
-            self.detection.setIouThreshold(0.5)
-            self.detection.setBlobPath(self.nnPath)
-            self.detection.setNumInferenceThreads(2)
-            self.detection.input.setBlocking(False)
-
-            self.manip.initialConfig.setResize(640, 352)
-            self.manip.initialConfig.setCropRect(0, 0, 640, 352)
-            self.manip.setFrameType(dai.ImgFrame.Type.BGR888p)
-
     def _linkStereo(self):
         self.leftCam.isp.link(self.stereo.left)
         self.rightCam.isp.link(self.stereo.right)
         self.stereo.depth.link(self.xoutDepth.input)
 
-    def _linkNN(self):
-        if not self.native:
-            self.centerCam.isp.link(self.manip.inputImage)
-            self.manip.out.link(self.detection.input)
-            
-            if self.syncNN:
-                self.detection.passthrough.link(self.xoutRgb.input)
-            else:
-                self.centerCam.isp.link(self.xoutRgb.input)
-
-            self.detection.out.link(self.xoutYolo.input)
-
-        else:
-            self.centerCam.isp.link(self.xoutRgb.input)
+    def _linkRGB(self):
+        self.centerCam.isp.link(self.xoutRgb.input)           
 
     def _initQueues(self):
         self.qRgb = self.device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
         self.qDepth = self.device.getOutputQueue(name="depth", maxSize=4, blocking=False)
 
-        if not self.native: 
-            self.qDet = self.device.getOutputQueue(name="yolo", maxSize=4, blocking=False)
-
-    def _captureLoop(self):
-        """ Threaded function to continuously grab frames """
-        while self.running:
-            inRgb = self.qRgb.get()
-            inDepth = self.qDepth.get()
-            # inDet = self.qDet.get()
-
-            if inRgb and inDepth:
-                frame = (inRgb.getCvFrame()[10:800,0:1280-20], inDepth.getCvFrame()[0:800-10,20:1280])
-                # Store the latest frame safely
-                with self.lock:
-                    if self.frame_queue.full():
-                        self.frame_queue.get()
-                    self.frame_queue.put(frame)
-
-            if not self.native:
-                inDet = self.qDet.get()
-                if inDet:
-                    with self.lock:
-                        if self.det_queue.full():
-                            self.det_queue.get()
-                        self.det_queue.put(inDet.detections)
-
-            time.sleep(1 / self.FPS)  # Sleep to match frame rate
     def _findCamera(self) -> bool:
         """ Check if a DepthAI device exists """
         try:
@@ -186,37 +116,37 @@ class OAKD_LR:
         print("Starting pipeline...")
         self._initPipeline()
         self._setProperties()
-        self._linkNN()
+        self._linkRGB()
         self._linkStereo()
         self.device.startPipeline(self.pipeline)
         print("Pipeline initialized.")
         self._initQueues()
 
-        # Start thread
-        self.running = True
-        self.capture_thread = threading.Thread(target=self._captureLoop, daemon=True)
-        self.capture_thread.start()
         time.sleep(1)  # wait for frame to arrive queue
-
+        res = self.getLatestBuffers()
+        cv2.imshow("buffer", res)
     def stopCapture(self):
-        self.running = False
-        if self.capture_thread:
-            self.capture_thread.join()
         if self.device:
             self.device.close()
 
     def getLatestBuffers(self):
-        with self.lock:
-            if not self.frame_queue.empty():
-                return self.frame_queue.queue[-1]  # Get latest frame
-            else:
-                print("Queue empty")
-        return None
+        res = self.qRgb.get().getCvFrame()
+        return res
 
-    def getLatestDetection(self):
-        with self.lock:
-            if not self.det_queue.empty():
-                return self.det_queue.queue[-1]  # Get latest detection
-            else:
-                print("Queue empty")
-        return None
+"""some function for processing"""
+
+if __name__ == "__main__":
+    cam = OAKD_LR()
+    cam.startCapture()
+
+    counter = 0
+    while(counter < 100):
+        buffer = cam.getLatestBuffers()
+        cv2.imshow("frame", buffer)
+        print(counter)
+        counter +=1
+        time.sleep(1)
+
+
+    cv2.destroyAllWindows()
+
