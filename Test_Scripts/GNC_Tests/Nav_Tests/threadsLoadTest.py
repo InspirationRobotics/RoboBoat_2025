@@ -61,7 +61,7 @@ with open(LOG_FILE, mode="w", newline="") as file:
             print(lat, lon, heading)
             print("\n")
             for object in detect:
-                print(f"{object['label']} | ang: {object['angle']} | dis: {object['depth']} | position: {object['location']}")
+                print(f"{object["label"]} | ang: {object["angle"]} | dis: {object["depth"]} | position: {object["location"]}")
             time.sleep(1)  # Log every second
 
     except KeyboardInterrupt:

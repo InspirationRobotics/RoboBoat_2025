@@ -22,7 +22,11 @@ class infoCore:
 
     def start_collecting(self):
         # A Thread is started when you initialize the GPS object
+<<<<<<< HEAD
         self.GPS = GPS(serialport = "/dev/ttyUSB0", baudrate= 115200, callback = None, threaded= True, offset = -146) 
+=======
+        self.GPS = GPS(serialport = "/dev/ttyUSB0", baudrate= 115200, callback = None, threaded= True) 
+>>>>>>> main
         self.Camera.start()   # Start Perception Thread
         pass
 

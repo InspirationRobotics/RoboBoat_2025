@@ -27,6 +27,9 @@ class MissionHelper:
 
         self.waypoint_generation_method = config["waypoint_generation_method"]
         self.mission_file_location = config["mission_plan"]
+
+        self.sign_model_path = config["sign_model_path"]
+        self.sign_label_map = config["sign_label_map"]
         
         self.mission_sequence = self.load_json(str(self.mission_file_location))["missions"]
 
