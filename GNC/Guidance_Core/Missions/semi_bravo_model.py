@@ -32,7 +32,7 @@ try:
     for index, p in enumerate(waypoints):
         if(index==1):
             motor.rotate(0.2)
-            time.sleep(2)
+            time.sleep(1)
             motor.stay()
             start_time = time.time()
             shoot = False
