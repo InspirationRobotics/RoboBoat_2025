@@ -35,7 +35,7 @@ try:
             pass
             Servo.set_pwm(1,1500)
             Servo.set_pwm(1,1800)
-            time.sleep(10)
+            time.sleep(20)
             Servo.set_pwm(1,1500)
             
         nav_thread = threading.Thread(target=NNAV.run, args=(p, 1.5), daemon=True)
