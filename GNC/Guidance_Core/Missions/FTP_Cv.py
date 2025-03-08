@@ -152,7 +152,7 @@ def draw_colored_point_on_mask(mask, center, color=(0, 0, 255)):
 
 class cvCore:
     def __init__(self,port:str = "/dev/video0"):
-        self.cap = cv2.VideoCapture("/home/chaser/Downloads/02_h264.mp4")  #"/home/chaser/Downloads/02_h264.mp4"
+        self.cap = cv2.VideoCapture(port)  #"/home/chaser/Downloads/02_h264.mp4"
         self.lock = threading.Lock
 
 
@@ -194,7 +194,7 @@ class cvCore:
         self.cap.release()
         cv2.destroyAllWindows()
     
-    def control_loop(self,motor=None,dir=None,debug=False):
+    def control_loop(self,motor=None,debug=False):
         # dir -> left or right
         if not self.cap.isOpened():
             print("Error: Could not open camera.")
@@ -258,12 +258,14 @@ class cvCore:
 
 if __name__ == "__main__":
     # TODO merge this repo with competition branch, import motor to pass into contorl_loop
+    from GNC.Control_Core.motor_core_new import MotorCore
     import threading
     import time
+    motor = MotorCore()
     cam = cvCore()
-    cam_thread = threading.Thread(target=cam.control_loop_test,daemon=True)
+    cam_thread = threading.Thread(target=cam.control_loop,args=(motor,False),daemon=True)
     cam_thread.start()
-
+    
     for i in range(120):
         print(f"time: {i}")
         time.sleep(1)

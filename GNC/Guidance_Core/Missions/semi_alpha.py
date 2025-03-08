@@ -8,6 +8,7 @@ import threading
 import math
 import time
 from API.Servos.mini_maestro import MiniMaestro
+from GNC.Guidance_Core.Missions.FTP_Cv import cvCore
 
 config     = MissionHelper()
 print("loading configs")
@@ -17,7 +18,7 @@ print("start background threads")
 info.start_collecting()
 motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
 NNAV    = waypointNav.waypointNav(infoCore=info, motors=motor)
-
+Servo = MiniMaestro(port="/dev/ttyACM0")
 # load waypoints
 nav = navChannel.navChannel(infoCore=info, motors=motor)
 lat, lon = nav.run()
@@ -33,11 +34,25 @@ tolerance = 1.5 # Meters
 waypoints  = NNAV._readLatLon(file_path = config["waypoint_file"])
 waypoints.insert(0,{"lat" : nav_lat, "lon" : nav_lon})
 
+# Follow the path thread start
+FTP = cvCore()
+FTP_Thread = threading.Thread(target=FTP.control_loop,args=(motor,False),daemon=True)
+FTP_Thread.start()
+time.sleep(120) # this is our time out
+FTP_Thread.join()
 try:
-    for p in waypoints:
+    for index, p in enumerate(waypoints):
+        if(index==int):
+            pass
+            Servo.set_pwm(1,1500)
+            Servo.set_pwm(1,1800)
+            time.sleep(5)
+            Servo.set_pwm(1,1500)
+            
         nav_thread = threading.Thread(target=NNAV.run, args=(p, 1.5), daemon=True)
         nav_thread.start()
         nav_thread.join()  # ✅ WAIT for thread to finish before stopping motors
+
     NNAV.stop()  # ✅ Stop everything AFTER all waypoints are reached
 except KeyboardInterrupt:
     print("\n[!] KeyboardInterrupt detected! Stopping mission...")
