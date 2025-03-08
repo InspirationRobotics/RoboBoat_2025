@@ -21,8 +21,8 @@ motors     = motor_core_new.MotorCore(config.motor_port)
 # NAV Block
 mission = navChannel.navChannel(infoCore=info, motors=motors)
 lat, lon = mission.run()
-nav_lat, nav_lon = gpsfunc.destination_point(lat, lon, 270, 35)
-return_lat, return_lon = gpsfunc.destination_point(lat, lon, 0, 20)
+nav_lat, nav_lon = gpsfunc.destination_point(lat, lon, 310, 25)
+return_lat, return_lon = gpsfunc.destination_point(lat, lon, 40, 20)
 
 # Initial point
 first_point = {"lat" : lat, "lon" : lon}
