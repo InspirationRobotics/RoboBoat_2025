@@ -42,7 +42,7 @@ waypoints.insert(0,{"lat" : nav_lat, "lon" : nav_lon})
 # FTP_Thread.join()
 try:
     for index, p in enumerate(waypoints):
-        if(index==10):
+        if(index==2):
             pass
             Servo.set_pwm(1,1500)
             Servo.set_pwm(1,1800)
