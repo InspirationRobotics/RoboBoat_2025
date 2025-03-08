@@ -1,4 +1,4 @@
-from GNC.Control_Core  import motor_core_new
+from GNC.Control_Core  import motor_core
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
 from GNC.Guidance_Core.waypointNav import waypointNav
@@ -27,7 +27,7 @@ LABELMAP_2 = config["competition_label_map"]
 # Initialize info Core
 infocore = infoCore(MODEL_2,LABELMAP_2)
 infocore.start_collecting()  # Starts background threads
-motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
+motor      = motor_core.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
 NNAV    = waypointNav(infoCore=infocore, motors=motor)
 servo = MiniMaestro(port="/dev/ttyACM0")
 try:

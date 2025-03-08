@@ -1,6 +1,6 @@
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
-from GNC.Control_Core import motor_core_new
+from GNC.Control_Core import motor_core
 from GNC.Nav_Core import gis_funcs 
 import cv2
 import numpy as np
@@ -91,7 +91,7 @@ config     = config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
 info       = infoCore(modelPath=config["sign_model_path"],labelMap=config["sign_label_map"])
 print("start background threads")
 info.start_collecting()
-motor      = motor_core_new.MotorCore("/dev/ttyACM2",debug=False) # load with default port "/dev/ttyACM2"
+motor      = motor_core.MotorCore("/dev/ttyACM2",debug=False) # load with default port "/dev/ttyACM2"
 time.sleep(2)
 print("rest 2 seconds")
 GPS, _ = info.getInfo()

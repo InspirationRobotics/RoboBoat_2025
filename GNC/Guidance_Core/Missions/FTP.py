@@ -1,5 +1,5 @@
 from GNC.Nav_Core import gis_funcs
-from GNC.Control_Core  import motor_core_new
+from GNC.Control_Core  import motor_core
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
 import GNC.Nav_Core.gis_funcs as gpsfunc
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     info       = infoCore(modelPath=config["competition_model_path"],labelMap=config["competition_label_map"])
     print("start background threads")
     info.start_collecting()
-    motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
+    motor      = motor_core.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
     mission    = FTP(infoCore=info, motors=motor)
 
     try:

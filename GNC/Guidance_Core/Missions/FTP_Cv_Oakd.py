@@ -257,7 +257,7 @@ class cvCore:
 
 if __name__ == "__main__":
     # TODO merge this repo with competition branch, import motor to pass into contorl_loop
-    from GNC.Control_Core.motor_core_new import MotorCore
+    from GNC.Control_Core.motor_core import MotorCore
     from GNC.Nav_Core.info_core import infoCore
     import threading
     import time

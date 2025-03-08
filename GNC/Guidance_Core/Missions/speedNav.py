@@ -1,7 +1,7 @@
 """Keep the target at x=0.25  part of the screen, when heading is 180 + original, we go back to initial position"""
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.waypointNav import waypointNav
-from GNC.Control_Core.motor_core_new import MotorCore
+from GNC.Control_Core.motor_core import MotorCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
 import time
 import math

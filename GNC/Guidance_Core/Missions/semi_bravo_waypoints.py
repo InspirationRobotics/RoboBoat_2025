@@ -1,4 +1,4 @@
-from GNC.Control_Core  import motor_core_new
+from GNC.Control_Core  import motor_core
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
 from GNC.Guidance_Core import waypointNav
@@ -16,7 +16,7 @@ config     = config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
 info       = infoCore(modelPath=config["competition_model_path"],labelMap=config["competition_label_map"])
 print("start background threads")
 info.start_collecting()
-motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
+motor      = motor_core.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
 NNAV    = waypointNav.waypointNav(infoCore=info, motors=motor)
 Servo = MiniMaestro(port="/dev/ttyACM0")
 # load waypoints
