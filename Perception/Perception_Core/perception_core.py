@@ -3,9 +3,12 @@ import numpy as np
 import cv2
 import time
 import math
-from API.Camera.oakd_poe_lr.oakd_api import OAKD_LR
+from API.Camera.oakd_api import OAKD_LR
 
 class CameraCore:
+    """
+    This is the camera core to do some calculation base on the information get from the api
+    """
     def __init__(self, model_path: str, labelMap: list):
         self.cam = OAKD_LR(model_path=model_path, labelMap=labelMap)
         self.cam_lock = Lock()
@@ -22,7 +25,7 @@ class CameraCore:
     def start(self):
         """Start camera streaming in a separate thread."""
         if self.running:
-            print("Camera is already running.")
+            print("[ERROR] Camera is already running.")
             return
         
         self.running = True
@@ -30,10 +33,10 @@ class CameraCore:
             if(self._findCamera):
                 self.cam.startCapture()
             else:
-                print("ERROR: CAMERA NOT FOUND PLEASE CHECK CONNECTION")
+                print("[ERROR] CAMERA NOT FOUND PLEASE CHECK CONNECTION")
                 return
         except RuntimeError as e:
-            print(f"ERROR Device not found {e}")
+            print(f"[ERROR] Device not found {e}")
         self.capture_thread = Thread(target=self._capture_loop, daemon=True)
         self.capture_thread.start()
         print("Camera capture started.")
@@ -45,7 +48,7 @@ class CameraCore:
             self.capture_thread.join()
             self.capture_thread = None
             self.cam.stopCapture()
-        print("Camera capture stopped.")
+        print("[DEBUG] Camera capture stopped.")
     
     def _findCamera(self) ->bool:
         """Check if the camera exist"""
@@ -74,7 +77,7 @@ class CameraCore:
         """Retrieve the latest RGB and depth frames."""
         with self.cam_lock:
             if self.rgb_frame is None or self.depth_frame is None:
-                print("Warning: Frames are not available.")
+                print("[WARNING!] Frames are not available.")
             # print(type(self.rgb_frame))
             # print(self.rgb_frame)
             balanced_frame = self._balance(self.rgb_frame)
@@ -101,7 +104,7 @@ class CameraCore:
         detections = self.get_latest_detections()
 
         if self.depth_frame is None or detections is None:
-            # print("Error: Depth frame or detections are not available.")
+            print("Error: Depth frame or detections are not available.")
             return depth_data
 
         for detection in detections:
@@ -158,7 +161,7 @@ class CameraCore:
         print(f"Switching model to: {modelPath}")
 
         self.stop()  # Stop camera capture
-        print("Wait for threads to close")
+        print("[DEBUG] Wait for threads to close")
         time.sleep(5)
         try:
             # Create a new OAKD_LR instance with the new model
@@ -166,7 +169,7 @@ class CameraCore:
             
             # Restart capture with new model
             self.start()
-            print("Model switched successfully.")
+            print("[DEBUG] Model switched successfully.")
         except Exception as e:
             print(f"Error switching model: {e}")
             self.start()  # Restart with the previous model if switch fails
@@ -179,7 +182,7 @@ class CameraCore:
         rgb, _ = self.get_latest_frames()
         depth = self.get_object_depth()
         if rgb is None:
-            print("Error: RGB frame is not available for visualization.")
+            print("[Error] RGB frame is not available for visualization.")
             return None
         
         color = (255, 0, 0)
@@ -196,22 +199,28 @@ class CameraCore:
                             cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
                 cv2.rectangle(rgb, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
         except Exception as e:
-            print(f"Visualization Error: {e}")
+            print(f"[Error] Visualization Error: {e}")
         
         return rgb
     def _balance(self, frame, reference_Y_mean=244.41758007812504):
+        """
+        This is a function to balance the brightness and saturation of the frame
+        when having back light(facing the sun), cannot apply to oak_d preprocessing
+        because of its unique pipeline.
+        For more information, search up rolling average exposure
+        """
         if frame is None:
-            print("Error: Frame is None!")
+            print("[Error] Frame is None!")
             return None
 
         # Ensure frame is a valid numpy array
         if not isinstance(frame, np.ndarray):
-            print(f"Error: Frame is not a numpy array! Type: {type(frame)}")
+            print(f"[Error] Frame is not a numpy array! Type: {type(frame)}")
             return None
 
         # Ensure frame is 3D (H, W, 3) and not grayscale or empty
         if len(frame.shape) != 3 or frame.shape[2] != 3:
-            print(f"Error: Frame shape is invalid! Expected (H, W, 3), got {frame.shape}")
+            print(f"[Error] Frame shape is invalid! Expected (H, W, 3), got {frame.shape}")
             return None
 
         # Convert full frame to YCrCb
@@ -240,4 +249,4 @@ class CameraCore:
             norm_vals[::2] = frame.shape[1]
             return (np.clip(np.array(bbox), 0, 1) * norm_vals).astype(int)
         except Exception as e:
-            print("Normoalize bbox Error: {e}")
+            print("[ERROR] Normoalize bbox Error: {e}")
