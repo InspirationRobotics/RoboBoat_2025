@@ -196,7 +196,7 @@ class cvCore:
     
     def control_loop(self,motor=None,debug=False):
         while True:
-            frame = self.info.getFrameRaw
+            frame = self.info.getFrameRaw()
 
 
             hsv = preprocess_frame(frame)
