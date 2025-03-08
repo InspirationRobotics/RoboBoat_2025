@@ -1,7 +1,7 @@
 from GNC.Control_Core  import motor_core_new
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
-from GNC.Guidance_Core import waypointNav
+from GNC.Guidance_Core.waypointNav import waypointNav
 from GNC.Guidance_Core.Missions import navChannel
 import GNC.Nav_Core.gis_funcs as gpsfunc
 import threading
