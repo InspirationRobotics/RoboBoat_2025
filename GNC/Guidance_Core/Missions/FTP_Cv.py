@@ -249,9 +249,12 @@ class cvCore:
                         if red_buoy > 0.25:
                             motor.veer(0.6,0.2)
                         else:
-                            motor.surge(0.6,0.0)
+                            motor.surge(0.6)
             if debug:
                 combined = red_mask + green_mask
+                print(f"DEBUG: redX: {red_buoy} | greenX: {green_buoy}")
+                cv2.imshow("red" , red_mask)
+                cv2.imshow("green",green_mask)
                 cv2.imshow("mask", combined)
             time.sleep(1/20)
 
@@ -262,7 +265,8 @@ if __name__ == "__main__":
     import time
     motor = MotorCore(debug=True)
     cam = cvCore()
-    cam_thread = threading.Thread(target=cam.control_loop,args=(motor,False),daemon=True)
+    #cam_thread = threading.Thread(target=cam.control_loop,args=(motor,True),daemon=True)
+    cam_thread = threading.Thread(target=cam.control_loop_test,daemon=True)
     cam_thread.start()
     
     for i in range(120):
