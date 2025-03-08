@@ -210,7 +210,6 @@ class cvCore:
 
             if debug:
                 combined = red_mask + green_mask
-                print(f"DEBUG: redX: {red_buoy} | greenX: {green_buoy}")
                 cv2.imshow("ori", frame)
                 cv2.imshow("mask", combined)
     
@@ -255,6 +254,10 @@ class cvCore:
                             motor.veer(0.6,0.2)
                         else:
                             motor.surge(0.6)
+
+            if debug:
+                print(f"DEBUG: redX: {red_buoy} | greenX: {green_buoy}")
+
             time.sleep(1/20)
 
 if __name__ == "__main__":
