@@ -32,7 +32,7 @@ waypoints  = NNAV._readLatLon(file_path = config["waypoint_file"])
 try:
     for index, p in enumerate(waypoints):
         if(index==1):
-            pass
+            motor.stay()
             Servo.set_pwm(1,1500)
             Servo.set_pwm(1,1800)
             time.sleep(20)
