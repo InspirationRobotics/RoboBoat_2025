@@ -132,7 +132,7 @@ class OAKD_LR:
         res = self.qRgb.get().getCvFrame()
         return res
 
-"""some function for processing"""
+# TODO, figure out what self.qRGB is and self.qRGB.get() is 
 
 if __name__ == "__main__":
     cam = OAKD_LR()
