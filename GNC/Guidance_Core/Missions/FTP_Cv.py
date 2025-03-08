@@ -252,6 +252,7 @@ class cvCore:
                             motor.surge(0.6,0.0)
             if debug:
                 combined = red_mask + green_mask
+                print(f"DEBUG: redX: {red_buoy} | greenX: {green_buoy}")
                 cv2.imshow("mask", combined)
             time.sleep(1/20)
 
