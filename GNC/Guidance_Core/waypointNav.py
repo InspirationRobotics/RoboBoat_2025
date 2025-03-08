@@ -10,23 +10,10 @@ import math
 import time
 from API.Servos.mini_maestro import MiniMaestro
 
-<<<<<<< HEAD
 class waypointNav:
     def __init__(self , infoCore, motors):  
         self.info               = infoCore
         self.motor              = motors
-=======
-class waypointNav(MissionHelper):
-    def __init__(self, *, info = None, motor = None):              
-        if info is None:
-            self.info               = infoCore(modelPath=self.sign_model_path, labelMap=self.sign_label_map)
-        else:
-            self.info = info
-        if motor is None:
-            self.motor              = motor_core_new(self.motor_port)
-        else:
-            self.motor              = motor
->>>>>>> main
 
         self.waypoints :list    = None
         
@@ -37,7 +24,6 @@ class waypointNav(MissionHelper):
 
 
     def _loadConfig(self,file_path:str = "GNC/Guidance_Core/Config/barco_polo.json"):
-<<<<<<< HEAD
         self.config = MissionHelper()
         self.config = self.config.load_json(path=file_path)
 
@@ -45,13 +31,6 @@ class waypointNav(MissionHelper):
         self._loadConfig()
         print(f"path: {self.config['waypoint_file']}")
         self.waypoints = self._readLatLon(self.config['waypoint_file'])
-=======
-        self.parse_config_data(self.load_json(path=file_path))
-
-    def _loadWaypoints(self):
-        print(f"path: {self.waypoint_file}")
-        self.waypoints = self.__readLatLon(self.waypoint_file)
->>>>>>> main
         print("\nWaypoints: ")
         for points in self.waypoints:
             print(points)
@@ -147,7 +126,6 @@ if __name__ == "__main__":
     config     = MissionHelper()
     print("loading configs")
     config     = config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
-<<<<<<< HEAD
     info       = infoCore(modelPath=config["competition_model_path"],labelMap=config["competition_label_map"])
     print("start background threads")
     info.start_collecting()
@@ -157,15 +135,6 @@ if __name__ == "__main__":
     # load waypoints
     waypoints  = mission._readLatLon(file_path = config["waypoint_file"])
     
-=======
-    info       = infoCore(modelPath=config["sign_model_path"],labelMap=config["sign_label_map"])
-    print("start background threads")
-    info.start_collecting()
-    motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
-
-    mission    = waypointNav(info=info, motor=motor)
-    mission.start()
->>>>>>> main
     try:
         for p in waypoints:
             nav_thread = threading.Thread(target=mission.run, args=(p, 1.0), daemon=True)
