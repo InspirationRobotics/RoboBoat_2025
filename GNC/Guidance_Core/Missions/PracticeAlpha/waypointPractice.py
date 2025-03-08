@@ -22,7 +22,7 @@ Servo = MiniMaestro(port="/dev/ttyACM0")
 # load waypoints
 nav = navChannel.navChannel(infoCore=info, motors=motor)
 lat, lon = nav.run()
-nav_lat, nav_lon = gpsfunc.destination_point(lat, lon, 313, 25) # Change
+nav_lat, nav_lon = gpsfunc.destination_point(lat, lon, 313, 25)
 tolerance = 1.5 # Meters
 
 # def start_waypoint(point, tolerance : float = 1.0):
@@ -34,15 +34,16 @@ tolerance = 1.5 # Meters
 waypoints  = NNAV._readLatLon(file_path = config["waypoint_file"])
 waypoints.insert(0,{"lat" : nav_lat, "lon" : nav_lon})
 
-# Follow the path thread start
-FTP = cvCore()
-FTP_Thread = threading.Thread(target=FTP.control_loop,args=(motor,False),daemon=True)
-FTP_Thread.start()
-time.sleep(120) # this is our time out
-FTP_Thread.join()
+# # Follow the path thread start
+# FTP = cvCore()
+# FTP_Thread = threading.Thread(target=FTP.control_loop,args=(motor,False),daemon=True)
+# FTP_Thread.start()
+# time.sleep(120) # this is our time out
+# FTP_Thread.join()
 try:
     for index, p in enumerate(waypoints):
-        if(index==int):
+        if(index==10):
+            pass
             Servo.set_pwm(1,1500)
             Servo.set_pwm(1,1800)
             time.sleep(5)
@@ -73,4 +74,3 @@ except KeyboardInterrupt:
 # time.sleep(1)
 
 print("program finished")
-    

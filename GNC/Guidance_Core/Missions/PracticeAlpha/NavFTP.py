@@ -23,40 +23,36 @@ Servo = MiniMaestro(port="/dev/ttyACM0")
 nav = navChannel.navChannel(infoCore=info, motors=motor)
 lat, lon = nav.run()
 nav_lat, nav_lon = gpsfunc.destination_point(lat, lon, 313, 25) # Change
+nav_point = {"lat" : nav_lat, "lon" : nav_lon}
 tolerance = 1.5 # Meters
 
-# def start_waypoint(point, tolerance : float = 1.0):
-#     nav_thread = threading.Thread(target=NNAV.run, args=(point, tolerance), daemon=True) # arguemnets: waypoint(dict), tolerance(float)->in meters
-#     nav_thread.start()
-#     nav_thread.join()
-#     print("[Mission] Waypoint reached.")
+def start_waypoint(point, tolerance : float = 1.5):
+    nav_thread = threading.Thread(target=NNAV.run, args=(point, tolerance), daemon=True) # arguemnets: waypoint(dict), tolerance(float)->in meters
+    nav_thread.start()
+    nav_thread.join()
+    print("[Mission] Waypoint reached.")
 
-waypoints  = NNAV._readLatLon(file_path = config["waypoint_file"])
-waypoints.insert(0,{"lat" : nav_lat, "lon" : nav_lon})
+# waypoints  = NNAV._readLatLon(file_path = config["waypoint_file"])
+# waypoints.insert(0,{"lat" : nav_lat, "lon" : nav_lon})
 
-# Follow the path thread start
-FTP = cvCore()
-FTP_Thread = threading.Thread(target=FTP.control_loop,args=(motor,False),daemon=True)
-FTP_Thread.start()
-time.sleep(120) # this is our time out
-FTP_Thread.join()
+# # Follow the path thread start
+# FTP = cvCore()
+# FTP_Thread = threading.Thread(target=FTP.control_loop,args=(motor,False),daemon=True)
+# FTP_Thread.start()
+# time.sleep(120) # this is our time out
+# FTP_Thread.join()
+
 try:
-    for index, p in enumerate(waypoints):
-        if(index==int):
-            Servo.set_pwm(1,1500)
-            Servo.set_pwm(1,1800)
-            time.sleep(5)
-            Servo.set_pwm(1,1500)
-            
-        nav_thread = threading.Thread(target=NNAV.run, args=(p, 1.5), daemon=True)
-        nav_thread.start()
-        nav_thread.join()  # ✅ WAIT for thread to finish before stopping motors
+    start_waypoint(nav_point)
+    FTP = cvCore()
+    FTP_Thread = threading.Thread(target=FTP.control_loop,args=(motor,False),daemon=True)
+    FTP_Thread.start()
+    time.sleep(60) # this is our time out
+    FTP_Thread.join()
 
-    NNAV.stop()  # ✅ Stop everything AFTER all waypoints are reached
 except KeyboardInterrupt:
     print("\n[!] KeyboardInterrupt detected! Stopping mission...")
     NNAV.stopThread()  # ✅ Use stop event to signal stop
-    nav_thread.join()
     NNAV.stop()  # Stop motors and background threads
     print("[✔] Mission stopped cleanly.")
 
@@ -73,4 +69,3 @@ except KeyboardInterrupt:
 # time.sleep(1)
 
 print("program finished")
-    
