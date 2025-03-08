@@ -251,8 +251,7 @@ class cvCore:
                         else:
                             motor.surge(0.6)
 
-            if debug:
-                print(f"DEBUG: redX: {red_buoy} | greenX: {green_buoy}")
+            print(f"DEBUG: redX: {red_buoy} | greenX: {green_buoy}")
 
             time.sleep(1/20)
 
