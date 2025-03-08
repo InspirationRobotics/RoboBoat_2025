@@ -4,14 +4,26 @@ import depthai as dai
 import threading
 import queue
 import time
-
+"""
+Note from creator:
+I think I overcomplicates things
+self.frame_queue for frames may not be necessary
+"""
 class OAKD_LR:
     def __init__(self, model_path: str, labelMap: list):
+        """
+        Arguments: 
+            model_path  :str  -> path to the blob file
+            labelMap    :list -> A list of classes, can be found from json file in Model folder
+
+        """
+        # config for stereo camera
         self.FPS = 20
         self.extended_disparity = True
         self.subpixel = True
         self.lr_check = True
 
+        # config for NN detection
         self.syncNN = True
         self.nnPath = model_path
         self.labelMap = labelMap
@@ -22,6 +34,8 @@ class OAKD_LR:
         else:
             print("ERROR: DID NOT FOUND OAK_D CAMERA")
             self.device = None
+
+        # image config
         self.COLOR_RESOLUTION = dai.ColorCameraProperties.SensorResolution.THE_1200_P
         self.imageWidth = 1920
         self.imageHeight = 1200
@@ -48,7 +62,7 @@ class OAKD_LR:
         self.detection = self.pipeline.create(dai.node.YoloDetectionNetwork)
         self.manip = self.pipeline.create(dai.node.ImageManip)
 
-        # Out put node
+        # Output node
         self.xoutRgb = self.pipeline.create(dai.node.XLinkOut)
         self.xoutDepth = self.pipeline.create(dai.node.XLinkOut)
         self.xoutYolo = self.pipeline.create(dai.node.XLinkOut)
@@ -59,8 +73,6 @@ class OAKD_LR:
         self.xoutYolo.setStreamName("yolo")
 
     def _setProperties(self):
-#         cam['cam_b'].initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_A)
-# cam['cam_c'].initialControl.setMisc("3a-follow", dai.CameraBoardSocket.CAM_A)
         self.leftCam.setIspScale(2, 3)
         self.leftCam.setPreviewSize(640, 352) # the size should be 640,400 for future models
         self.leftCam.setCamera("left")
@@ -122,7 +134,7 @@ class OAKD_LR:
         self.qDepth = self.device.getOutputQueue(name="depth", maxSize=4, blocking=False)
 
     def _captureLoop(self):
-        """ Threaded function to continuously grab frames """
+        """ Threaded function to continuously grab frames and put them in queue"""
         while self.running:
             inRgb = self.qRgb.get()
             inDepth = self.qDepth.get()
@@ -169,15 +181,15 @@ class OAKD_LR:
             print("[ERROR] Device is not running!")
             return
         else:
-            print("Device running.")
+            print("[DEBUG] Device running.")
 
-        print("Starting pipeline...")
+        print("[DEBUG] Starting pipeline...")
         self._initPipeline()
         self._setProperties()
         self._linkNN()
         self._linkStereo()
         self.device.startPipeline(self.pipeline)
-        print("Pipeline initialized.")
+        print("[DEBUG] Pipeline initialized.")
         self._initQueues()
 
         # Start thread
@@ -198,7 +210,7 @@ class OAKD_LR:
             if not self.frame_queue.empty():
                 return self.frame_queue.queue[-1]  # Get latest frame
             else:
-                print("Queue empty")
+                print("[ERROR] Queue empty")
         return None
 
     def getLatestDetection(self):
@@ -206,5 +218,5 @@ class OAKD_LR:
             if not self.det_queue.empty():
                 return self.det_queue.queue[-1]  # Get latest detection
             else:
-                print("Queue empty")
+                print("[ERROR] Queue empty")
         return None
