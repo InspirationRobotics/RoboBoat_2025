@@ -30,23 +30,28 @@ infocore.start_collecting()  # Starts background threads
 motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
 NNAV    = waypointNav(infoCore=infocore, motors=motor)
 servo = MiniMaestro(port="/dev/ttyACM0")
+try:
+    while(True):
+        gps, detections = infocore.getInfo()
 
-while(True):
-    gps, detections = infocore.getInfo()
-
-    for object in detections:
-        if(object["label"] == "black_triangle"):
-            print("detected")
-            points = object["location"]
-            print("running waypoint")
-            NNAV.run(points=points,tolerance=1.5)
-            print("shooting water")
-            servo.set_pwm(1,1800)
-            time.sleep(10)
-            servo.set_pwm(1,1500)
-            break
-
-print("program finished")
+        for object in detections:
+            if(object["label"] == "black_triangle"):
+                print("detected")
+                points = object["location"]
+                print("running waypoint")
+                print(points)
+                NNAV.run(points=points,tolerance=0.5)
+                print("shooting water")
+                servo.set_pwm(1,1800)
+                time.sleep(5)
+                servo.set_pwm(1,1500)
+                break
+except KeyboardInterrupt:
+    print("program finished")
+    servo.set_pwm(1,1500)
+    NNAV.stop()
+    infocore.stop_collecting()
+    motor.stop()
             
 
 
