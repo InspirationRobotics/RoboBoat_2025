@@ -212,6 +212,7 @@ class cvCore:
                 combined = red_mask + green_mask
                 cv2.imshow("ori", frame)
                 cv2.imshow("mask", combined)
+                cv2.waitKey(1)
     
             _ ,red_buoy = find_largest(red_mask)
             _ ,green_buoy = find_largest(green_mask)
