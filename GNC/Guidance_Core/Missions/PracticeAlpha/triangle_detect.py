@@ -29,6 +29,7 @@ infocore = infoCore(MODEL_2,LABELMAP_2)
 infocore.start_collecting()  # Starts background threads
 motor      = motor_core_new.MotorCore("/dev/ttyACM2") # load with default port "/dev/ttyACM2"
 NNAV    = waypointNav(infoCore=infocore, motors=motor)
+servo = MiniMaestro(port="/dev/ttyACM0")
 
 while(True):
     gps, detections = infocore.getInfo()
@@ -39,6 +40,14 @@ while(True):
             points = object["location"]
             print("running waypoint")
             NNAV.run(points=points,tolerance=1.5)
+            print("shooting water")
+            servo.set_pwm(1,1800)
+            time.sleep(10)
+            servo.set_pwm(1,1500)
+            break
+
+print("program finished")
+            
 
 
 
