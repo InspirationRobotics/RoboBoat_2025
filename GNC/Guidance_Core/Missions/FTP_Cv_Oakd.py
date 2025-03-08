@@ -196,9 +196,8 @@ class cvCore:
     
     def control_loop(self,motor=None,debug=False):
         while True:
-            gps, frame = self.info
-            if not ret:
-                break
+            frame = self.info.getFrame()
+
 
             hsv = preprocess_frame(frame)
             red_mask = get_red_mask(hsv)
@@ -252,19 +251,26 @@ class cvCore:
                         else:
                             motor.surge(0.6)
 
-            if debug:
-                print(f"DEBUG: redX: {red_buoy} | greenX: {green_buoy}")
+            print(f"DEBUG: redX: {red_buoy} | greenX: {green_buoy}")
 
             time.sleep(1/20)
 
 if __name__ == "__main__":
     # TODO merge this repo with competition branch, import motor to pass into contorl_loop
     from GNC.Control_Core.motor_core_new import MotorCore
+    from GNC.Nav_Core.info_core import infoCore
     import threading
     import time
-    motor = MotorCore(debug=True)
-    cam = cvCore()
-    cam_thread = threading.Thread(target=cam.control_loop,args=(motor,True),daemon=True)
+    from GNC.Guidance_Core.mission_helper import MissionHelper
+    config     = MissionHelper()
+    print("loading configs")
+    config     = config.load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
+    info       = infoCore(modelPath=config["competition_model_path"],labelMap=config["competition_label_map"])
+    print("start background threads")
+    info.start_collecting()
+    motor      = MotorCore("/dev/ttyACM2")
+    cam = cvCore(info=info)
+    cam_thread = threading.Thread(target=cam.control_loop,args=(motor,False),daemon=True)
     #cam_thread = threading.Thread(target=cam.control_loop_test,daemon=True)
     cam_thread.start()
     
