@@ -261,7 +261,7 @@ if __name__ == "__main__":
     from GNC.Control_Core.motor_core_new import MotorCore
     import threading
     import time
-    motor = MotorCore()
+    motor = MotorCore(debug=True)
     cam = cvCore()
     cam_thread = threading.Thread(target=cam.control_loop,args=(motor,False),daemon=True)
     cam_thread.start()
