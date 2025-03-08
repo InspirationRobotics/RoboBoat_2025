@@ -31,6 +31,9 @@ waypoints  = NNAV._readLatLon(file_path = config["waypoint_file"])
 try:
     for index, p in enumerate(waypoints):
         if(index==1):
+            motor.rotate(0.2)
+            time.sleep(2)
+            motor.stay()
             start_time = time.time()
             shoot = False
             while((time.time()-start_time)<30 and not shoot):
