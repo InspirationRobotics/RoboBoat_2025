@@ -263,7 +263,7 @@ if __name__ == "__main__":
     import time
     motor = MotorCore(debug=True)
     cam = cvCore()
-    cam_thread = threading.Thread(target=cam.control_loop,args=(motor,False),daemon=True)
+    cam_thread = threading.Thread(target=cam.control_loop,args=(motor,True),daemon=True)
     cam_thread.start()
     
     for i in range(120):
