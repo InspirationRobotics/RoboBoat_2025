@@ -43,7 +43,6 @@ FTP_Thread.join()
 try:
     for index, p in enumerate(waypoints):
         if(index==int):
-            pass
             Servo.set_pwm(1,1500)
             Servo.set_pwm(1,1800)
             time.sleep(5)
