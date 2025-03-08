@@ -42,12 +42,12 @@ waypoints.insert(0,{"lat" : nav_lat, "lon" : nav_lon})
 # FTP_Thread.join()
 try:
     for index, p in enumerate(waypoints):
-        if(index==1):
-            pass
-            Servo.set_pwm(1,1500)
-            Servo.set_pwm(1,1800)
-            time.sleep(5)
-            Servo.set_pwm(1,1500)
+        # if(index==1):
+        #     pass
+        #     Servo.set_pwm(1,1500)
+        #     Servo.set_pwm(1,1800)
+        #     time.sleep(5)
+        #     Servo.set_pwm(1,1500)
             
         nav_thread = threading.Thread(target=NNAV.run, args=(p, 1.5), daemon=True)
         nav_thread.start()
