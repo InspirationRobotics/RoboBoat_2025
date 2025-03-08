@@ -123,8 +123,7 @@ class OAKD_LR:
         self._initQueues()
 
         time.sleep(1)  # wait for frame to arrive queue
-        res = self.getLatestBuffers()
-        cv2.imshow("buffer", res)
+
     def stopCapture(self):
         if self.device:
             self.device.close()
