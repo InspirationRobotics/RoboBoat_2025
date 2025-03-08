@@ -32,7 +32,7 @@ tolerance = 1.5 # Meters
 #     print("[Mission] Waypoint reached.")
 
 waypoints  = NNAV._readLatLon(file_path = config["waypoint_file"])
-# waypoints.insert(0,{"lat" : nav_lat, "lon" : nav_lon})
+waypoints.insert(0,{"lat" : nav_lat, "lon" : nav_lon})
 
 # # Follow the path thread start
 # FTP = cvCore()
