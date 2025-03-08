@@ -1,6 +1,6 @@
 from GNC.Control_Core  import motor_core
 from GNC.Nav_Core.info_core import infoCore
-import GNC.Nav_Core.gis_funcs as gpsfunc
+import API.Util.gis_funcs as gpsfunc
 from GNC.Guidance_Core.waypointNav import waypointNav
 from GNC.Guidance_Core.mission_helper import MissionHelper
 from GNC.Guidance_Core.Missions import navChannel, FTP

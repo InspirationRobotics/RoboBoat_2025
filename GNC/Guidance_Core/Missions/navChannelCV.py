@@ -1,7 +1,7 @@
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
 from GNC.Control_Core import motor_core
-from GNC.Nav_Core import gis_funcs 
+from API.Util import gis_funcs 
 import cv2
 import numpy as np
 import time

@@ -4,7 +4,7 @@ This is the script for waypoint navigation
 from GNC.Control_Core  import motor_core
 from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
-import GNC.Nav_Core.gis_funcs as gpsfunc
+import API.Util.gis_funcs as gpsfunc
 import threading
 import math
 import time

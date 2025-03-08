@@ -3,7 +3,7 @@ from GNC.Nav_Core.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
 from GNC.Guidance_Core import waypointNav
 from GNC.Guidance_Core.Missions import navChannel
-import GNC.Nav_Core.gis_funcs as gpsfunc
+import API.Util.gis_funcs as gpsfunc
 import threading
 import math
 import time

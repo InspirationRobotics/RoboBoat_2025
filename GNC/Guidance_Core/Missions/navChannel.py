@@ -1,4 +1,4 @@
-from GNC.Nav_Core import gis_funcs
+from API.Util import gis_funcs
 
 class navChannel:
     def __init__(self, *, infoCore, motors):
