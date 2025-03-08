@@ -26,7 +26,7 @@ nav_lat, nav_lon = gpsfunc.destination_point(lat, lon, 313, 20)
 tolerance = 1.5 # Meters
 
 waypoints  = NNAV._readLatLon(file_path = config["waypoint_file"])
-waypoints.insert(0,{"lat" : nav_lat, "lon" : nav_lon})
+# waypoints.insert(0,{"lat" : nav_lat, "lon" : nav_lon})
 
 try:
     for index, p in enumerate(waypoints):
