@@ -58,6 +58,8 @@ try:
     NNAV.stop()  # ✅ Stop everything AFTER all waypoints are reached
 except KeyboardInterrupt:
     print("\n[!] KeyboardInterrupt detected! Stopping mission...")
+    Servo.set_pwm(1,1500)
+    time.sleep(2)
     NNAV.stopThread()  # ✅ Use stop event to signal stop
     nav_thread.join()
     NNAV.stop()  # Stop motors and background threads
