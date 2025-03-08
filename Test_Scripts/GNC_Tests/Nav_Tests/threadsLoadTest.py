@@ -1,7 +1,7 @@
 """
 This script starts GPS and Camera background thread and put CPU usage and response time into cpu_usage_log.cvs
 """
-from GNC.Nav_Core.info_core import infoCore
+from GNC.info_core import infoCore
 import time
 import psutil
 import csv

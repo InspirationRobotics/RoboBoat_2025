@@ -8,7 +8,7 @@ matplotlib.use("TkAgg")  # Or "Qt5Agg" if you have PyQt installed
 import matplotlib.pyplot as plt
 
 # Load the CSV file
-LOG_FILE = "cpu_usage_log.csv"
+LOG_FILE = "Test_Scripts/Perception_Tests/cpu_usage_log.csv"
 df = pd.read_csv(LOG_FILE)
 
 # Convert timestamp to datetime format

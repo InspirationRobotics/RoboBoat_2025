@@ -1,5 +1,5 @@
 from GNC.Control_Core  import motor_core
-from GNC.Nav_Core.info_core import infoCore
+from GNC.info_core import infoCore
 from GNC.Guidance_Core.mission_helper import MissionHelper
 from GNC.Guidance_Core import waypointNav
 from GNC.Guidance_Core.Missions import navChannel
