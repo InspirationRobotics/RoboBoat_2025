@@ -195,7 +195,6 @@ class cvCore:
         cv2.destroyAllWindows()
     
     def control_loop(self,motor=None,debug=False):
-        # dir -> left or right
         if not self.cap.isOpened():
             print("Error: Could not open camera.")
             return
@@ -209,6 +208,12 @@ class cvCore:
             red_mask = get_red_mask(hsv)
             green_mask = get_green_mask(hsv)
 
+            if debug:
+                combined = red_mask + green_mask
+                cv2.imshow("ori", frame)
+                cv2.imshow("mask", combined)
+                cv2.waitKey(1)
+    
             _ ,red_buoy = find_largest(red_mask)
             _ ,green_buoy = find_largest(green_mask)
 
@@ -250,11 +255,10 @@ class cvCore:
                             motor.veer(0.6,0.2)
                         else:
                             motor.surge(0.6)
+
             if debug:
-                combined = red_mask + green_mask
                 print(f"DEBUG: redX: {red_buoy} | greenX: {green_buoy}")
-                cv2.imshow("ori", frame)
-                cv2.imshow("mask", combined)
+
             time.sleep(1/20)
 
 if __name__ == "__main__":
