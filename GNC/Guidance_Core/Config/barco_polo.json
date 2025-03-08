@@ -5,7 +5,7 @@
     "gps_port": "/dev/ttyUSB0",
 
     "waypoint_generation_method": "hardcode",
-    "waypoint_file": "GNC/Guidance_Core/Config/bravo_waypoints_picture.txt",
+    "waypoint_file": "GNC/Guidance_Core/Config/bravo_waypoints_range_finder.txt",
 
     "camera_port": "None",
     "camera_mxid": "None",
