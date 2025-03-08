@@ -25,29 +25,31 @@ lat, lon = nav.run()
 nav_lat, nav_lon = gpsfunc.destination_point(lat, lon, 313, 20)
 tolerance = 1.5 # Meters
 
-# def start_waypoint(point, tolerance : float = 1.0):
-#     nav_thread = threading.Thread(target=NNAV.run, args=(point, tolerance), daemon=True) # arguemnets: waypoint(dict), tolerance(float)->in meters
-#     nav_thread.start()
-#     nav_thread.join()
-#     print("[Mission] Waypoint reached.")
-
 waypoints  = NNAV._readLatLon(file_path = config["waypoint_file"])
 waypoints.insert(0,{"lat" : nav_lat, "lon" : nav_lon})
 
-# # Follow the path thread start
-# FTP = cvCore()
-# FTP_Thread = threading.Thread(target=FTP.control_loop,args=(motor,False),daemon=True)
-# FTP_Thread.start()
-# time.sleep(120) # this is our time out
-# FTP_Thread.join()
 try:
     for index, p in enumerate(waypoints):
-        # if(index==1):
-        #     pass
-        #     Servo.set_pwm(1,1500)
-        #     Servo.set_pwm(1,1800)
-        #     time.sleep(5)
-        #     Servo.set_pwm(1,1500)
+        if(index==1):
+            start_time = time.time()
+            shoot = False
+            while((time.time()-start_time)<30 and not shoot):
+                gps, detections = info.getInfo()
+
+                for object in detections:
+                    if(object["label"] == "black_triangle"):
+                        print("detected")
+                        points = object["location"]
+                        print("running waypoint")
+                        print(points)
+                        NNAV.run(points=points,tolerance=0.5)
+                        print("shooting water")
+                        Servo.set_pwm(1,1800)
+                        time.sleep(20)
+                        Servo.set_pwm(1,1500)
+                        shoot = True
+                        break
+            print("Exit While Loop | Go to next waypoint")
             
         nav_thread = threading.Thread(target=NNAV.run, args=(p, 1.5), daemon=True)
         nav_thread.start()
@@ -60,17 +62,5 @@ except KeyboardInterrupt:
     nav_thread.join()
     NNAV.stop()  # Stop motors and background threads
     print("[✔] Mission stopped cleanly.")
-
-# # shooting water
-# maestro = MiniMaestro(port="/dev/ttyACM0")
-
-# print("water gun")
-
-# maestro.set_pwm(1, 1500)  # Move servo on channel 1
-# time.sleep(1)
-# maestro.set_pwm(1, 1800)  # Move servo on channel 1   
-# time.sleep(10)
-# maestro.set_pwm(1, 1500)  # Move servo on channel 1
-# time.sleep(1)
 
 print("program finished")

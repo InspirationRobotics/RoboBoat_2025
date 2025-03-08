@@ -48,7 +48,7 @@ try:
                 time.sleep(20)
                 servo.set_pwm(1,1500)
                 shoot = True
-                breaks
+                break
 except KeyboardInterrupt:
     print("program finished")
     servo.set_pwm(1,1500)
