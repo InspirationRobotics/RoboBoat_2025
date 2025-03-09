@@ -9,7 +9,6 @@ import threading
 import math
 import time
 from API.Servos.mini_maestro import MiniMaestro
-from GNC.Guidance_Core.Missions.FTP_Cv import cvCore
 
 config     = MissionHelper()
 print("loading configs")
@@ -31,12 +30,19 @@ waypoints  = waypoint_parse.process_waypoints(waypoint_path=config["waypoint_jso
 
 try:
     for index, p in enumerate(waypoints):
-        # if(index==1):
+        # if (index == 5):
         #     motor.stay()
+        #     time.sleep(2)
         #     Servo.set_pwm(1,1500)
         #     Servo.set_pwm(1,1800)
-        #     time.sleep(20)
+        #     time.sleep(10)
         #     Servo.set_pwm(1,1500)
+            
+        if(index==6):
+            motor.stay()
+            time.sleep(1)
+            motor.rotate(0.5)
+            time.sleep(20)
             
         nav_thread = threading.Thread(target=NNAV.run, args=(p, 1.5), daemon=True)
         nav_thread.start()
