@@ -38,7 +38,7 @@ try:
         #     time.sleep(10)
         #     Servo.set_pwm(1,1500)
             
-        if(index==6):
+        if(index==8):
             motor.stay()
             time.sleep(1)
             # Verified three yellow buoys on course
