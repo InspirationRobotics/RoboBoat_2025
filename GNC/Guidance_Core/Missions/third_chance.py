@@ -41,6 +41,7 @@ try:
         if(index==6):
             motor.stay()
             time.sleep(1)
+            # Verified three yellow buoys on course
             motor.rotate(0.5)
             time.sleep(20)
             
