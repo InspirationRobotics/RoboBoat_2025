@@ -44,6 +44,6 @@ if __name__ =="__main__":
     sequence_path = "GNC/Guidance_Core/Config/waypoint_sequence.json"
 
     wayP = process_waypoints(waypoint_path,sequence_path)
-    print(wayP)
+    # print(wayP)
     for w in wayP:
         print(f"[{w['lat']},{w['lon']}],")
