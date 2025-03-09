@@ -45,3 +45,5 @@ if __name__ =="__main__":
 
     wayP = process_waypoints(waypoint_path,sequence_path)
     print(wayP)
+    for w in wayP:
+        print(f"[{w['lat']},{w['lon']}],")
