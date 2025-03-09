@@ -7,7 +7,7 @@ motors = motor_core.MotorCore("/dev/ttyACM2")
 # Set speed to 1 for 40 seconds. Take out a stopwatch and learn
 # how much time three rotations take, then change this argument
 try:
-    motors.rotate(1)
+    motors.rotate(0.5)
     time.sleep(40)
     motors.stay()
 
