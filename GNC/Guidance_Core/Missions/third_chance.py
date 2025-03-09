@@ -44,6 +44,8 @@ try:
             # Verified three yellow buoys on course
             motor.rotate(0.5)
             time.sleep(20)
+            motor.stay()
+            time.sleep(2)
             
         nav_thread = threading.Thread(target=NNAV.run, args=(p, 1.5), daemon=True)
         nav_thread.start()
