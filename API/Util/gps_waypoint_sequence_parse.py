@@ -1,5 +1,5 @@
 import math
-
+import json
 
 def apply_offset(lat, lon, dx, dy):
     """
@@ -13,18 +13,35 @@ def apply_offset(lat, lon, dx, dy):
     dlon = (dx / (R * math.cos(math.radians(lat)))) * (180 / math.pi)
     return lat + dlat, lon + dlon
 
-def process_waypoints(file_path, dx, dy):
+def process_waypoints(waypoint_path, sequence_path):
     """Read waypoints from a file, apply an offset, and overwrite the file."""
-    with open(file_path, 'r') as file:
-        waypoints = [line.strip().split(', ') for line in file]
     
-    new_waypoints = [apply_offset(float(lat), float(lon), dx, dy) for lat, lon in waypoints]
-    
-    with open(file_path, 'w') as file:
-        for lat, lon in new_waypoints:
-            file.write(f"{lat}, {lon}\n")
+    # Load main data file (position and offset information)
+    with open(waypoint_path, "r") as file:
+        waypoints = json.load(file)
 
-# Example usage
-file_path = "GNC/Guidance_Core/Config/waypoints.txt"  # Replace with actual file path
-dx, dy = 10, 0 # Offset in meters
-process_waypoints(file_path, dx, dy)
+    # Load sequence file (list of keys in order)
+    with open(sequence_path ,"r") as file:
+        sequence = json.load(file)
+
+    # initialize new waypoint list
+    new_waypoints = []
+    # Process data in the given sequence
+    for key in sequence:
+        if key in waypoints:  # Ensure key exists in data.json
+            position = waypoints[key]["position"]
+            offset =   waypoints[key]["offset"]
+            newPosition = apply_offset(position[0],position[1],offset[0], offset[1])
+            new_waypoints.append({"lat": newPosition[0], "lon": newPosition[1]})
+        else:
+            print(f"Warning: {key} not found in data.json")
+
+    return new_waypoints
+
+if __name__ =="__main__":
+    # Example usage
+    waypoint_path = "GNC/Guidance_Core/Config/waypoints.json"
+    sequence_path = "GNC/Guidance_Core/Config/waypoint_sequence.json"
+
+    wayP = process_waypoints(waypoint_path,sequence_path)
+    print(wayP)
