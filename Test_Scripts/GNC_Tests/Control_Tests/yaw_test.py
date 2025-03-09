@@ -8,9 +8,8 @@ motors = motor_core.MotorCore("/dev/ttyACM2")
 # how much time three rotations take, then change this argument
 try:
     motors.rotate(0.5)
-    time.sleep(40)
+    time.sleep(20)
     motors.stay()
-
 except KeyboardInterrupt:
-    motors.stay()
+    motors.stop()
     

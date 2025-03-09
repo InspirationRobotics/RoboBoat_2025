@@ -65,11 +65,3 @@ class infoCore:
     
     def switchModel(self,modelPath:str,labelMap:str):
         self.Camera.switchModel(modelPath=modelPath,labelMap=labelMap)
-
-
-
-
-
-    
-    
-
