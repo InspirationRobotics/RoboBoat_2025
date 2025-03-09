@@ -12,6 +12,8 @@ try:
     motors.stay()
     time.sleep(2)
 except KeyboardInterrupt:
+    motors.stay()
+    time.sleep(1)
     motors.stop()
     time.sleep(2)
     
