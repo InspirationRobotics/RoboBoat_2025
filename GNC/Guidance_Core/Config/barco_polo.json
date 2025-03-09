@@ -6,6 +6,8 @@
 
     "waypoint_generation_method": "hardcode",
     "waypoint_file": "GNC/Guidance_Core/Config/bravo_waypoints_picture.txt",
+    "waypoint_json":"GNC/Guidance_Core/Config/waypoints.json",
+    "waypoint_sequence": "GNC/Guidance_Core/Config/waypoints_sequence.json",
 
     "camera_port": "None",
     "camera_mxid": "None",
