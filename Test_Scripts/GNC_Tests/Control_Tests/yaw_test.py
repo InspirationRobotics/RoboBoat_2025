@@ -10,6 +10,8 @@ try:
     motors.rotate(0.5)
     time.sleep(20)
     motors.stay()
+    time.sleep(2)
 except KeyboardInterrupt:
     motors.stop()
+    time.sleep(2)
     
