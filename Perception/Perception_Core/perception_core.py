@@ -11,82 +11,28 @@ class CameraCore:
     """
     def __init__(self, model_path: str, labelMap: list):
         self.cam = OAKD_LR(model_path=model_path, labelMap=labelMap)
-        self.cam_lock = Lock()
         self.labelMap = labelMap
-        
-        # Shared resources (protected by lock)
-        self.rgb_frame = None
-        self.depth_frame = None
-        self.detections = []
-        
-        self.running = False
-        self.capture_thread = None
     
     def start(self):
         """Start camera streaming in a separate thread."""
-        if self.running:
-            print("[ERROR] Camera is already running.")
-            return
-        
-        self.running = True
-        try:
-            if(self._findCamera):
-                self.cam.startCapture()
-            else:
-                print("[ERROR] CAMERA NOT FOUND PLEASE CHECK CONNECTION")
-                return
-        except RuntimeError as e:
-            print(f"[ERROR] Device not found {e}")
-        self.capture_thread = Thread(target=self._capture_loop, daemon=True)
-        self.capture_thread.start()
-        print("Camera capture started.")
+        self.cam.startCapture()
     
     def stop(self):
         """Stop camera streaming."""
-        self.running = False
-        if self.capture_thread:
-            self.capture_thread.join()
-            self.capture_thread = None
-            self.cam.stopCapture()
+        self.cam.stopCapture()
         print("[DEBUG] Camera capture stopped.")
+    
+    def _align(self):
+        """align rgb frame with depth frame"""
+        pass
     
     def _findCamera(self) ->bool:
         """Check if the camera exist"""
-        return not (self.cam.device is None)
+        return self.cam._findCamera()
     
-    def _capture_loop(self):
-        """Continuously fetch frames and detections in the background."""
-        while self.running:
-            with self.cam_lock:
-                frames = self.cam.getLatestBuffers()
-                if frames is not None:
-                    self.rgb_frame, self.depth_frame = frames
-                else:
-                    print("Warning: No frames available from the camera.")
-                    self.rgb_frame, self.depth_frame = None, None
-                
-                detections = self.cam.getLatestDetection()
-                if detections is not None:
-                    self.detections = detections
-                else:
-                    self.detections = []
-            
-            time.sleep(1 / self.cam.FPS)  # Sleep to match frame rate
-    
-    def get_latest_frames(self):
-        """Retrieve the latest RGB and depth frames."""
-        with self.cam_lock:
-            if self.rgb_frame is None or self.depth_frame is None:
-                print("[WARNING!] Frames are not available.")
-            # print(type(self.rgb_frame))
-            # print(self.rgb_frame)
-            balanced_frame = self._balance(self.rgb_frame)
-            return balanced_frame, self.depth_frame
-    
-    def get_latest_detections(self):
-        """Retrieve the latest object detections."""
-        with self.cam_lock:
-            return self.detections
+    def getLatestInfo(self):
+        """return rgb, depth, detection informaiton"""
+        return self.cam.getLatestBuffers(), self.cam.getLatestDepth(), self.cam.getLatestDetection()
     
     def get_object_depth(self, scale: float = 0.5) -> list:
         """
@@ -100,8 +46,7 @@ class CameraCore:
             list: A list of dictionaries containing the label, confidence, bounding box, and average depth of each object.
         """
         depth_data = []
-        self.rgb_frame, self.depth_frame = self.get_latest_frames()
-        detections = self.get_latest_detections()
+        rgb_frame ,depth_frame, detections = self.getLatestInfo()
 
         if self.depth_frame is None or detections is None:
             print("Error: Depth frame or detections are not available.")
@@ -109,7 +54,7 @@ class CameraCore:
 
         for detection in detections:
             # Calculate bounding box coordinates
-            bbox = self._frame_norm(self.rgb_frame, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
+            bbox = self._frame_norm(rgb_frame, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
             
             # Calculate the center of the bounding box
             center_x = (bbox[0] + bbox[2]) // 2
@@ -126,7 +71,7 @@ class CameraCore:
             )
             
             # Crop the depth frame to the smaller bounding box
-            depth_crop = self.depth_frame[bbox_center[1]:bbox_center[3], bbox_center[0]:bbox_center[2]]
+            depth_crop = depth_frame[bbox_center[1]:bbox_center[3], bbox_center[0]:bbox_center[2]]
             
             # Calculate the average depth (in mm) and convert to meters
             avg_depth = np.mean(depth_crop) if depth_crop.size > 0 else 0
@@ -139,12 +84,14 @@ class CameraCore:
 
             # Convert perpendicular depth to actual distance
             distance = abs(avg_depth_meters/(math.cos(angle_rad)))
+
             # Append the result
             # Top left corner is xmin, ymin, lower right corner is xmax, ymax.
             depth_data.append({
                 "label": self.labelMap[detection.label],
                 "confidence":detection.confidence,
                 "bbox": (detection.xmin, detection.ymin, detection.xmax, detection.ymax),
+                "center": (int((detection.xmin+detection.xmax)/2),int((detection.ymin+detection.ymax)/2)),
                 "depth": avg_depth_meters,
                 "distance":distance,
                 "angle":angle
@@ -153,6 +100,7 @@ class CameraCore:
         return depth_data
     
     def switchModel(self, modelPath: str,labelMap:str):
+        """DEPRECATED"""
         """Switch to a different model dynamically."""
         if not modelPath:
             print("Error: Model path is empty.")
@@ -174,13 +122,10 @@ class CameraCore:
             print(f"Error switching model: {e}")
             self.start()  # Restart with the previous model if switch fails
 
-    def getFrameRaw(self):
-        return self.cam.getLatestBuffers()
-        pass
     def visualize(self):
         """Return a labeled OpenCV frame with bounding boxes and labels."""
-        rgb, _ = self.get_latest_frames()
-        depth = self.get_object_depth()
+        rgb, depth, _ = self.getLatestInfo()
+
         if rgb is None:
             print("[Error] RGB frame is not available for visualization.")
             return None
@@ -202,7 +147,9 @@ class CameraCore:
             print(f"[Error] Visualization Error: {e}")
         
         return rgb
+    
     def _balance(self, frame, reference_Y_mean=244.41758007812504):
+        """DEPRECATED"""
         """
         This is a function to balance the brightness and saturation of the frame
         when having back light(facing the sun), cannot apply to oak_d preprocessing
@@ -250,3 +197,23 @@ class CameraCore:
             return (np.clip(np.array(bbox), 0, 1) * norm_vals).astype(int)
         except Exception as e:
             print("[ERROR] Normoalize bbox Error: {e}")
+
+
+if __name__ == "__main__":
+    from GNC.Guidance_Core.mission_helper import MissionHelper
+    # Load config
+    config = MissionHelper().load_json(path="GNC/Guidance_Core/Config/barco_polo.json")
+
+    # Define paths to models
+    MODEL_1 = config["test_model_path"]
+    MODEL_2 = config["competition_model_path"]
+
+    # Label Map (Ensure it matches your detection classes)
+    LABELMAP_1 = config["test_label_map"]
+    LABELMAP_2 = config["comopetition_label_map"]
+
+    cam = CameraCore(model_path=LABELMAP_2,labelMap=LABELMAP_2)
+    cam.start()
+
+    while(True):
+        pass

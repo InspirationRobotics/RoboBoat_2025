@@ -13,18 +13,14 @@ from threading import Thread, Lock
 from queue import Queue
 import math
 class infoCore:
-    def __init__(self,modelPath:str ,labelMap:list):
-        # Stop event to control the manager core and background threads
-        self.manager_stop_event = None
-        
-        # Initialize GPS and Camera
+    def __init__(self,modelPath:str ,labelMap:list):        
+        # Initialize Camera
         self.Camera = CameraCore(model_path=modelPath,labelMap=labelMap)
 
     def start_collecting(self):
         # A Thread is started when you initialize the GPS object
         self.GPS = GPS(serialport = "/dev/ttyUSB0", baudrate= 115200, callback = None, threaded= True, offset = -146) 
         self.Camera.start()   # Start Perception Thread
-        pass
 
     def stop_collecting(self):
         self.GPS.__del__()
@@ -64,4 +60,8 @@ class infoCore:
         return self.GPS.get_data()
     
     def switchModel(self,modelPath:str,labelMap:str):
+        """DEPRECATED we don't need seperate model"""
         self.Camera.switchModel(modelPath=modelPath,labelMap=labelMap)
+
+if __name__ == "__main__":
+    pass
