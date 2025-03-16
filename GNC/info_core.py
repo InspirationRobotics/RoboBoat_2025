@@ -28,7 +28,7 @@ class infoCore:
 
     def getInfo(self): # return object information and GPS data
         detections = self.Camera.get_object_depth(visualize=False)  
-        print(f"[DEBUG] info-detection{detections}")
+        #print(f"[DEBUG] info-detection{detections}")
         gpsData = self.GPS.get_data()
         boat_heading    = gpsData.heading
         boat_lat        = gpsData.lat

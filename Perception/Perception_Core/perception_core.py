@@ -97,7 +97,7 @@ class CameraCore:
                 "angle":angle
             })
         
-        print(f"[DEBUG] camcore{depth_data}")
+        #print(f"[DEBUG] camcore{depth_data}")
         if visualize:
             return rgb_frame, depth_data
         else:

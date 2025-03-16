@@ -15,7 +15,7 @@ class FTP:
         self.motors = motors
 
         # Threshold to look for objects.
-        self.threshold = 0.7
+        self.threshold = 0.4
 
         self.cur_ang = None
         self.cur_dis = None
@@ -55,7 +55,6 @@ class FTP:
 
             red_detected = False
             green_detected = False
-            threshold = 0.9
             if len(detections)>=1 and detections is not None:
                 # collect objects
                 for detection in detections:
@@ -72,12 +71,12 @@ class FTP:
                 green_min_detection = None
 
                 for object in red_object_list:
-                    if(object["bbox"][3]>red_min   and object["bbox"][3]<threshold):
+                    if(object["bbox"][3]>red_min   and object["bbox"][3]>self.threshold):
                         red_min_detection = object
                         red_detected = True
 
                 for object in green_object_list:
-                    if(object["bbox"][3]>green_min and object["bbox"][3]<threshold):
+                    if(object["bbox"][3]>green_min and object["bbox"][3]>self.threshold):
                         green_min_detection = object
                         green_detected = True
 
@@ -111,7 +110,7 @@ class FTP:
             # update del dis
             self.cur_ang,self.cur_dis = self.updateDelta(gpsData.lat,gpsData.lon)
 
-            time.sleep(0.05)
+            time.sleep(0.2)
 
         # NOTE: Need to write an actual executable file.
     def stop(self):
@@ -130,7 +129,7 @@ if __name__ == "__main__":
     mission    = FTP(infoCore=info, motors=motor)
 
     try:
-        mission.run(endpoint=config["FTP_endpoint"],tolerance=1.5)
+        mission.run(endpoint=config["FTP_endpoint"],tolerance=1.5,debug=True)
         mission.stop()
     except KeyboardInterrupt:
         mission.stop()
