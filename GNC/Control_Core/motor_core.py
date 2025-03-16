@@ -26,7 +26,7 @@ class MotorCore:
 
     def veer(self, magnitudeF, magnitudeB):
         """ 
-        Move forward and yaw at the same time.
+        Move forward and yaw at the same time. Front two motor moves forward, back two motor yaw
         Arguments:
             magnitudeF : magnitude for front motors
             magnitudeB : magnitude for back motors
@@ -36,6 +36,19 @@ class MotorCore:
             Positive magnitudeB is clockwise
         """
         self.t200.set_thrusters(-magnitudeF,-magnitudeF,magnitudeB,magnitudeB)
+
+    def sway(self,magnitudeF, magnitudeB):
+        """
+        Similar to veer, but use front two motor to turn left / right
+        Arguments: 
+            magnitudeF : magnitude for front motors
+            magnitudeB : magnitude for back motors
+        Usage:
+            Positive magnitudeF is turn right/clockwise
+            Positive magnitudeB is forward
+        """
+        self.t200.set_thrusters(-magnitudeF,magnitudeF,magnitudeB,-magnitudeB)
+
 
     def rotate(self, magnitude):
         """Rotate, all motors help rotation Positive magnitude is clockwise, negative is counterclockwise."""
