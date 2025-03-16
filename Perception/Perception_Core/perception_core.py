@@ -48,7 +48,7 @@ class CameraCore:
         depth_data = []
         rgb_frame ,depth_frame, detections = self.getLatestInfo()
 
-        if self.depth_frame is None or detections is None:
+        if depth_frame is None or detections is None:
             print("Error: Depth frame or detections are not available.")
             return depth_data
 
