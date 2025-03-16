@@ -164,11 +164,11 @@ class OAKD_LR:
         return res
     
     def getLatestDepth(self):
-        res = self.qDepth.get()
+        res = self.qDepth.get().getCvFrame()
         return res
     
     def getLatestDetection(self):
-        res = self.qDet.get()
+        res = self.qDet.get().detections
         return res
 
 if __name__ == "__main__":
