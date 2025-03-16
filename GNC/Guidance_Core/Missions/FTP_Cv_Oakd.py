@@ -270,7 +270,7 @@ if __name__ == "__main__":
     info.start_collecting()
     motor      = MotorCore("/dev/ttyACM2")
     cam = cvCore(info=info)
-    cam.control_loop(motor=motor,debug=True)
+    cam.control_loop(motor=motor,debug=False)
 
 
 
