@@ -50,10 +50,7 @@ class infoCore:
         return gpsData, detections
 
     def getFrame(self):
-        return self.Camera.visualize()  
-
-    def getFrameRaw(self):
-        return self.Camera.getFrameRaw()    
+        return self.Camera.visualize()     
 
     def getGPSData(self) ->GPSData:
         """DEPRECATED it's now integrated in getInfo"""
@@ -63,5 +60,4 @@ class infoCore:
         """DEPRECATED we don't need seperate model"""
         self.Camera.switchModel(modelPath=modelPath,labelMap=labelMap)
 
-if __name__ == "__main__":
-    pass
+

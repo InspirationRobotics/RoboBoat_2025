@@ -210,10 +210,17 @@ if __name__ == "__main__":
 
     # Label Map (Ensure it matches your detection classes)
     LABELMAP_1 = config["test_label_map"]
-    LABELMAP_2 = config["comopetition_label_map"]
+    LABELMAP_2 = config["competition_label_map"]
 
-    cam = CameraCore(model_path=LABELMAP_2,labelMap=LABELMAP_2)
+    cam = CameraCore(model_path=MODEL_2,labelMap=LABELMAP_2)
     cam.start()
 
-    while(True):
-        pass
+    while(True):  # count for 100s to display frames
+        rgb, depth, detection = cam.getLatestInfo()
+
+        cv2.imshow("frame", rgb)
+
+        if cv2.waitKey(100) & 0xFF == ord('q'):  # Exit on pressing 'q'
+            break
+
+    cv2.destroyAllWindows()

@@ -7,7 +7,7 @@ import time
 
 class OAKD_LR:
     def __init__(self, model_path: str, labelMap: list ,debug:bool = False):
-        self.FPS = 20
+        self.FPS = 5
         self.extended_disparity = True
         self.subpixel = True
         self.lr_check = True
@@ -145,11 +145,11 @@ class OAKD_LR:
             print("[DEBUG] Device running.")
 
         print("[DEBUG] Starting pipeline...")
-        self.device.startPipeline(self.pipeline)
         self._initPipeline()
         self._setProperties()
         self._linkNN()
         self._linkStereo()
+        self.device.startPipeline(self.pipeline)
 
         print("[DEBUG] Pipeline initialized.")
 
@@ -182,20 +182,17 @@ if __name__ == "__main__":
 
     # Label Map (Ensure it matches your detection classes)
     LABELMAP_1 = config["test_label_map"]
-    LABELMAP_2 = config["comopetition_label_map"]
+    LABELMAP_2 = config["competition_label_map"]
 
     cam = OAKD_LR(model_path=MODEL_2,labelMap=LABELMAP_2)
     cam.startCapture()
 
-    counter = 0
-    while(counter < 100):  # count for 100s to display frames
+    while(True):  # count for 100s to display frames
         buffer = cam.getLatestBuffers()
 
         cv2.imshow("frame", buffer)
-        cv2.waitKey(50)
 
-        counter +=1
-        print(counter)
-        time.sleep(1)
+        if cv2.waitKey(100) & 0xFF == ord('q'):  # Exit on pressing 'q'
+            break
 
     cv2.destroyAllWindows()
