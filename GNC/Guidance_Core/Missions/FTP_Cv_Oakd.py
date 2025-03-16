@@ -206,7 +206,8 @@ class cvCore:
                 combined = red_mask + green_mask
                 cv2.imshow("ori", frame)
                 cv2.imshow("mask", combined)
-                cv2.waitKey(1)
+                if cv2.waitKey(100) & 0xFF == ord('q'):  # Exit on pressing 'q'
+                    break
     
             _ ,red_buoy = find_largest(red_mask)
             _ ,green_buoy = find_largest(green_mask)
@@ -269,9 +270,7 @@ if __name__ == "__main__":
     info.start_collecting()
     motor      = MotorCore("/dev/ttyACM2")
     cam = cvCore(info=info)
-    cam_thread = threading.Thread(target=cam.control_loop,args=(motor,True),daemon=True)
-    cam_thread.start()
-    
-    for i in range(120):
-        print(f"time: {i}")
-        time.sleep(1)
+    cam.control_loop(motor=motor,debug=True)
+
+
+
