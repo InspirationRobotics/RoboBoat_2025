@@ -28,11 +28,11 @@ class infoCore:
 
     def getInfo(self): # return object information and GPS data
         detections = self.Camera.get_object_depth(visualize=False)  
+        print(f"[DEBUG] info-detection{detections}")
         gpsData = self.GPS.get_data()
         boat_heading    = gpsData.heading
         boat_lat        = gpsData.lat
         boat_lon        = gpsData.lon
-        print(detections)
         for object in detections:
             R = 6371000  # Earth radius in meters
             heading = math.radians((boat_heading + object["angle"]) % 360)     # abs heading [0,2pi]

@@ -97,7 +97,7 @@ class CameraCore:
                 "angle":angle
             })
         
-        print(depth_data)
+        print(f"[DEBUG] camcore{depth_data}")
         return depth_data if not visualize else rgb_frame,depth_data
     
     def switchModel(self, modelPath: str,labelMap:str):
