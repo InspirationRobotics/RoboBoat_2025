@@ -229,27 +229,27 @@ class cvCore:
                     # in 4 section
                     if green_buoy >0.5:
                         if green_buoy > 0.75:
-                            motor.surge(0.4)
+                            motor.surge(0.3)
                         else:
-                            motor.veer(0.3,-0.4)
+                            motor.veer(0.3,-0.3)
                     else:
                         if green_buoy < 0.25:
-                            motor.veer(0.3,-0.5)
-                        else:
                             motor.veer(0.3,-0.4)
+                        else:
+                            motor.veer(0.3,-0.5)
             elif(green_buoy is None):
                 if red_buoy is not None:
                     # 4 section -> turn right
                     if red_buoy > 0.5:
                         if red_buoy >0.75:
-                            motor.veer(0.6,0.5)
+                            motor.veer(0.3,0.5)
                         else:
-                            motor.veer(0.6,0.4)
+                            motor.veer(0.3,0.4)
                     else:
                         if red_buoy > 0.25:
-                            motor.veer(0.6,0.3)
+                            motor.veer(0.3,0.3)
                         else:
-                            motor.surge(0.6)
+                            motor.surge(0.3)
 
             print(f"DEBUG: redX: {red_buoy} | greenX: {green_buoy}")
 
