@@ -196,8 +196,7 @@ class cvCore:
     
     def control_loop(self,motor=None,debug=False):
         while True:
-            frame = self.info.getFrame()
-
+            _,_,frame = self.info.getInfo(visualize=True)
 
             hsv = preprocess_frame(frame)
             red_mask = get_red_mask(hsv)
@@ -270,8 +269,7 @@ if __name__ == "__main__":
     info.start_collecting()
     motor      = MotorCore("/dev/ttyACM2")
     cam = cvCore(info=info)
-    cam_thread = threading.Thread(target=cam.control_loop,args=(motor,False),daemon=True)
-    #cam_thread = threading.Thread(target=cam.control_loop_test,daemon=True)
+    cam_thread = threading.Thread(target=cam.control_loop,args=(motor,True),daemon=True)
     cam_thread.start()
     
     for i in range(120):

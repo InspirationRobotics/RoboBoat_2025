@@ -26,8 +26,11 @@ class infoCore:
         self.GPS.__del__()
         self.Camera.stop()
 
-    def getInfo(self): # return object information and GPS data
-        detections = self.Camera.get_object_depth(visualize=False)  
+    def getInfo(self,visualize:bool = False): # return object information and GPS data
+        if visualize:
+            detections = self.Camera.get_object_depth(visualize=visualize)
+        else:
+            rgb, detections = self.Camera.get_object_depth(visualize=False)  
         #print(f"[DEBUG] info-detection{detections}")
         gpsData = self.GPS.get_data()
         boat_heading    = gpsData.heading
@@ -48,7 +51,10 @@ class infoCore:
             # add location to dictionary
             object["location"] = {"lat":lat_obj,"lon":lon_obj}
 
-        return gpsData, detections
+        if visualize:
+            return gpsData, detections,rgb
+        else:
+            return gpsData, detections
 
     def getFrame(self):
         return self.Camera.visualize()     
