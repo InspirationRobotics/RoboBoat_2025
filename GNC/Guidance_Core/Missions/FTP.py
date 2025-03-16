@@ -31,7 +31,7 @@ class FTP:
         self.cur_ang /= 180
         return self.cur_ang, self.cur_dis
     
-    def run(self,endpoint,tolerance=1.5):
+    def run(self,endpoint,tolerance=1.5, debug:bool = False):
         # Find the two closest objects that are lowest on the screen.
         # Find the midpoint of both objects(pixel values).
         # If the difference between one midpoint is greater than the other, yaw to force the values to be within equal within a certain 
@@ -96,14 +96,17 @@ class FTP:
             if(delta_center > screen_tolerance):
                 """turn left"""
                 print("\nturn left")
-                self.motors.veer(0.8,-0.5)
+                if not debug:
+                    self.motors.veer(0.8,-0.5)
             elif(delta_center < -screen_tolerance):
                 """turn right"""
                 print("\nturn right")
-                self.motors.veer(0.8, 0.5)
+                if not debug:
+                    self.motors.veer(0.8, 0.5)
             else:
                 print("\nsurge")
-                self.motors.surge(1)
+                if not debug:
+                    self.motors.surge(1)
 
             # update del dis
             self.cur_ang,self.cur_dis = self.updateDelta(gpsData.lat,gpsData.lon)

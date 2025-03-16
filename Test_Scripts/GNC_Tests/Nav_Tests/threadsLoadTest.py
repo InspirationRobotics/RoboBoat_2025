@@ -37,8 +37,6 @@ with open(LOG_FILE, mode="w", newline="") as file:
 
     try:
         while True:
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
             cpu_usage = psutil.cpu_percent(interval=0)  # Instant CPU reading
 
@@ -51,8 +49,6 @@ with open(LOG_FILE, mode="w", newline="") as file:
             # Extract GPS data
             lat, lon, heading = gpsdata.lat, gpsdata.lon, gpsdata.heading
 
-            
-            cv2.imshow("Frame",infocore.getFrame())
             # Write to CSV
             writer.writerow([timestamp, cpu_usage, results["response time"], lat, lon, heading])
 
