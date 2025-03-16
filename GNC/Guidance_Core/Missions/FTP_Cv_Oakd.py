@@ -90,7 +90,7 @@ def find_extreme(mask):
     return leftmost_center,rightmost_center
 
 
-def find_largest(mask):
+def find_largest(mask,threshold:int = 500):
     """Find the largest contour and its centroid in the given binary mask."""
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
@@ -100,7 +100,7 @@ def find_largest(mask):
     # Find the largest contour by area
     largest_contour = max(contours, key=cv2.contourArea)
     area = cv2.contourArea(largest_contour)
-    if area>500:
+    if area>threshold:
         # Compute the centroid using image moments
         M = cv2.moments(largest_contour)
         if M["m00"] != 0:
@@ -209,8 +209,8 @@ class cvCore:
                 if cv2.waitKey(100) & 0xFF == ord('q'):  # Exit on pressing 'q'
                     break
     
-            _ ,red_buoy = find_largest(red_mask)
-            _ ,green_buoy = find_largest(green_mask)
+            _ ,red_buoy = find_largest(red_mask,threshold=500)
+            _ ,green_buoy = find_largest(green_mask,threshold=200)
 
             # normalizing
             if red_buoy is not None:
