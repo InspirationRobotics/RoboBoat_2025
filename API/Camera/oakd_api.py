@@ -168,8 +168,8 @@ class OAKD_LR:
         return res
     
     def getLatestDetection(self):
-        res = self.qDet.get().detections
-        return res
+        res = self.qDet.get()
+        return res.detections
 
 if __name__ == "__main__":
     from GNC.Guidance_Core.mission_helper import MissionHelper

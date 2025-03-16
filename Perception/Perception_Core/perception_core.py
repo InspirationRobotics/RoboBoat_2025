@@ -34,7 +34,7 @@ class CameraCore:
         """return rgb, depth, detection informaiton"""
         return self.cam.getLatestBuffers(), self.cam.getLatestDepth(), self.cam.getLatestDetection()
     
-    def get_object_depth(self, scale: float = 0.5) -> list:
+    def get_object_depth(self, scale: float = 0.5, visualize:bool = False) -> list:
         """
         Calculate the depth of detected objects and return their details.
         
@@ -66,8 +66,8 @@ class CameraCore:
             bbox_center = (
                 max(0, center_x - int(width * scale / 2)),
                 max(0, center_y - int(height * scale / 2)),
-                min(self.depth_frame.shape[1], center_x + int(width * scale / 2)),
-                min(self.depth_frame.shape[0], center_y + int(height * scale / 2))
+                min(depth_frame.shape[1], center_x + int(width * scale / 2)),
+                min(depth_frame.shape[0], center_y + int(height * scale / 2))
             )
             
             # Crop the depth frame to the smaller bounding box
@@ -97,7 +97,7 @@ class CameraCore:
                 "angle":angle
             })
         
-        return depth_data
+        return depth_data if not visualize else rgb_frame,depth_data
     
     def switchModel(self, modelPath: str,labelMap:str):
         """DEPRECATED"""
@@ -124,7 +124,7 @@ class CameraCore:
 
     def visualize(self):
         """Return a labeled OpenCV frame with bounding boxes and labels."""
-        rgb, depth, _ = self.getLatestInfo()
+        rgb, detections = self.get_object_depth(scale=0.5,visualize=True)
 
         if rgb is None:
             print("[Error] RGB frame is not available for visualization.")
@@ -132,7 +132,7 @@ class CameraCore:
         
         color = (255, 0, 0)
         try:
-            for object in depth:
+            for object in detections:
                 bbox = self._frame_norm(rgb, (object["bbox"][0], object["bbox"][1], object["bbox"][2], object["bbox"][3]))
                 cv2.putText(rgb, object["label"], (bbox[0] + 10, bbox[1] + 20), 
                             cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
@@ -215,8 +215,10 @@ if __name__ == "__main__":
     cam = CameraCore(model_path=MODEL_2,labelMap=LABELMAP_2)
     cam.start()
 
-    while(True):  # count for 100s to display frames
-        rgb, depth, detection = cam.getLatestInfo()
+    while(True):  
+        #rgb, depth, detection = cam.getLatestInfo()
+
+        rgb = cam.visualize()
 
         cv2.imshow("frame", rgb)
 
