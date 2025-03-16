@@ -32,6 +32,7 @@ class infoCore:
         boat_heading    = gpsData.heading
         boat_lat        = gpsData.lat
         boat_lon        = gpsData.lon
+        print(detections)
         for object in detections:
             R = 6371000  # Earth radius in meters
             heading = math.radians((boat_heading + object["angle"]) % 360)     # abs heading [0,2pi]
