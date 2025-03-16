@@ -98,7 +98,10 @@ class CameraCore:
             })
         
         print(f"[DEBUG] camcore{depth_data}")
-        return depth_data if not visualize else rgb_frame,depth_data
+        if visualize:
+            return rgb_frame, depth_data
+        else:
+            return depth_data
     
     def switchModel(self, modelPath: str,labelMap:str):
         """DEPRECATED"""
