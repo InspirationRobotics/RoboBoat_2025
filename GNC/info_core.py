@@ -28,9 +28,9 @@ class infoCore:
 
     def getInfo(self,visualize:bool = False): # return object information and GPS data
         if visualize:
-            detections = self.Camera.get_object_depth(visualize=visualize)
+            rgb, detections = self.Camera.get_object_depth(visualize=visualize)
         else:
-            rgb, detections = self.Camera.get_object_depth(visualize=False)  
+            detections = self.Camera.get_object_depth(visualize=False)  
         #print(f"[DEBUG] info-detection{detections}")
         gpsData = self.GPS.get_data()
         boat_heading    = gpsData.heading
