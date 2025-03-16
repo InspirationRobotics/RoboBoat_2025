@@ -7,7 +7,7 @@ import time
 
 class OAKD_LR:
     def __init__(self, model_path: str, labelMap: list ,debug:bool = False):
-        self.FPS = 5
+        self.FPS = 20
         self.extended_disparity = True
         self.subpixel = True
         self.lr_check = True
