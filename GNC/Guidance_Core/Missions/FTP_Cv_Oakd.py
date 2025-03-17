@@ -114,8 +114,17 @@ def find_largest(mask,threshold:int = 500):
     else:
         return None, None
     
-def find_lowest(mask,threshold:int = 100):
-    pass
+def find_lowest(mask,threshold:int = 320):
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    lowest_x = 0
+    lowest_y = 0
+    for object in contours:
+        x, y, w, h = cv2.boundingRect(object)
+        if(y+h>lowest_y):
+            lowest_x = x+w//2
+            lowest_y = y+h
+    
+    return (lowest_x,lowest_y)
 
 def draw_colored_point_on_mask(mask, center, color=(0, 0, 255)):
     """Convert mask to BGR and draw a colored point at the given center"""
@@ -187,6 +196,9 @@ class cvCore:
             _ ,red_buoy = find_largest(red_mask,threshold=500)
             _ ,green_buoy = find_largest(green_mask,threshold=200)
 
+            # red_buoy = find_lowest(red_mask)
+            # green_buoy = find_lowest(green_mask)
+
             # normalizing
             if red_buoy is not None:
                 red_buoy = red_buoy[0]/640
@@ -198,7 +210,7 @@ class cvCore:
                 midpoint = (red_buoy+green_buoy)/2
                 # control motor to veer(add some p control)
                 delta_normalized = (midpoint-0.5)
-                motor.veer(1,delta_normalized)
+                motor.sway(delta_normalized, 0.3)
             elif(red_buoy is None):
                 if green_buoy is not None:
                     # in 4 section
@@ -228,7 +240,7 @@ class cvCore:
 
             print(f"DEBUG: redX: {red_buoy} | greenX: {green_buoy}")
 
-            time.sleep(1/60)
+            time.sleep(1/20)
 
 if __name__ == "__main__":
     # TODO merge this repo with competition branch, import motor to pass into contorl_loop
