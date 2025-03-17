@@ -113,34 +113,9 @@ def find_largest(mask,threshold:int = 500):
         return largest_contour, center
     else:
         return None, None
-
-def find_lowest_red(mask, normalize=False):
-    """
-    Finds the lowest red pixel in the given binary mask and normalizes the coordinates to a 0-1 range.
-
-    :param mask: Binary mask with red pixels as white (255).
-    :param normalize: Whether to normalize the coordinates to a 0-1 range.
-    :return: (x, y) coordinates of the lowest red pixel, or None if not found.
-    """
-    height, width = mask.shape
-
-    # Find all nonzero (white) pixel locations
-    coordinates = np.column_stack(np.where(mask > 0))
-
-    if coordinates.shape[0] == 0:
-        return None  # No red pixels found
-
-    # Get the pixel with the maximum y-coordinate (lowest in the image)
-    lowest_pixel = tuple(coordinates[np.argmax(coordinates[:, 0])])  # (y, x) format
-
-    # Normalize if required
-    if normalize:
-        # Normalize to 0-1 range
-        normalized_x = np.clip(lowest_pixel[1] / width, 0, 1)
-        normalized_y = np.clip(lowest_pixel[0] / height, 0, 1)
-        lowest_pixel = (normalized_x, normalized_y)
-
-    return lowest_pixel  # Return normalized (x, y) or absolute (x, y)
+    
+def find_lowest(mask,threshold:int = 100):
+    pass
 
 def draw_colored_point_on_mask(mask, center, color=(0, 0, 255)):
     """Convert mask to BGR and draw a colored point at the given center"""
@@ -231,29 +206,29 @@ class cvCore:
                         if green_buoy > 0.75:
                             motor.surge(0.3)
                         else:
-                            motor.veer(0.3,-0.3)
+                            motor.sway(-0.3,0.3)
                     else:
                         if green_buoy < 0.25:
-                            motor.veer(0.3,-0.4)
+                            motor.sway(-0.4,0.3)
                         else:
-                            motor.veer(0.3,-0.5)
+                            motor.sway(-0.5,0.3)
             elif(green_buoy is None):
                 if red_buoy is not None:
                     # 4 section -> turn right
                     if red_buoy > 0.5:
                         if red_buoy >0.75:
-                            motor.veer(0.3,0.5)
+                            motor.sway(0.5,0.3)                            
                         else:
-                            motor.veer(0.3,0.4)
+                            motor.sway(0.4,0.3)
                     else:
                         if red_buoy > 0.25:
-                            motor.veer(0.3,0.3)
+                            motor.sway(0.3,0.3)
                         else:
                             motor.surge(0.3)
 
             print(f"DEBUG: redX: {red_buoy} | greenX: {green_buoy}")
 
-            time.sleep(1/20)
+            time.sleep(1/60)
 
 if __name__ == "__main__":
     # TODO merge this repo with competition branch, import motor to pass into contorl_loop
@@ -268,9 +243,9 @@ if __name__ == "__main__":
     info       = infoCore(modelPath=config["competition_model_path"],labelMap=config["competition_label_map"])
     print("start background threads")
     info.start_collecting()
-    motor      = MotorCore("/dev/ttyACM2")
+    motor      = MotorCore("/dev/ttyACM2",debug=True)
     cam = cvCore(info=info)
-    cam.control_loop(motor=motor,debug=False)
+    cam.control_loop(motor=motor,debug=True)
 
 
 
