@@ -17,10 +17,10 @@ class Arduino:
     def __init__(self, port="/dev/ttyACM2", baudrate=115200):
         self.arduino = serial.Serial(port=port, baudrate=baudrate, timeout = 0.1)
 
-        self.send_PWM([1500] * 4)
+        self.send_PWM([1500] * 4,debug=True)
         time.sleep(1)
  
-    def send_PWM(self, command):
+    def send_PWM(self, command, debug:bool = False):
         """
         Writes the PWMs to the arduino.
 
@@ -30,7 +30,8 @@ class Arduino:
         for index, value in enumerate(command):
             command[index] = str(value)
         parsed_pwms = ",".join(command)
-        print(parsed_pwms)
+        if debug:
+            print(f"PWM: {parsed_pwms}")
         # Example parsed_pwms : 1500,1600,1500,1750
         self.arduino.write(parsed_pwms.encode())
 
@@ -121,7 +122,7 @@ class T200(Arduino):
                     # Change the value at the right index
                     self.motor_PWM_list[index] = PWM_value
 
-            self.send_PWM(self.motor_PWM_list)
+            self.send_PWM(self.motor_PWM_list,debug=self.debug)
             time.sleep(0.05)
     
     @debug_decorator
