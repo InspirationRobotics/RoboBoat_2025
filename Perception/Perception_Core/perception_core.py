@@ -9,9 +9,10 @@ class CameraCore:
     """
     This is the camera core to do some calculation base on the information get from the api
     """
-    def __init__(self, model_path: str, labelMap: list):
+    def __init__(self, model_path: str, labelMap: list, debug:bool = False):
         self.cam = OAKD_LR(model_path=model_path, labelMap=labelMap)
         self.labelMap = labelMap
+        self.debug = debug
     
     def start(self):
         """Start camera streaming in a separate thread."""
@@ -45,6 +46,7 @@ class CameraCore:
         Returns:
             list: A list of dictionaries containing the label, confidence, bounding box, and average depth of each object.
         """
+
         depth_data = []
         rgb_frame ,depth_frame, detections = self.getLatestInfo()
 
