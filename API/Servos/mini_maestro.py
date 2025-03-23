@@ -50,13 +50,13 @@ if __name__ == "__main__":
     maestro.set_pwm(0, 1500)  # Move servo on channel 0
     time.sleep(2)
 
-    print("ball launched")
-    maestro.set_pwm(0, 1800)  # Move servo on channel 0   
-    time.sleep(0.35)
+    # print("ball launched")
+    # maestro.set_pwm(0, 1800)  # Move servo on channel 0   
+    # time.sleep(0.35)
     
-    maestro.set_pwm(0, 1500)  # Move servo on channel 0
-    time.sleep(2)    
-    print("finished launching")
+    # maestro.set_pwm(0, 1500)  # Move servo on channel 0
+    # time.sleep(2)    
+    # print("finished launching")
 
     maestro.set_pwm(1, 1500)  # Move servo on channel 1
     print("water gun")
