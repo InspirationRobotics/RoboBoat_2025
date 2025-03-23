@@ -69,6 +69,7 @@ class Rescue(MissionHelper):
                     time.sleep(2)
                     self.servo.set_pwm(self.water_cannon_channel, self.nominalPWM)
 
+                    return 
                     # self.triangle = True
 
             if(self.objectDetected == False and self.duration > (time.time() - self.startTime)):
