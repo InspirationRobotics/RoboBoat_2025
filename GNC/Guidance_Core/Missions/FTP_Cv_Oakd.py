@@ -230,18 +230,18 @@ class cvCore:
                             motor.sway(-0.1,0.1)
                     else:
                         if green_buoy < 0.25:
-                            motor.sway(-0.1,0.1)
+                            motor.sway(-0.15,0.1)
                         else:
-                            motor.sway(-0.1,0.1)
+                            motor.sway(-0.2,0.1)
             elif(green_buoy is None):
                 print("[DEBUG] turn right")
                 if red_buoy is not None:
                     # 4 section -> turn right
                     if red_buoy > 0.5:
                         if red_buoy >0.75:
-                            motor.sway(0.1,0.1)                            
+                            motor.sway(0.2,0.1)                            
                         else:
-                            motor.sway(0.1,0.1)
+                            motor.sway(0.15,0.1)
                     else:
                         if red_buoy > 0.25:
                             motor.sway(0.1,0.1)
