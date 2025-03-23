@@ -17,6 +17,7 @@ class OAKD_LR:
         self.nnPath = model_path
         self.labelMap = labelMap
         self.confidenceThreshold = 0.5
+        self.maxDisparity = None
 
         if(self._findCamera()):
             self.device = dai.Device()
@@ -94,6 +95,7 @@ class OAKD_LR:
         self.leftCam.isp.link(self.stereo.left)
         self.rightCam.isp.link(self.stereo.right)
         self.stereo.depth.link(self.xoutDepth.input)
+        self.maxDisparity = self.stereo.initialConfig.getMaxDisparity()
 
     def _linkNN(self):
         self.centerCam.preview.link(self.manip.inputImage)
@@ -186,10 +188,12 @@ if __name__ == "__main__":
 
     cam = OAKD_LR(model_path=MODEL_2,labelMap=LABELMAP_2)
     cam.startCapture()
-
+    
     while(True):  # count for 100s to display frames
         buffer = cam.getLatestBuffers()
         depth = cam.getLatestDepth()
+        disp = (depth * (255.0 / cam.maxDisparity)).astype(np.uint8)
+        disp = cv2.applyColorMap(disp, cv2.COLORMAP_JET)
         cv2.imshow("frame", buffer)
         cv2.imshow("depth", depth)
 
