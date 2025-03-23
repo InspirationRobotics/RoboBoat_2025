@@ -69,7 +69,7 @@ if __name__ == "__main__":
     print("finished")
 
     maestro.set_pwm(1, 1200)  # Move servo on channel 1
-    maestro.set_pwm(2, 1800)  # Move servo on channel 2
+    # maestro.set_pwm(2, 1800)  # Move servo on channel 2
 
     # Close connection when done
     maestro.close()

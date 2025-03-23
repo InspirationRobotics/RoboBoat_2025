@@ -31,7 +31,7 @@ class Rescue(MissionHelper):
 
         # # Maybe? declare mini maestro channel for water gun and racketball launcher also the PWM value
         self.racquetball_launcher_channel   = 0
-        self.water_cannon_channel           = 0
+        self.water_cannon_channel           = 1
         self.launchPWM                      = 1600
         self.nominalPWM                     = 1800
 
