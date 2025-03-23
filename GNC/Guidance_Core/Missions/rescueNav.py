@@ -70,7 +70,6 @@ class Rescue(MissionHelper):
                     time.sleep(2)
                     self.servo.set_pwm(1, 1500)
 
-                    return 
                     # self.triangle = True
 
             if(self.objectDetected == False and self.duration > (time.time() - self.startTime)):
