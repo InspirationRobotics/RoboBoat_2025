@@ -213,7 +213,7 @@ class cvCore:
                 delta_normalized = (midpoint-0.5)
                 #print("[DEBUG] turn right") if delta_normalized>0 else print("[DEBUG] turn left")
                 #motor.sway(delta_normalized*(0.2/0.5), 0.2)
-                if delta_normalized < 0.3:
+                if delta_normalized < 0.2:
                     print(f"[DEBUG] surge")
                     motor.surge(0.2)
                 else:
