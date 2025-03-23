@@ -195,7 +195,7 @@ if __name__ == "__main__":
         disp = (depth * (255.0 / cam.maxDisparity)).astype(np.uint8)
         disp = cv2.applyColorMap(disp, cv2.COLORMAP_JET)
         cv2.imshow("frame", buffer)
-        cv2.imshow("depth", depth)
+        cv2.imshow("depth", disp)
 
         if cv2.waitKey(100) & 0xFF == ord('q'):  # Exit on pressing 'q'
             break
