@@ -72,7 +72,7 @@ class OAKD_LR:
         self.centerCam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
         self.centerCam.setFps(self.FPS)
 
-        #self.stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT) # this make the window smaller for some reason
+        self.stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT) # this make the window smaller for some reason
         self.stereo.initialConfig.setMedianFilter(dai.MedianFilter.MEDIAN_OFF)
         self.stereo.setLeftRightCheck(self.lr_check)
         self.stereo.setExtendedDisparity(self.extended_disparity)
