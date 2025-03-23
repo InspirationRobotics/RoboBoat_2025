@@ -50,7 +50,7 @@ class Rescue(MissionHelper):
                 self.objectDetected = True
                 if(label=="Cross" or label=="Black boat"):
                     self.wayPNav.loadWaypoints([object["location"]])
-                    self.wayPNav.run(tolerance=2.5)
+                    self.wayPNav.run(points=object["location"],tolerance=2.5)
                     
                     # code for water gun and racketball
                     self.servo.set_pwm(self.racquetball_launcher_channel, self.launchPWM)
@@ -60,7 +60,7 @@ class Rescue(MissionHelper):
 
                 elif(label=="Triangle"or label== "Orange boat"):
                     self.wayPNav.loadWaypoints([object["location"]])
-                    self.wayPNav.run(tolerance=2.5)
+                    self.wayPNav.run(points=object["location"],tolerance=2.5)
 
                     # code for water gun and racketball
                     self.servo.set_pwm(self.water_cannon_channel, self.launchPWM)
