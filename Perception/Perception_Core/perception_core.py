@@ -225,8 +225,9 @@ if __name__ == "__main__":
         #rgb, depth, detection = cam.getLatestInfo()
 
         rgb = cam.visualize()
-
+        rgb_frame ,depth_frame, detections = cam.getLatestInfo()
         cv2.imshow("frame", rgb)
+        cv2.imshow("depth frame", depth_frame)
 
         if cv2.waitKey(100) & 0xFF == ord('q'):  # Exit on pressing 'q'
             break
