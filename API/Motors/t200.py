@@ -30,8 +30,8 @@ class Arduino:
         for index, value in enumerate(command):
             command[index] = str(value)
         parsed_pwms = ",".join(command)
-        if debug:
-            print(f"PWM: {parsed_pwms}")
+        # if debug:
+        print(f"PWM: {parsed_pwms}")
         # Example parsed_pwms : 1500,1600,1500,1750
         self.arduino.write(parsed_pwms.encode())
 
@@ -123,7 +123,6 @@ class T200(Arduino):
                     self.motor_PWM_list[index] = PWM_value
 
             self.send_PWM(self.motor_PWM_list,debug=self.debug)
-            print(self.motor_PWM_list)
             time.sleep(0.05)
     
     @debug_decorator
