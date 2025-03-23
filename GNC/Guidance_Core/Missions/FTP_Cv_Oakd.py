@@ -209,7 +209,8 @@ class cvCore:
             if(red_buoy is not None and green_buoy is not None):
                 midpoint = (red_buoy+green_buoy)/2
                 # control motor to veer(add some p control)
-                delta_normalized = (midpoint-0.5)
+                
+                #delta_normalized = (midpoint-0.5)
                 #print("[DEBUG] turn right") if delta_normalized>0 else print("[DEBUG] turn left")
                 #motor.sway(delta_normalized*(0.2/0.5), 0.2)
                 print(f"[DEBUG] surge")
@@ -222,24 +223,24 @@ class cvCore:
                         if green_buoy > 0.75:
                             motor.surge(0.2)
                         else:
-                            motor.sway(-0.1,0.2)
+                            motor.sway(-0.1,0.1)
                     else:
                         if green_buoy < 0.25:
-                            motor.sway(-0.1,0.2)
+                            motor.sway(-0.1,0.1)
                         else:
-                            motor.sway(-0.1,0.2)
+                            motor.sway(-0.1,0.1)
             elif(green_buoy is None):
                 print("[DEBUG] turn right")
                 if red_buoy is not None:
                     # 4 section -> turn right
                     if red_buoy > 0.5:
                         if red_buoy >0.75:
-                            motor.sway(0.1,0.2)                            
+                            motor.sway(0.1,0.1)                            
                         else:
-                            motor.sway(0.1,0.2)
+                            motor.sway(0.1,0.1)
                     else:
                         if red_buoy > 0.25:
-                            motor.sway(0.1,0.2)
+                            motor.sway(0.1,0.1)
                         else:
                             motor.surge(0.2)
 
