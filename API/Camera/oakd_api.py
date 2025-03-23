@@ -189,8 +189,9 @@ if __name__ == "__main__":
 
     while(True):  # count for 100s to display frames
         buffer = cam.getLatestBuffers()
-
+        depth = cam.getLatestDepth()
         cv2.imshow("frame", buffer)
+        cv2.imshow("depth", depth)
 
         if cv2.waitKey(100) & 0xFF == ord('q'):  # Exit on pressing 'q'
             break
