@@ -64,10 +64,11 @@ class Rescue(MissionHelper):
 
                     # code for water gun and racketball
                     print("shoot water")
-                    self.servo.set_pwm(self.water_cannon_channel, self.nominalPWM)
-                    self.servo.set_pwm(self.water_cannon_channel, self.launchPWM)
+                    self.servo.set_pwm(1, 1500)
                     time.sleep(2)
-                    self.servo.set_pwm(self.water_cannon_channel, self.nominalPWM)
+                    self.servo.set_pwm(1, 1800)
+                    time.sleep(2)
+                    self.servo.set_pwm(1, 1500)
 
                     return 
                     # self.triangle = True
