@@ -64,6 +64,7 @@ class Rescue(MissionHelper):
 
                     # code for water gun and racketball
                     print("shoot water")
+                    self.servo.set_pwm(self.water_cannon_channel, self.nominalPWM)
                     self.servo.set_pwm(self.water_cannon_channel, self.launchPWM)
                     time.sleep(2)
                     self.servo.set_pwm(self.water_cannon_channel, self.nominalPWM)
