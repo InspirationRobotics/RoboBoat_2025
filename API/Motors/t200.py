@@ -30,7 +30,6 @@ class Arduino:
         for index, value in enumerate(command):
             command[index] = str(value)
         parsed_pwms = ",".join(command)
-        # if debug:
         print(f"PWM: {parsed_pwms}")
         # Example parsed_pwms : 1500,1600,1500,1750
         self.arduino.write(parsed_pwms.encode())

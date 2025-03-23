@@ -255,9 +255,9 @@ if __name__ == "__main__":
     info       = infoCore(modelPath=config["competition_model_path"],labelMap=config["competition_label_map"])
     print("start background threads")
     info.start_collecting()
-    motor      = MotorCore("/dev/ttyACM2",debug=True)
+    motor      = MotorCore("/dev/ttyACM2",debug=False)
     cam = cvCore(info=info)
-    cam.control_loop(motor=motor,debug=True)
+    cam.control_loop(motor=motor,debug=False)
 
 
 
