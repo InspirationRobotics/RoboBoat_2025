@@ -123,7 +123,7 @@ class T200(Arduino):
                     self.motor_PWM_list[index] = PWM_value
 
             self.send_PWM(self.motor_PWM_list,debug=self.debug)
-            time.sleep(0.02)
+            time.sleep(0.05)
     
     @debug_decorator
     def stop_thrusters(self):
