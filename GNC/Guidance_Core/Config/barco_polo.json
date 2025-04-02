@@ -1,8 +1,44 @@
 {
     "boat": "Barco Polo",
-    "arduino_port": "platform-3610000.xhci-usb-0:2.2:1.0",
-    "gps_port": "filler_space",
-    "camera_port": "filler_space",
-    "camera_mxid": "filler_space",
-    "camera_focal_length": "filler_space"
+    "mission_plan": "GNC/Guidance_Core/Config/mission_plan.json",
+    "motor_port": "/dev/tty/ACM2",
+    "gps_port": "/dev/tty/USB0",
+
+    "waypoint_generation_method": "hardcode",
+    "waypoint_file": "GNC/Guidance_Core/Config/waypoints.txt",
+
+    "camera_port": "None",
+    "camera_mxid": "None",
+    "camera_focal_length": "None",
+    "root_model_path": "Perception/Models",
+
+    "test_model_path" : "Perception/Models/test_model/yolov8n_coco_640x352.blob",
+    "test_label_map" :[
+        "person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train",
+        "truck", "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench",
+        "bird", "cat", "dog", "horse", "sheep", "cow", "elephant",
+        "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie",
+        "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat",
+        "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle", "wine glass", "cup",
+        "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich",
+        "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake",
+        "chair", "sofa", "pottedplant", "bed", "diningtable", "toilet", "tvmonitor",
+        "laptop", "mouse", "remote", "keyboard", "cell phone", "microwave", "oven",
+        "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors",
+        "teddy bear", "hair drier", "toothbrush"
+    ],
+    "sign_model_path" : "Perception/Models/sign_model/sign_openvino_2022.1_6shave.blob",
+    "sign_label_map" :[
+        "Black Boat",
+        "Cross",
+        "Orange Boat",
+        "Triangle"
+    ],
+
+
+    "mini_maestro_port": "/dev/ttyACM1",
+    "racquetball_launcher_channel": "0",
+    "water_cannon_channel": "1",
+    "launch_PWM": "1800",
+    "nominal_PWM": "1500"
 }

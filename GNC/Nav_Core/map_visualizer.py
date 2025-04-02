@@ -1,7 +1,12 @@
+"""
+Code in order to visualize a passed-in map of a course. This is NOT priority, as it is more of a decoration than an actual useful file.
+This file is currently half-baked. 
+"""
+
 import smopy
 import cv2
 import numpy as np
-from GNC.Nav_Core.map_helper import mapHelper
+from GNC.Nav_Core import gis_funcs
 from typing import Tuple, Union
 from pathlib import Path
 
@@ -13,7 +18,7 @@ Next Steps:
 - Can handle difference in sizing, signs later.
 """
 
-class mapVisualizer(mapHelper):
+class mapVisualizer():
     def __init__(self, /, map : list = [], scale : float = 1.0, save : bool = False, zoom : int = 16, frame_size : int = 800, *,
                  path_to_save_image : str | Path = '', magnify : float = 1.0):
         super().__init__()
@@ -92,8 +97,8 @@ class mapVisualizer(mapHelper):
         center = (self.calculate_midpoint(southwest_corner, northeast_corner))
 
         # Scale the map so that it extends outside of the rectangular shape created by the actual mapped objects.
-        scaled_corners = [self.extend_vector(center, southwest_corner, self.map_scale), self.extend_vector(center, southeast_corner, self.map_scale),
-                          self.extend_vector(center, northwest_corner, self.map_scale), self.extend_vector(center, northeast_corner, self.map_scale)
+        scaled_corners = [gis_funcs.extend_vector(center, southwest_corner, self.map_scale), gis_funcs.extend_vector(center, southeast_corner, self.map_scale),
+                          gis_funcs.extend_vector(center, northwest_corner, self.map_scale), gis_funcs.extend_vector(center, northeast_corner, self.map_scale)
                           ]
         
         return scaled_corners

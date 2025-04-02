@@ -6,12 +6,13 @@ Remember that all files are run as modules: run "python3 -m API.GPS.gps_visualiz
 
 # Smopy eeds to be imported onto host computer. See Setup/install_smopy.sh to install smopy individually, 
 # if you haven't already setup all necessary dependencies, or just run "pip install smopy" in terminal.
-import smopy 
+import smopy
 import cv2
 import numpy as np
 from pathlib import Path
 from API.GPS.waypoint_data_parser import GPSDataParser
 from datetime import datetime
+from typing import Union
 
 class GPSVisualizer:
     """
@@ -25,19 +26,20 @@ class GPSVisualizer:
         heading_offset (float, kwarg): Heading offset of the GPS to take into account in visualizer, defaults to 0.
     """
 
-    def __init__(self, file_path : Path | str, *, zoom : int = 19, playback_speed : int = 10, frame_size : int = 600, heading_offset : float = 0):
-        self.target = {}
-        self.position = {}
-        self.heading = {}
-
-        dp = GPSDataParser(file_path)
-        self.position, self.heading = dp.parse_data()
-        
-        self.playback_speed = playback_speed
-        self.zoom = zoom
-        self.frame_size = frame_size
-        self.heading_offset = heading_offset
-        self.get_map()
+    
+    def __init__(self, file_path: Union[Path, str], *, zoom: int = 19, playback_speed: int = 10, frame_size: int = 600, heading_offset: float = 0):
+            self.target = {}
+            self.position = {}
+            self.heading = {}
+    
+            dp = GPSDataParser(file_path)
+            self.position, self.heading = dp.parse_data()
+            
+            self.playback_speed = playback_speed
+            self.zoom = zoom
+            self.frame_size = frame_size
+            self.heading_offset = heading_offset
+            self.get_map()
         
     def get_map(self, save : bool = False):
         lat, lon = self.position[next(iter(self.position))]
@@ -124,6 +126,6 @@ class GPSVisualizer:
 
 if __name__ == "__main__":
     # Test for GPSVisualizer.
-    file_path = r'Test_Scripts/API_Tests/GPS_Tests/Missions/large_gps_parser_test.txt'
+    file_path = r'/Users/brandontran3/GPS_log.txt'
     visualizer = GPSVisualizer(file_path, playback_speed=5, frame_size=900, zoom=17)
     visualizer.draw()

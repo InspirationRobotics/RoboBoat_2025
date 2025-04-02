@@ -5,10 +5,12 @@ Includes the class definitions of GPSData -- object to store GPS data, and GPS -
 
 import os
 import time
-from typing import Any, List, Tuple
+from typing import List, Tuple
 from pathlib import Path
 from serial import Serial
 from threading import Thread, Lock
+
+# Need to import pynmeagps locally
 from pynmeagps import NMEAReader, NMEAMessage
 
 """
@@ -27,7 +29,6 @@ class GPSData:
         self.lon (float) : GPS-based longitude
         self.headt (float) : GPS-based absolute heading
     """
-    # NOTE: Check to make sure that the GPS heading is actually an absolute, not relative heading.
 
     def __init__(self, lat : float, lon : float, headt : float):
         self.lat = lat
@@ -41,7 +42,7 @@ class GPSData:
         """
         return self.lat and self.lon and self.heading
 
-    def __setattr__(self, name: str, value: Any) -> None:
+    def __setattr__(self, name: str, value) -> None:
         """
         Puts GPS data into a dictionary and attaches the time stamp of when the data was listed
         """
@@ -69,7 +70,7 @@ class GPS:
         offset (float): Keyword argument, whether or not to take into account any sort of offset for the GPS
     """
 
-    def __init__(self, serialport : str, baudrate : int = 115200, callback = None, threaded : bool = True, *, offset : float = None):
+    def __init__(self, serialport : str = "/dev/ttyUSB0", baudrate : int = 115200, callback = None, threaded : bool = True, *, offset : float = None):
         stream = Serial(serialport, baudrate, timeout=3)
         self.nmr = NMEAReader(stream)
         self.threaded = threaded
@@ -295,3 +296,9 @@ class GPS:
                 except:
                     pass
         return waypoints
+    
+if __name__ == "__main__":
+    gps = GPS("/dev/ttyUSB0", 115200, None, True)
+    print("Waiting...")
+    time.sleep(3)
+    gps.calibrate_heading_offset(calib_time=5)
