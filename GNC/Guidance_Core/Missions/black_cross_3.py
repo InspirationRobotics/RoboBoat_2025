@@ -114,6 +114,8 @@ def launch_ardiuno(ardiuno_compound):
     ardiuno_compound.send_command("g")  # Will now send as bytes: b'g'
     time.sleep(2)
     ardiuno_compound.send_command("a")  # reloading
+    time.sleep(2)
+
 
 def main():
         # Change port based on your system (e.g., "COM3" on Windows, "/dev/ttyUSB0" on Linux/Mac)
