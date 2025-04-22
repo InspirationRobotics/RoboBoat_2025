@@ -73,7 +73,8 @@ def find_contours(mask, shape_name='black'):
                     c_y = int(M['m01'] / M['m00'])
                     centroids.append((c_x, c_y))
 
-    return centroids, info if shape_name == 'black' else centroids
+    # Always return two values
+    return (centroids, info) if shape_name == 'black' else (centroids, [])
 
 
 def find_closest_match(black_info, white_centroids):
@@ -82,6 +83,8 @@ def find_closest_match(black_info, white_centroids):
 
     for (bc, bw, bh) in black_info:
         for wc in white_centroids:
+            if not isinstance(wc, tuple) or len(wc) != 2:
+                continue
             dist = math.hypot(bc[0] - wc[0], bc[1] - wc[1])
             if dist < min_distance:
                 min_distance = dist
@@ -111,7 +114,7 @@ def main():
 
         mask_black, mask_white = process_frame(frame)
         black_centroids, black_info = find_contours(mask_black, 'black')
-        white_centroids = find_contours(mask_white, 'white')
+        white_centroids, _ = find_contours(mask_white, 'white')
 
         match = find_closest_match(black_info, white_centroids)
         if match:
