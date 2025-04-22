@@ -114,7 +114,7 @@ def launch_ardiuno(ardiuno_compound):
     ardiuno_compound.send_command("g")  # Will now send as bytes: b'g'
     time.sleep(0.5)
     ardiuno_compound.send_command("A")  # reloading
-    time.sleep(0.5)
+    time.sleep(10)
 
 
 def main():
