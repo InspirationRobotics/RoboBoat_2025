@@ -12,12 +12,20 @@ class ArdiunoCompound:
         """
         self.serial_conn = serial.Serial(port, baudrate, timeout=1)
         time.sleep(2)  # Allow time for the connection to establish
+
     def send_command(self, msg):
+        """
+        Sends a string or byte message to the serial device.
+        Automatically encodes string messages to bytes.
+        """
+        if isinstance(msg, str):
+            msg = msg.encode()  # Convert to bytes if it's a string
         self.serial_conn.write(msg)
 
     def set_pwm(self, channel, target):
         """
         Sends a command to set the PWM signal for a servo.
+
         Args:
             - channel (int): The servo channel (0-5 for Mini Maestro 6).
             - target (int): PWM value (in microseconds, typically 500-2500).
@@ -33,14 +41,14 @@ class ArdiunoCompound:
         if self.serial_conn.is_open:
             self.serial_conn.close()
 
-# Example usage:
+
+# === Example usage ===
 if __name__ == "__main__":
     # Change port based on your system (e.g., "COM3" on Windows, "/dev/ttyUSB0" on Linux/Mac)
-    # maestro = ArdiunoCompound(port="/dev/ttyUSB0")
     maestro = ArdiunoCompound(port="/dev/ttyACM3")
 
-    # Move servos to new positions
-    maestro.send_command("g")  # Move servo on channel 0
+    # Send simple character command
+    maestro.send_command("g")  # Will now send as bytes: b'g'
     time.sleep(2)
 
     # Close connection when done
