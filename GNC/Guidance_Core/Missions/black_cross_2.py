@@ -1,10 +1,15 @@
 import cv2
 import numpy as np
 import math
+from API.Servos.mini_maestro import MiniMaestro
 
 # === Calibration Constants ===
 REAL_WIDTH_INCHES = 18.5
 FOCAL_LENGTH = 588.3843844
+
+#
+maestro = MiniMaestro(port="/dev/ttyACM0")
+
 
 # Load video
 #cap = cv2.VideoCapture('2025-02-16-151324.webm')
@@ -129,6 +134,11 @@ while cap.isOpened():
         label = f'{closest_w}x{closest_h}px, {estimated_distance:.1f}"'
         cv2.putText(image, label, (closest_black[0] + 10, closest_black[1]),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+        if estimated_distance <= 40:
+            print(f"Distance: {estimated_distance:.2f} inches")
+            maestro.set_pwm(0, 1800)  # Move servo on channel 0
+        else: 
+            maestro.set_pwm(0, 1500)  # Move servo on channel 0
 
     # Show and save frame
     cv2.imshow("Detected Shapes", image)
