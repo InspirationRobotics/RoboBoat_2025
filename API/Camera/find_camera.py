@@ -138,4 +138,4 @@ class FindCamera:
 if __name__ == "__main__":
     # Test script.
     fC = FindCamera()
-    print(fC.matches)
+    print("fC.matches: {}".format(fC.matches))
