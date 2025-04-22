@@ -13,7 +13,7 @@ FOCAL_LENGTH = 588.3843844
 maestro = MiniMaestro(port="/dev/ttyACM0")
 launch_ball = False
 start = datetime.datetime.now()
-time_delay = 5 # seconds between each shot
+time_delay = 5 # seconds between each shot [seconds]
 
 # Load video
 #cap = cv2.VideoCapture('2025-02-16-151324.webm')
@@ -146,8 +146,8 @@ while cap.isOpened():
 
     if launch_ball == True:
         sample_now = datetime.datetime.now()
-        if sample_now > start + time_delay:
-            start = datetime.datetime.now()
+        if sample_now.second > start.second + time_delay:
+            start = datetime.datetime.now() # restarting the timer of when the last shot was
             maestro.set_pwm(0, 1800)  # Move servo on channel 0
             time.sleep(2)
             maestro.set_pwm(0, 1500)  # Move servo on channel 0
