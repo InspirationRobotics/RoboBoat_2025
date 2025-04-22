@@ -112,9 +112,9 @@ def launch(maestro):
 def launch_ardiuno(ardiuno_compound):
     # Send simple character command
     ardiuno_compound.send_command("g")  # Will now send as bytes: b'g'
-    time.sleep(2)
-    ardiuno_compound.send_command("a")  # reloading
-    time.sleep(2)
+    time.sleep(0.5)
+    ardiuno_compound.send_command("A")  # reloading
+    time.sleep(0.5)
 
 
 def main():
