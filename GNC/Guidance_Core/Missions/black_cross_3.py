@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import math
 from API.Servos.mini_maestro import MiniMaestro
+from API.Servos.ardiuno_compound import ArdiunoCompound
+
 import time
 
 # === Calibration Constants ===
@@ -107,8 +109,16 @@ def launch(maestro):
     time.sleep(2)
     maestro.set_pwm(0, 1500)
 
+def launch_ardiuno(ardiuno_compound):
+    # Send simple character command
+    ardiuno_compound.send_command("g")  # Will now send as bytes: b'g'
+    time.sleep(2)
+    ardiuno_compound.send_command("a")  # reloading
 
 def main():
+        # Change port based on your system (e.g., "COM3" on Windows, "/dev/ttyUSB0" on Linux/Mac)
+    ardiuno_compound = ArdiunoCompound(port="/dev/ttyACM3")
+
     maestro = MiniMaestro(port="/dev/ttyACM0")
     cap = init_camera()
     last_shot_time = time.time()
@@ -135,13 +145,19 @@ def main():
             print(f"Target at {distance:.2f} inches")
 
             if distance <= LAUNCH_DISTANCE_THRESHOLD and time.time() - last_shot_time >= TIME_DELAY:
-                launch(maestro)
+                #launch(maestro)
+                launch_ardiuno(ardiuno_compound)
+
                 print("Ball launched!")
                 last_shot_time = time.time()
 
         cv2.imshow("Detected Shapes", frame)
         if cv2.waitKey(25) & 0xFF == ord('q'):
             break
+
+    
+    # Close connection when done
+    ardiuno_compound.close()
 
     cap.release()
     cv2.destroyAllWindows()
