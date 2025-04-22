@@ -45,11 +45,11 @@ class ArdiunoCompound:
 # === Example usage ===
 if __name__ == "__main__":
     # Change port based on your system (e.g., "COM3" on Windows, "/dev/ttyUSB0" on Linux/Mac)
-    maestro = ArdiunoCompound(port="/dev/ttyACM3")
+    ardiuno_compound = ArdiunoCompound(port="/dev/ttyACM3")
 
     # Send simple character command
-    maestro.send_command("g")  # Will now send as bytes: b'g'
+    ardiuno_compound.send_command("g")  # Will now send as bytes: b'g'
     time.sleep(2)
 
     # Close connection when done
-    maestro.close()
+    ardiuno_compound.close()
