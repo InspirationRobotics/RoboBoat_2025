@@ -7,15 +7,13 @@ import time
 # === Calibration Constants ===
 REAL_WIDTH_INCHES = 18.5
 FOCAL_LENGTH = 588.3843844
-TIME_DELAY = 5  # seconds between each shot
-LAUNCH_DISTANCE_THRESHOLD = 40  # inches
+TIME_DELAY = 5
+LAUNCH_DISTANCE_THRESHOLD = 40
 
-# HSV color bounds
 LOWER_BLACK = np.array([0, 0, 0])
 UPPER_BLACK = np.array([180, 80, 100])
 LOWER_WHITE = np.array([0, 0, 170])
 UPPER_WHITE = np.array([180, 60, 255])
-
 KERNEL = np.ones((5, 5), np.uint8)
 
 
@@ -26,19 +24,11 @@ def init_camera():
     return cap
 
 
-def get_frame_dimensions(cap):
-    ret, frame = cap.read()
-    if not ret:
-        raise IOError("Cannot read frame from camera")
-    return frame.shape[:2]  # height, width
-
-
 def process_frame(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask_black = cv2.inRange(hsv, LOWER_BLACK, UPPER_BLACK)
     mask_white = cv2.inRange(hsv, LOWER_WHITE, UPPER_WHITE)
 
-    # Morphology
     mask_black = cv2.morphologyEx(mask_black, cv2.MORPH_CLOSE, KERNEL)
     mask_black = cv2.morphologyEx(mask_black, cv2.MORPH_OPEN, KERNEL)
     mask_white = cv2.morphologyEx(mask_white, cv2.MORPH_CLOSE, KERNEL)
@@ -47,7 +37,7 @@ def process_frame(frame):
     return mask_black, mask_white
 
 
-def find_contours(mask, shape_name='black'):
+def find_contours(mask, frame, shape_name='black'):
     centroids = []
     info = []
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -63,6 +53,14 @@ def find_contours(mask, shape_name='black'):
                     c_x = int(M['m10'] / M['m00'])
                     c_y = int(M['m01'] / M['m00'])
                     x, y, w, h = cv2.boundingRect(cnt)
+
+                    # Draw visuals
+                    cv2.drawContours(frame, [cnt], -1, (0, 255, 0), 2)
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                    cv2.putText(frame, 'Black Cross', (x, y - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                    cv2.circle(frame, (c_x, c_y), 8, (0, 128, 0), -1)
+
                     centroids.append((c_x, c_y))
                     info.append(((c_x, c_y), w, h))
 
@@ -71,9 +69,17 @@ def find_contours(mask, shape_name='black'):
                 if M['m00'] != 0:
                     c_x = int(M['m10'] / M['m00'])
                     c_y = int(M['m01'] / M['m00'])
+                    x, y, w, h = cv2.boundingRect(cnt)
+
+                    # Draw visuals
+                    cv2.drawContours(frame, [cnt], -1, (0, 255, 255), 2)
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 87, 51), 2)
+                    cv2.putText(frame, 'White Square', (x, y - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2)
+                    cv2.circle(frame, (c_x, c_y), 8, (191, 64, 191), -1)
+
                     centroids.append((c_x, c_y))
 
-    # Always return two values
     return (centroids, info) if shape_name == 'black' else (centroids, [])
 
 
@@ -113,23 +119,27 @@ def main():
             break
 
         mask_black, mask_white = process_frame(frame)
-        black_centroids, black_info = find_contours(mask_black, 'black')
-        white_centroids, _ = find_contours(mask_white, 'white')
+        black_centroids, black_info = find_contours(mask_black, frame, 'black')
+        white_centroids, _ = find_contours(mask_white, frame, 'white')
 
         match = find_closest_match(black_info, white_centroids)
         if match:
             closest_black, closest_w, closest_h = match
             distance = estimate_distance(closest_w)
 
-            print(f"Target at {distance:.2f} inches.")
+            cv2.circle(frame, closest_black, 15, (0, 0, 255), 3)
+            cv2.putText(frame, f'{closest_w}x{closest_h}px, {distance:.1f}"',
+                        (closest_black[0] + 10, closest_black[1]),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
+            print(f"Target at {distance:.2f} inches")
 
             if distance <= LAUNCH_DISTANCE_THRESHOLD and time.time() - last_shot_time >= TIME_DELAY:
                 launch(maestro)
                 print("Ball launched!")
                 last_shot_time = time.time()
 
-        # Display result
-        cv2.imshow("Vision", frame)
+        cv2.imshow("Detected Shapes", frame)
         if cv2.waitKey(25) & 0xFF == ord('q'):
             break
 
