@@ -145,12 +145,12 @@ while cap.isOpened():
             launch_ball = False
 
     if launch_ball == True:
-        sample_now = datetime.datetime.now()
-        if sample_now.second > start.second + time_delay:
-            start = datetime.datetime.now() # restarting the timer of when the last shot was
-            maestro.set_pwm(0, 1800)  # Move servo on channel 0
-            time.sleep(2)
-            maestro.set_pwm(0, 1500)  # Move servo on channel 0
+        #sample_now = datetime.datetime.now()
+        #if sample_now.second > start.second + time_delay:
+        #    start = datetime.datetime.now() # restarting the timer of when the last shot was
+        maestro.set_pwm(0, 1800)  # Move servo on channel 0
+        time.sleep(2)
+        maestro.set_pwm(0, 1500)  # Move servo on channel 0
 
 
 
