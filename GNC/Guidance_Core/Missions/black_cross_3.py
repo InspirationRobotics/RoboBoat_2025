@@ -124,6 +124,7 @@ def main():
     maestro = MiniMaestro(port="/dev/ttyACM0")
     cap = init_camera()
     last_shot_time = time.time()
+    ball_launched = True # this is to only allow one ball launch
 
     while True:
         ret, frame = cap.read()
@@ -145,14 +146,14 @@ def main():
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
             print(f"Target at {distance:.2f} inches")
+            if ball_launched:
+                if distance <= LAUNCH_DISTANCE_THRESHOLD and time.time() - last_shot_time >= TIME_DELAY:
+                    #launch(maestro)
+                    launch_ardiuno(ardiuno_compound)
 
-            if distance <= LAUNCH_DISTANCE_THRESHOLD and time.time() - last_shot_time >= TIME_DELAY:
-                #launch(maestro)
-                launch_ardiuno(ardiuno_compound)
-
-                print("Ball launched!")
-                last_shot_time = time.time()
-
+                    print("Ball launched!")
+                    last_shot_time = time.time()
+                    ball_launched = False
         cv2.imshow("Detected Shapes", frame)
         if cv2.waitKey(25) & 0xFF == ord('q'):
             break
