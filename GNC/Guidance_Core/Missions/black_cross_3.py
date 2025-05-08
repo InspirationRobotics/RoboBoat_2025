@@ -119,7 +119,7 @@ def launch_ardiuno(ardiuno_compound):
 
 def main():
         # Change port based on your system (e.g., "COM3" on Windows, "/dev/ttyUSB0" on Linux/Mac)
-    ardiuno_compound = ArdiunoCompound(port="/dev/ttyACM3")
+    ardiuno_compound = ArdiunoCompound(port="/dev/ttyACM2")
 
     maestro = MiniMaestro(port="/dev/ttyACM0")
     cap = init_camera()
