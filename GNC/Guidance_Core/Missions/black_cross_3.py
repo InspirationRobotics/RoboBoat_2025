@@ -153,7 +153,8 @@ def main():
 
                     print("Ball launched!")
                     last_shot_time = time.time()
-                    ball_launched = False
+                    ball_launched = False  # break the while loop
+                    break
         cv2.imshow("Detected Shapes", frame)
         if cv2.waitKey(25) & 0xFF == ord('q'):
             break
