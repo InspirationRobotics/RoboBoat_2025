@@ -3,6 +3,7 @@ import numpy as np
 import math
 from API.Servos.mini_maestro import MiniMaestro
 from API.Servos.ardiuno_compound import ArdiunoCompound
+from GNC.Control_Core  import motor_core # for the motor
 
 import time
 
@@ -124,8 +125,10 @@ def main():
     maestro = MiniMaestro(port="/dev/ttyACM0")
     cap = init_camera()
     last_shot_time = time.time()
-    ball_launched = True # this is to only allow one ball launch
-
+    ball_launched = False # this is to only allow one ball launch / chooses if we launch a ball
+    motor      = motor_core.MotorCore("/dev/ttyACM0") # load with default port "/dev/ttyACM0"
+    motor_move = True # to control if we move with motors
+    
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -137,9 +140,15 @@ def main():
 
         match = find_closest_match(black_info, white_centroids)
         if match:
+            # if can see the cross move forward
+            if motor_move: # moving forward
+                motor.surge(0.5)
+                
+            # estimating distance
             closest_black, closest_w, closest_h = match
             distance = estimate_distance(closest_w)
 
+            # front end user interface
             cv2.circle(frame, closest_black, 15, (0, 0, 255), 3)
             cv2.putText(frame, f'{closest_w}x{closest_h}px, {distance:.1f}"',
                         (closest_black[0] + 10, closest_black[1]),
@@ -148,6 +157,9 @@ def main():
             print(f"Target at {distance:.2f} inches")
             if ball_launched:
                 if distance <= LAUNCH_DISTANCE_THRESHOLD and time.time() - last_shot_time >= TIME_DELAY:
+                    # stop moving forward
+                    if motor_move:
+                        motor.stay()
                     #launch(maestro)
                     launch_ardiuno(ardiuno_compound)
 
