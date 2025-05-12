@@ -17,11 +17,6 @@ LOWER_WHITE = np.array([0, 0, 170])
 UPPER_WHITE = np.array([105, 17, 210])
 KERNEL = np.ones((5, 5), np.uint8)
 
-clicked_points = []
-
-def on_mouse(event, x, y, flags, param):
-    if event == cv2.EVENT_LBUTTONDOWN:
-        clicked_points.append((x, y))
 
 def process_frame(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -189,17 +184,6 @@ def main():
                         ball_launched = False
 
             preview_frame = cv2.resize(frame, (960, 540))
-
-            # Draw clicked points and print depth
-            orig_h, orig_w = depth_frame.shape[:2]
-            for px, py in clicked_points:
-                scaled_y = int(py * orig_h / 540)
-                scaled_x = int(px * orig_w / 960)
-                if 0 <= scaled_y < orig_h and 0 <= scaled_x < orig_w:
-                    dval = depth_frame[scaled_y, scaled_x]
-                    cv2.circle(preview_frame, (px, py), 5, (0, 0, 255), -1)
-                    cv2.putText(preview_frame, f"Depth: {dval:.1f}mm", (px + 10, py),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
             # Show disparity map in a separate window
             max_disparity = stereo.initialConfig.getMaxDisparity()
