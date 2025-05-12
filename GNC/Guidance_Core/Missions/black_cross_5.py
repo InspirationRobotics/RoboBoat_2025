@@ -186,7 +186,15 @@ def main():
             # Draw clicked points and print depth
             for px, py in clicked_points:
                 if 0 <= px < preview_frame.shape[1] and 0 <= py < preview_frame.shape[0]:
-                    dval = depth_frame[int(py * frame.shape[0] / 540), int(px * frame.shape[1] / 960)]
+                    orig_h, orig_w = depth_frame.shape[:2]
+                    scaled_y = int(py * orig_h / 540)
+                    scaled_x = int(px * orig_w / 960)
+
+                    if 0 <= scaled_y < orig_h and 0 <= scaled_x < orig_w:
+                        dval = depth_frame[scaled_y, scaled_x]
+                        cv2.circle(preview_frame, (px, py), 5, (0, 0, 255), -1)
+                        cv2.putText(preview_frame, f"Depth: {dval:.1f}mm", (px + 10, py),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
                     cv2.circle(preview_frame, (px, py), 5, (0, 0, 255), -1)
                     cv2.putText(preview_frame, f"Depth: {dval:.1f}mm", (px + 10, py),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
