@@ -133,12 +133,18 @@ def main():
     xout_depth.setStreamName("depth")
     stereo.depth.link(xout_depth.input)
 
+    xout_disp = pipeline.create(dai.node.XLinkOut)
+    xout_disp.setStreamName("disparity")
+    stereo.disparity.link(xout_disp.input)
+
     cv2.namedWindow("Detected Shapes")
+    cv2.namedWindow("raw disparity")
     cv2.setMouseCallback("Detected Shapes", on_mouse)
 
     with dai.Device(pipeline) as device:
         color_queue = device.getOutputQueue(name="color", maxSize=4, blocking=False)
         depth_queue = device.getOutputQueue(name="depth", maxSize=4, blocking=False)
+        disp_queue = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
 
         ardiuno_compound = ArdiunoCompound(port="/dev/ttyACM2")
         maestro = MiniMaestro(port="/dev/ttyACM0")
@@ -151,6 +157,7 @@ def main():
         while True:
             frame = color_queue.get().getCvFrame()
             depth_frame = depth_queue.get().getFrame().astype(np.float32)
+            disparity_map = disp_queue.get().getCvFrame()
             depth_frame[depth_frame == 0] = np.nan
 
             mask_black, mask_white = process_frame(frame)
@@ -184,20 +191,20 @@ def main():
             preview_frame = cv2.resize(frame, (960, 540))
 
             # Draw clicked points and print depth
+            orig_h, orig_w = depth_frame.shape[:2]
             for px, py in clicked_points:
-                if 0 <= px < preview_frame.shape[1] and 0 <= py < preview_frame.shape[0]:
-                    orig_h, orig_w = depth_frame.shape[:2]
-                    scaled_y = int(py * orig_h / 540)
-                    scaled_x = int(px * orig_w / 960)
-
-                    if 0 <= scaled_y < orig_h and 0 <= scaled_x < orig_w:
-                        dval = depth_frame[scaled_y, scaled_x]
-                        cv2.circle(preview_frame, (px, py), 5, (0, 0, 255), -1)
-                        cv2.putText(preview_frame, f"Depth: {dval:.1f}mm", (px + 10, py),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+                scaled_y = int(py * orig_h / 540)
+                scaled_x = int(px * orig_w / 960)
+                if 0 <= scaled_y < orig_h and 0 <= scaled_x < orig_w:
+                    dval = depth_frame[scaled_y, scaled_x]
                     cv2.circle(preview_frame, (px, py), 5, (0, 0, 255), -1)
                     cv2.putText(preview_frame, f"Depth: {dval:.1f}mm", (px + 10, py),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+
+            # Show disparity map in a separate window
+            max_disparity = stereo.initialConfig.getMaxDisparity()
+            normalized_disparity = (disparity_map * (255 / max_disparity)).astype(np.uint8)
+            cv2.imshow("raw disparity", normalized_disparity)
 
             cv2.imshow("Detected Shapes", preview_frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
