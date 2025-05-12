@@ -73,6 +73,8 @@ def find_contours(mask, frame, shape_name='black'):
                 cv2.circle(frame, (c_x, c_y), 8, (191, 64, 191), -1)
 
                 centroids.append((c_x, c_y))
+                info.append(((c_x, c_y), w, h))
+
 
     return (centroids, info) if shape_name == 'black' else (centroids, [])
 
@@ -175,7 +177,7 @@ def main():
             # Process detections
             mask_black, mask_white = process_frame(frame)
             black_centroids, black_info = find_contours(mask_black, frame, 'black')
-            white_centroids, _ = find_contours(mask_white, frame, 'white')
+            white_centroids, white_info = find_contours(mask_white, frame, 'white')
             
             # Target matching
             match = find_closest_match(black_info, white_centroids)
@@ -203,13 +205,37 @@ def main():
                 valid_depths = masked_depth[~np.isnan(masked_depth)]
                 
                 print(valid_depths)
+                
+                # === Estimate and Display Depth for White Squares ===
+                for ((wc_x, wc_y), w, h) in white_info:
+                    x1, y1 = wc_x - w // 2, wc_y - h // 2
+                    x2, y2 = wc_x + w // 2, wc_y + h // 2
 
+                    # Clamp to image bounds
+                    x1 = max(0, x1)
+                    y1 = max(0, y1)
+                    x2 = min(depth_frame.shape[1], x2)
+                    y2 = min(depth_frame.shape[0], y2)
+
+                    # Create mask for white square region
+                    mask_white_region = np.zeros(depth_frame.shape, dtype=np.uint8)
+                    cv2.rectangle(mask_white_region, (x1, y1), (x2, y2), 255, -1)
+
+                    # Apply depth mask and calculate mean
+                    white_masked_depth = np.where(mask_white_region == 255, depth_frame, np.nan)
+                    white_valid = white_masked_depth[~np.isnan(white_masked_depth)]
+
+                    if white_valid.size > 0:
+                        white_dist_m = np.nanmean(white_valid) / 1000.0
+                        cv2.putText(frame, f'{white_dist_m:.2f}m', (wc_x + 10, wc_y),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+
+                # ball launch section
                 if valid_depths.size > 0:
                     distance_m = np.nanmean(valid_depths) / 1000.0  # mm to m
                 else:
                     distance_m = float('inf')  # fallback if no valid depth
-
-
+                    
                     if motor_move:
                         motor.surge(0.5)
 
