@@ -103,7 +103,7 @@ def main():
     # Create pipeline
     pipeline = dai.Pipeline()
 
-    # Color (center) camera
+    # Color camera for visual processing
     cam_rgb = pipeline.create(dai.node.ColorCamera)
     cam_rgb.setBoardSocket(dai.CameraBoardSocket.RGB)
     cam_rgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
@@ -114,14 +114,14 @@ def main():
     xout_rgb.setStreamName("color")
     cam_rgb.video.link(xout_rgb.input)
 
-    # Depth camera (mono + stereo)
+    # Mono cameras for depth (resolution ≤ 1280 width)
     mono_left = pipeline.create(dai.node.MonoCamera)
     mono_right = pipeline.create(dai.node.MonoCamera)
     stereo = pipeline.create(dai.node.StereoDepth)
 
     mono_left.setBoardSocket(dai.CameraBoardSocket.LEFT)
-    mono_left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
     mono_right.setBoardSocket(dai.CameraBoardSocket.RIGHT)
+    mono_left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
     mono_right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
 
     stereo.setLeftRightCheck(True)
@@ -152,7 +152,7 @@ def main():
         while True:
             frame = color_queue.get().getCvFrame()
             depth_frame = depth_queue.get().getFrame().astype(np.float32)
-            depth_frame[depth_frame == 0] = np.nan  # Invalid values
+            depth_frame[depth_frame == 0] = np.nan  # Mask out invalid depth
 
             mask_black, mask_white = process_frame(frame)
             black_centroids, black_info = find_contours(mask_black, frame, 'black')
@@ -165,7 +165,7 @@ def main():
 
                 if 0 <= y < depth_frame.shape[0] and 0 <= x < depth_frame.shape[1]:
                     distance_mm = depth_frame[int(y), int(x)]
-                    distance_m = distance_mm / 1000.0  # Convert to meters
+                    distance_m = distance_mm / 1000.0  # Convert mm to meters
 
                     if motor_move:
                         motor.surge(0.5)
