@@ -175,13 +175,14 @@ def main():
             mask_black, mask_white = process_frame(frame)
             black_centroids, black_info = find_contours(mask_black, frame, 'black')
             white_centroids, _ = find_contours(mask_white, frame, 'white')
-
+            
             # Target matching
             match = find_closest_match(black_info, white_centroids)
             if match:
                 closest_black, closest_w, closest_h = match
                 x, y = closest_black
-
+                
+                print(depth_frame)
                 if 0 <= y < depth_frame.shape[0] and 0 <= x < depth_frame.shape[1]:
                     distance_mm = depth_frame[int(y), int(x)]
                     distance_m = distance_mm / 1000.0
