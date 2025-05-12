@@ -76,7 +76,7 @@ def find_contours(mask, frame, shape_name='black'):
                 info.append(((c_x, c_y), w, h))
 
 
-    return (centroids, info) if shape_name == 'black' else (centroids, [])
+    return (centroids, info)
 
 def find_closest_match(black_info, white_centroids):
     """Find the closest white centroid to a black cross."""
