@@ -204,7 +204,8 @@ def main():
                         last_shot_time = time.time()
                         ball_launched = False
                         break
-
+                        
+            preview_frame = cv2.resize(frame, (960, 540))  # Resize to half HD
             cv2.imshow("Detected Shapes", frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
