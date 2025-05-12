@@ -183,18 +183,30 @@ def main():
                 closest_black, closest_w, closest_h = match
                 x, y = closest_black
                 
-                print(depth_frame)
-                
-                filename = 'data.csv'
+                if False: # set to true if want to save depth mask
+                    print(depth_frame)
 
-                with open(filename, 'w', newline='') as file:
-                    writer = csv.writer(file)
-                    writer.writerows(depth_frame)
-                    break 
+                    filename = 'data.csv'
+
+                    with open(filename, 'w', newline='') as file:
+                        writer = csv.writer(file)
+                        writer.writerows(depth_frame)
+                        break 
                     
-                if 0 <= y < depth_frame.shape[0] and 0 <= x < depth_frame.shape[1]:
-                    distance_mm = depth_frame[int(y), int(x)]
-                    distance_m = distance_mm / 1000.0
+                # Define a mask for the black cross region
+                mask_shape = np.zeros(depth_frame.shape, dtype=np.uint8)
+                cv2.rectangle(mask_shape, (x - closest_w // 2, y - closest_h // 2),
+                              (x + closest_w // 2, y + closest_h // 2), 255, -1)
+
+                # Mask depth values
+                masked_depth = np.where(mask_shape == 255, depth_frame, np.nan)
+                valid_depths = masked_depth[~np.isnan(masked_depth)]
+
+                if valid_depths.size > 0:
+                    distance_m = np.nanmean(valid_depths) / 1000.0  # mm to m
+                else:
+                    distance_m = float('inf')  # fallback if no valid depth
+
 
                     if motor_move:
                         motor.surge(0.5)
