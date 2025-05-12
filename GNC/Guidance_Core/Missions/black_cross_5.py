@@ -190,6 +190,7 @@ def main():
                 with open(filename, 'w', newline='') as file:
                     writer = csv.writer(file)
                     writer.writerows(depth_frame)
+                    break 
                     
                 if 0 <= y < depth_frame.shape[0] and 0 <= x < depth_frame.shape[1]:
                     distance_mm = depth_frame[int(y), int(x)]
