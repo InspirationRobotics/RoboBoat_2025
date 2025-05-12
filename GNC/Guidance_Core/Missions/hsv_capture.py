@@ -2,13 +2,13 @@ import cv2
 import depthai as dai
 import numpy as np
 
-# Global clicked point
-clicked_point = [-1, -1]
+# Store all clicked points and their HSV values
+clicked_points = []
 
 # Mouse event callback to store click
 def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
-        clicked_point[0], clicked_point[1] = x, y
+        clicked_points.append((x, y))
 
 def main():
     # Create DepthAI pipeline
@@ -42,13 +42,33 @@ def main():
             preview_frame = cv2.resize(frame, (960, 540))
             hsv_frame = cv2.cvtColor(preview_frame, cv2.COLOR_BGR2HSV)
 
-            # Show HSV value if user clicked
-            if clicked_point[0] != -1 and clicked_point[1] != -1:
-                hsv_val = hsv_frame[clicked_point[1], clicked_point[0]]
-                print(f"Clicked at ({clicked_point[0]}, {clicked_point[1]}) -> HSV: {hsv_val}")
-                cv2.circle(preview_frame, (clicked_point[0], clicked_point[1]), 5, (0, 0, 255), -1)
-                cv2.putText(preview_frame, f'HSV: {hsv_val}', (clicked_point[0] + 10, clicked_point[1]),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+            hsv_values = []
+
+            # Draw and collect HSV values
+            for (x, y) in clicked_points:
+                if 0 <= x < 960 and 0 <= y < 540:
+                    hsv = hsv_frame[y, x]
+                    hsv_values.append(hsv)
+                    cv2.circle(preview_frame, (x, y), 5, (0, 0, 255), -1)
+                    cv2.putText(preview_frame, f'{hsv}', (x + 10, y),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+
+            # Show HSV stats
+            if hsv_values:
+                hsv_array = np.array(hsv_values)
+                hsv_min = np.min(hsv_array, axis=0)
+                hsv_max = np.max(hsv_array, axis=0)
+                hsv_avg = np.mean(hsv_array, axis=0).astype(int)
+
+                print("\n--- HSV Stats ---")
+                print(f"Min: {hsv_min}")
+                print(f"Max: {hsv_max}")
+                print(f"Avg: {hsv_avg}")
+
+                # Display stats on preview
+                stats_text = f"Min: {hsv_min}  Max: {hsv_max}  Avg: {hsv_avg}"
+                cv2.putText(preview_frame, stats_text, (10, 25),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (50, 255, 50), 2)
 
             cv2.imshow("Camera Stream", preview_frame)
 
