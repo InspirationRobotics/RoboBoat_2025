@@ -105,7 +105,7 @@ def main():
 
     # Color camera for visual processing
     cam_rgb = pipeline.create(dai.node.ColorCamera)
-    cam_rgb.setBoardSocket(dai.CameraBoardSocket.RGB)
+    cam_rgb.setBoardSocket(dai.CameraBoardSocket.CAM_A)
     cam_rgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
     cam_rgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
     cam_rgb.setInterleaved(False)
@@ -119,15 +119,15 @@ def main():
     mono_right = pipeline.create(dai.node.MonoCamera)
     stereo = pipeline.create(dai.node.StereoDepth)
 
-    mono_left.setBoardSocket(dai.CameraBoardSocket.LEFT)
-    mono_right.setBoardSocket(dai.CameraBoardSocket.RIGHT)
+    mono_left.setBoardSocket(dai.CameraBoardSocket.CAM_B)
+    mono_right.setBoardSocket(dai.CameraBoardSocket.CAM_C)
     mono_left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
     mono_right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
 
     stereo.setLeftRightCheck(True)
     stereo.setSubpixel(True)
     stereo.setExtendedDisparity(False)
-    stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.HIGH_DENSITY)
+    stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
 
     mono_left.out.link(stereo.left)
     mono_right.out.link(stereo.right)
