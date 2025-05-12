@@ -262,11 +262,22 @@ def main():
             disp_bgr = cv2.cvtColor(normalized_disparity, cv2.COLOR_GRAY2BGR)
 
             # Draw bounding boxes from white square detections
+            # Get scaling factors from original frame to disparity map
+            h_ratio = disp_bgr.shape[0] / frame.shape[0]
+            w_ratio = disp_bgr.shape[1] / frame.shape[1]
+
             for ((wc_x, wc_y), w, h) in white_info:
-                x1 = max(0, wc_x - w // 2)
-                y1 = max(0, wc_y - h // 2)
-                x2 = min(disp_bgr.shape[1], wc_x + w // 2)
-                y2 = min(disp_bgr.shape[0], wc_y + h // 2)
+                x1 = int((wc_x - w // 2) * w_ratio)
+                y1 = int((wc_y - h // 2) * h_ratio)
+                x2 = int((wc_x + w // 2) * w_ratio)
+                y2 = int((wc_y + h // 2) * h_ratio)
+
+                # Clamp to image bounds
+                x1 = max(0, min(disp_bgr.shape[1] - 1, x1))
+                y1 = max(0, min(disp_bgr.shape[0] - 1, y1))
+                x2 = max(0, min(disp_bgr.shape[1] - 1, x2))
+                y2 = max(0, min(disp_bgr.shape[0] - 1, y2))
+
                 cv2.rectangle(disp_bgr, (x1, y1), (x2, y2), (0, 255, 255), 2)
 
             cv2.imshow("raw disparity", disp_bgr)
