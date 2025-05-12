@@ -186,7 +186,7 @@ def main():
                 x, y = closest_black
                 
                 if False: # set to true if want to save depth mask
-                    print(depth_frame)
+                    #print(depth_frame)
 
                     filename = 'data.csv'
 
@@ -257,7 +257,18 @@ def main():
             # Normalize disparity for visualization
             max_disparity = stereo.initialConfig.getMaxDisparity()
             normalized_disparity = (disparity_map * (255 / max_disparity)).astype(np.uint8)
-            cv2.imshow("raw disparity", normalized_disparity)
+            # Convert to BGR for drawing colored boxes
+            disp_bgr = cv2.cvtColor(normalized_disparity, cv2.COLOR_GRAY2BGR)
+
+            # Draw bounding boxes from white square detections
+            for ((wc_x, wc_y), w, h) in white_info:
+                x1 = max(0, wc_x - w // 2)
+                y1 = max(0, wc_y - h // 2)
+                x2 = min(disp_bgr.shape[1], wc_x + w // 2)
+                y2 = min(disp_bgr.shape[0], wc_y + h // 2)
+                cv2.rectangle(disp_bgr, (x1, y1), (x2, y2), (0, 255, 255), 2)
+
+            cv2.imshow("raw disparity", disp_bgr)
             cv2.imshow("Detected Shapes", preview_frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
