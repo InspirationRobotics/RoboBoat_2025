@@ -6,6 +6,7 @@ import math
 from API.Servos.mini_maestro import MiniMaestro
 from API.Servos.ardiuno_compound import ArdiunoCompound
 from GNC.Control_Core import motor_core
+import csv
 
 # === Calibration Constants ===
 TIME_DELAY = 5
@@ -183,6 +184,13 @@ def main():
                 x, y = closest_black
                 
                 print(depth_frame)
+                
+                filename = 'data.csv'
+
+                with open(filename, 'w', newline='') as file:
+                    writer = csv.writer(file)
+                    writer.writerows(depth_frame)
+                    
                 if 0 <= y < depth_frame.shape[0] and 0 <= x < depth_frame.shape[1]:
                     distance_mm = depth_frame[int(y), int(x)]
                     distance_m = distance_mm / 1000.0
