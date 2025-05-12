@@ -201,6 +201,8 @@ def main():
                 # Mask depth values
                 masked_depth = np.where(mask_shape == 255, depth_frame, np.nan)
                 valid_depths = masked_depth[~np.isnan(masked_depth)]
+                
+                print(valid_depths)
 
                 if valid_depths.size > 0:
                     distance_m = np.nanmean(valid_depths) / 1000.0  # mm to m
