@@ -129,8 +129,28 @@ def main():
     stereo.setExtendedDisparity(False)
     stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
 
-    mono_left.out.link(stereo.left)
-    mono_right.out.link(stereo.right)
+    # Set correct board sockets
+    cam_rgb.setBoardSocket(dai.CameraBoardSocket.CAM_A)
+    mono_left.setBoardSocket(dai.CameraBoardSocket.CAM_B)
+    mono_right.setBoardSocket(dai.CameraBoardSocket.CAM_C)
+
+    # Set stereo profile
+    stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
+    stereo.setExtendedDisparity(True)
+    stereo.setSubpixel(False)  # Required for extended disparity
+
+    # Add ImageManip nodes to resize mono inputs
+    manip_left = pipeline.create(dai.node.ImageManip)
+    manip_right = pipeline.create(dai.node.ImageManip)
+
+    manip_left.initialConfig.setResize(1280, 720)
+    manip_right.initialConfig.setResize(1280, 720)
+
+    mono_left.out.link(manip_left.inputImage)
+    mono_right.out.link(manip_right.inputImage)
+    manip_left.out.link(stereo.left)
+    manip_right.out.link(stereo.right)
+
 
     xout_depth = pipeline.create(dai.node.XLinkOut)
     xout_depth.setStreamName("depth")
