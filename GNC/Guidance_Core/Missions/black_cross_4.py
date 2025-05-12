@@ -14,9 +14,9 @@ TIME_DELAY = 5
 LAUNCH_DISTANCE_THRESHOLD = 1.0  # in meters
 
 LOWER_BLACK = np.array([0, 0, 0])
-UPPER_BLACK = np.array([180, 80, 100])
+UPPER_BLACK = np.array([80, 255,  76]])#([180, 80, 100])
 LOWER_WHITE = np.array([0, 0, 170])
-UPPER_WHITE = np.array([180, 60, 255])
+UPPER_WHITE = np.array(105, 17, 210)#([180, 60, 255])
 KERNEL = np.ones((5, 5), np.uint8)
 
 
