@@ -206,7 +206,7 @@ def main():
                         break
                         
             preview_frame = cv2.resize(frame, (960, 540))  # Resize to half HD
-            cv2.imshow("Detected Shapes", frame)
+            cv2.imshow("Detected Shapes", preview_frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
