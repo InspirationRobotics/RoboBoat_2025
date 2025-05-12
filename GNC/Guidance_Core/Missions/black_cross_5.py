@@ -17,11 +17,6 @@ LOWER_WHITE = np.array([0, 0, 170])
 UPPER_WHITE = np.array([105, 17, 210])
 KERNEL = np.ones((5, 5), np.uint8)
 
-clicked_points = []
-
-def on_mouse(event, x, y, flags, param):
-    if event == cv2.EVENT_LBUTTONDOWN:
-        clicked_points.append((x, y))
 
 def process_frame(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -58,7 +53,7 @@ def find_contours(mask, frame, shape_name='black'):
                     cv2.circle(frame, (c_x, c_y), 8, (0, 128, 0), -1)
 
                     centroids.append((c_x, c_y))
-                    info.append(((c_x, c_y), w, h, x, y))  # Add bbox origin for use
+                    info.append(((c_x, c_y), w, h))
 
             elif shape_name == 'white' and len(approx) >= 4:
                 M = cv2.moments(cnt)
@@ -79,12 +74,12 @@ def find_contours(mask, frame, shape_name='black'):
 def find_closest_match(black_info, white_centroids):
     min_distance = float('inf')
     closest = None
-    for (bc, bw, bh, bx, by) in black_info:
+    for (bc, bw, bh) in black_info:
         for wc in white_centroids:
             dist = math.hypot(bc[0] - wc[0], bc[1] - wc[1])
             if dist < min_distance:
                 min_distance = dist
-                closest = (bc, bw, bh, bx, by)
+                closest = (bc, bw, bh)
     return closest
 
 def launch_ardiuno(ardiuno_compound):
@@ -139,7 +134,6 @@ def main():
 
     cv2.namedWindow("Detected Shapes")
     cv2.namedWindow("raw disparity")
-    cv2.setMouseCallback("Detected Shapes", on_mouse)
 
     with dai.Device(pipeline) as device:
         color_queue = device.getOutputQueue(name="color", maxSize=4, blocking=False)
@@ -166,48 +160,29 @@ def main():
 
             match = find_closest_match(black_info, white_centroids)
             if match:
-                closest_black, closest_w, closest_h, bbox_x, bbox_y = match
+                closest_black, closest_w, closest_h = match
                 x, y = closest_black
-                
-                bbox_x2 = bbox_x + closest_w
-                bbox_y2 = bbox_y + closest_h
-                roi_disparity = disparity_map[bbox_y:bbox_y2, bbox_x:bbox_x2].astype(np.float32)
 
-                if roi_disparity.size > 0:
-                    mean_disparity = np.mean(roi_disparity) / 16.0  # subpixel mode
-                    if mean_disparity > 0:
-                        # Assuming 7.5cm baseline and pixel focal length from calibration
-                        baseline_m = 0.075
-                        focal_length_px = 870  # Example, replace with calibration
-                        distance_m = (focal_length_px * baseline_m) / mean_disparity
+                if 0 <= y < depth_frame.shape[0] and 0 <= x < depth_frame.shape[1]:
+                    distance_mm = depth_frame[int(y), int(x)]
+                    distance_m = distance_mm / 1000.0
 
+                    if motor_move:
+                        motor.surge(0.5)
+
+                    cv2.circle(frame, (x, y), 15, (0, 0, 255), 3)
+                    cv2.putText(frame, f'{closest_w}x{closest_h}px, {distance_m:.2f}m',
+                                (x + 10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
+                    if ball_launched and distance_m <= LAUNCH_DISTANCE_THRESHOLD and time.time() - last_shot_time >= TIME_DELAY:
                         if motor_move:
-                            motor.surge(0.5)
-
-                        cv2.circle(frame, (x, y), 15, (0, 0, 255), 3)
-                        cv2.putText(frame, f'{closest_w}x{closest_h}px, {distance_m:.2f}m',
-                                    (x + 10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-
-                        if ball_launched and distance_m <= LAUNCH_DISTANCE_THRESHOLD and time.time() - last_shot_time >= TIME_DELAY:
-                            if motor_move:
-                                motor.stay()
-                            launch_ardiuno(ardiuno_compound)
-                            print("Ball launched!")
-                            last_shot_time = time.time()
-                            ball_launched = False
+                            motor.stay()
+                        launch_ardiuno(ardiuno_compound)
+                        print("Ball launched!")
+                        last_shot_time = time.time()
+                        ball_launched = False
 
             preview_frame = cv2.resize(frame, (960, 540))
-
-            # Draw clicked points and print depth
-            orig_h, orig_w = depth_frame.shape[:2]
-            for px, py in clicked_points:
-                scaled_y = int(py * orig_h / 540)
-                scaled_x = int(px * orig_w / 960)
-                if 0 <= scaled_y < orig_h and 0 <= scaled_x < orig_w:
-                    dval = depth_frame[scaled_y, scaled_x]
-                    cv2.circle(preview_frame, (px, py), 5, (0, 0, 255), -1)
-                    cv2.putText(preview_frame, f"Depth: {dval:.1f}mm", (px + 10, py),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
             # Show disparity map in a separate window
             max_disparity = stereo.initialConfig.getMaxDisparity()
