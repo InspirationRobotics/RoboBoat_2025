@@ -165,8 +165,8 @@ def main():
         maestro = MiniMaestro(port="/dev/ttyACM0")
         motor = motor_core.MotorCore("/dev/ttyACM0")
 
-        motor_move = True
-        ball_launched = True
+        motor_move = False
+        ball_launched = False
         last_shot_time = time.time()
 
         while True:
