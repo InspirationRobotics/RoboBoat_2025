@@ -193,6 +193,7 @@ def main():
                     cv2.circle(frame, (x, y), 15, (0, 0, 255), 3)
                     cv2.putText(frame, f'{closest_w}x{closest_h}px, {distance_m:.2f}m',
                                 (x + 10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+                    print(f'{closest_w}x{closest_h}px, {distance_m:.2f}m')
 
                     print(f"Target at {distance_m:.2f} meters")
 
