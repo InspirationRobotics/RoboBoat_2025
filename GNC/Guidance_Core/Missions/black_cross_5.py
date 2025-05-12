@@ -178,7 +178,8 @@ def main():
             mask_black, mask_white = process_frame(frame)
             black_centroids, black_info = find_contours(mask_black, frame, 'black')
             white_centroids, white_info = find_contours(mask_white, frame, 'white')
-            
+            print(f"White boxes detected: {len(white_info)}")
+
             # Target matching
             match = find_closest_match(black_info, white_centroids)
             if match:
@@ -204,7 +205,7 @@ def main():
                 masked_depth = np.where(mask_shape == 255, depth_frame, np.nan)
                 valid_depths = masked_depth[~np.isnan(masked_depth)]
                 
-                print(valid_depths)
+                #print(valid_depths)
                 
                 # === Estimate and Display Depth for White Squares ===
                 for ((wc_x, wc_y), w, h) in white_info:
