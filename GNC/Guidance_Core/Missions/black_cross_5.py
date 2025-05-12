@@ -134,7 +134,6 @@ def main():
 
     cv2.namedWindow("Detected Shapes")
     cv2.namedWindow("raw disparity")
-    cv2.setMouseCallback("Detected Shapes", on_mouse)
 
     with dai.Device(pipeline) as device:
         color_queue = device.getOutputQueue(name="color", maxSize=4, blocking=False)
