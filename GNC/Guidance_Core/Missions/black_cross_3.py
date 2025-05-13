@@ -8,7 +8,7 @@ from GNC.Control_Core  import motor_core # for the motor
 import time
 
 # === Calibration Constants ===
-REAL_WIDTH_METERS = 0.4699
+REAL_WIDTH_METERS = 0.4699 #18.5 inches accross
 FOCAL_LENGTH = 588.3843844
 TIME_DELAY = 5
 LAUNCH_DISTANCE_THRESHOLD = 40
@@ -154,7 +154,7 @@ def main():
                         (closest_black[0] + 10, closest_black[1]),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
-            print(f"Target at {distance:.2f} inches")
+            print(f"Target at {distance:.2f} meters")
             if ball_launched:
                 if distance <= LAUNCH_DISTANCE_THRESHOLD and time.time() - last_shot_time >= TIME_DELAY:
                     # stop moving forward
