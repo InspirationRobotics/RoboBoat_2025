@@ -110,7 +110,7 @@ def main():
     # Color camera
     cam_rgb = pipeline.create(dai.node.ColorCamera)
     cam_rgb.setBoardSocket(dai.CameraBoardSocket.CAM_A)
-    cam_rgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
+    cam_rgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1200_P)
     cam_rgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
     cam_rgb.setInterleaved(False)
 
@@ -121,8 +121,8 @@ def main():
 
     mono_left.setBoardSocket(dai.CameraBoardSocket.CAM_B)
     mono_right.setBoardSocket(dai.CameraBoardSocket.CAM_C)
-    mono_left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
-    mono_right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
+    mono_left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_1200_P)
+    mono_right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_1200_P)
 
 
     # Stereo config
