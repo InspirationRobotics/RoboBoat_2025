@@ -100,6 +100,10 @@ def launch_ardiuno(ardiuno_compound):
 # === Main Execution ===
 
 def main():
+    # Stereo depth settings
+    EXTENDED_DISPARITY = False  # Doubles disparity range
+    SUBPIXEL = True  # Improves accuracy
+    LR_CHECK = True  # Handles occlusions better
     # === DepthAI Pipeline Configuration ===
     pipeline = dai.Pipeline()
 
