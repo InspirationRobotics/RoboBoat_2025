@@ -8,7 +8,7 @@ from GNC.Control_Core  import motor_core # for the motor
 import time
 
 # === Calibration Constants ===
-REAL_WIDTH_INCHES = 18.5
+REAL_WIDTH_METERS = 0.4699
 FOCAL_LENGTH = 588.3843844
 TIME_DELAY = 5
 LAUNCH_DISTANCE_THRESHOLD = 40
@@ -102,7 +102,7 @@ def find_closest_match(black_info, white_centroids):
 
 
 def estimate_distance(pixel_width):
-    return (REAL_WIDTH_INCHES * FOCAL_LENGTH) / pixel_width
+    return (REAL_WIDTH_METERS * FOCAL_LENGTH) / pixel_width
 
 
 def launch(maestro):
@@ -150,7 +150,7 @@ def main():
 
             # front end user interface
             cv2.circle(frame, closest_black, 15, (0, 0, 255), 3)
-            cv2.putText(frame, f'{closest_w}x{closest_h}px, {distance:.1f}"',
+            cv2.putText(frame, f'{closest_w}x{closest_h}px, {distance:.1f}m"',
                         (closest_black[0] + 10, closest_black[1]),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
