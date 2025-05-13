@@ -140,8 +140,8 @@ def main():
     # Resize mono images
     manip_left = pipeline.create(dai.node.ImageManip)
     manip_right = pipeline.create(dai.node.ImageManip)
-    manip_left.initialConfig.setResize(1280, 720)
-    manip_right.initialConfig.setResize(1280, 720)
+    manip_left.initialConfig.setResize(1200, 720)
+    manip_right.initialConfig.setResize(1200, 720)
     mono_left.out.link(manip_left.inputImage)
     mono_right.out.link(manip_right.inputImage)
     manip_left.out.link(stereo.left)
