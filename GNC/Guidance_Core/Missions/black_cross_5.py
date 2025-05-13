@@ -196,40 +196,56 @@ def main():
                         writer.writerows(depth_frame)
                         break 
                     
-                # Define a mask for the black cross region
-                mask_shape = np.zeros(depth_frame.shape, dtype=np.uint8)
-                cv2.rectangle(mask_shape, (x - closest_w // 2, y - closest_h // 2),
-                              (x + closest_w // 2, y + closest_h // 2), 255, -1)
+                # === Compute scale ratios from frame to depth_frame ===
+                h_ratio = depth_frame.shape[0] / frame.shape[0]
+                w_ratio = depth_frame.shape[1] / frame.shape[1]
 
-                # Mask depth values
+                # === Mask for black cross region ===
+                x1 = int((x - closest_w // 2) * w_ratio)
+                y1 = int((y - closest_h // 2) * h_ratio)
+                x2 = int((x + closest_w // 2) * w_ratio)
+                y2 = int((y + closest_h // 2) * h_ratio)
+
+                # Clamp to bounds
+                x1 = max(0, min(depth_frame.shape[1] - 1, x1))
+                y1 = max(0, min(depth_frame.shape[0] - 1, y1))
+                x2 = max(0, min(depth_frame.shape[1] - 1, x2))
+                y2 = max(0, min(depth_frame.shape[0] - 1, y2))
+
+                # Create mask and compute average depth
+                mask_shape = np.zeros(depth_frame.shape, dtype=np.uint8)
+                cv2.rectangle(mask_shape, (x1, y1), (x2, y2), 255, -1)
                 masked_depth = np.where(mask_shape == 255, depth_frame, np.nan)
                 valid_depths = masked_depth[~np.isnan(masked_depth)]
+
                 
                 #print(valid_depths)
                 
                 # === Estimate and Display Depth for White Squares ===
-                for ((wc_x, wc_y), w, h) in white_info:
-                    x1, y1 = wc_x - w // 2, wc_y - h // 2
-                    x2, y2 = wc_x + w // 2, wc_y + h // 2
+               for ((wc_x, wc_y), w, h) in white_info:
+                # Scale coordinates
+                x1 = int((wc_x - w // 2) * w_ratio)
+                y1 = int((wc_y - h // 2) * h_ratio)
+                x2 = int((wc_x + w // 2) * w_ratio)
+                y2 = int((wc_y + h // 2) * h_ratio)
 
-                    # Clamp to image bounds
-                    x1 = max(0, x1)
-                    y1 = max(0, y1)
-                    x2 = min(depth_frame.shape[1], x2)
-                    y2 = min(depth_frame.shape[0], y2)
+                # Clamp to bounds
+                x1 = max(0, min(depth_frame.shape[1] - 1, x1))
+                y1 = max(0, min(depth_frame.shape[0] - 1, y1))
+                x2 = max(0, min(depth_frame.shape[1] - 1, x2))
+                y2 = max(0, min(depth_frame.shape[0] - 1, y2))
 
-                    # Create mask for white square region
-                    mask_white_region = np.zeros(depth_frame.shape, dtype=np.uint8)
-                    cv2.rectangle(mask_white_region, (x1, y1), (x2, y2), 255, -1)
+                # Create mask and apply depth averaging
+                mask_white_region = np.zeros(depth_frame.shape, dtype=np.uint8)
+                cv2.rectangle(mask_white_region, (x1, y1), (x2, y2), 255, -1)
+                white_masked_depth = np.where(mask_white_region == 255, depth_frame, np.nan)
+                white_valid = white_masked_depth[~np.isnan(white_masked_depth)]
 
-                    # Apply depth mask and calculate mean
-                    white_masked_depth = np.where(mask_white_region == 255, depth_frame, np.nan)
-                    white_valid = white_masked_depth[~np.isnan(white_masked_depth)]
+                if white_valid.size > 0:
+                    white_dist_m = np.nanmean(white_valid) / 1000.0
+                    cv2.putText(frame, f'{white_dist_m:.2f}m', (wc_x + 10, wc_y),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
 
-                    if white_valid.size > 0:
-                        white_dist_m = np.nanmean(white_valid) / 1000.0
-                        cv2.putText(frame, f'{white_dist_m:.2f}m', (wc_x + 10, wc_y),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
 
                 # ball launch section
                 if valid_depths.size > 0:
