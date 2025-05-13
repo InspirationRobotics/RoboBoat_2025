@@ -244,7 +244,7 @@ def main():
                     if white_valid.size > 0:
                         white_dist_m = np.nanmean(white_valid) / 1000.0
                         cv2.putText(frame, f'{white_dist_m:.2f}m', (wc_x + 10, wc_y),
-                                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+                                   cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 255), 1)
 
 
                 # ball launch section
