@@ -150,7 +150,7 @@ def main():
 
             # front end user interface
             cv2.circle(frame, closest_black, 15, (0, 0, 255), 3)
-            cv2.putText(frame, f'{closest_w}x{closest_h}px, {distance:.1f}m"',
+            cv2.putText(frame, f'{closest_w}x{closest_h}px, {distance:.1f}m',
                         (closest_black[0] + 10, closest_black[1]),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
