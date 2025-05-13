@@ -14,9 +14,9 @@ TIME_DELAY = 5
 LAUNCH_DISTANCE_THRESHOLD = 40
 
 LOWER_BLACK = np.array([0, 0, 0])
-UPPER_BLACK = np.array([180, 80, 100])
+UPPER_BLACK = np.array([80, 255, 76])
 LOWER_WHITE = np.array([0, 0, 170])
-UPPER_WHITE = np.array([180, 60, 255])
+UPPER_WHITE = np.array([105, 17, 210])
 KERNEL = np.ones((5, 5), np.uint8)
 
 
@@ -127,7 +127,7 @@ def main():
     last_shot_time = time.time()
     ball_launched = False # this is to only allow one ball launch / chooses if we launch a ball
     motor      = motor_core.MotorCore("/dev/ttyACM0") # load with default port "/dev/ttyACM0"
-    motor_move = True # to control if we move with motors
+    motor_move = False # to control if we move with motors
     
     while True:
         ret, frame = cap.read()
