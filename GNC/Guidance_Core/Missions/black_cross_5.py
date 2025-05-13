@@ -122,10 +122,16 @@ def main():
 
 
     # Stereo config
-    stereo.setLeftRightCheck(True)
-    stereo.setSubpixel(True)
-    stereo.setExtendedDisparity(True)
+    #stereo.setLeftRightCheck(True)
+    #stereo.setSubpixel(True)
+    #stereo.setExtendedDisparity(True)
+    #stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
+    # Configure stereo depth node
     stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
+    stereo.initialConfig.setMedianFilter(dai.MedianFilter.KERNEL_7x7)
+    stereo.setLeftRightCheck(LR_CHECK)
+    stereo.setExtendedDisparity(EXTENDED_DISPARITY)
+    stereo.setSubpixel(SUBPIXEL)
 
     # Resize mono images
     manip_left = pipeline.create(dai.node.ImageManip)
