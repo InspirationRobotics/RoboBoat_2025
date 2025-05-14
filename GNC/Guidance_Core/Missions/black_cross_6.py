@@ -180,6 +180,17 @@ try:
                 # display original image of two cameras
                 cv2.imshow("Left Camera", left_q.get().getCvFrame())
                 #cv2.imshow("Right Camera", right_q.get().getCvFrame())
+                
+                # getting color frame
+                frame = left_q.get().getCvFrame()
+                
+                # apply detections
+                mask_black, mask_white = process_frame(frame)
+                
+                # finding centorids and h and width of detections
+                black_centroids, black_info = find_contours(mask_black, frame, 'black')
+                white_centroids, white_info = find_contours(mask_white, frame, 'white')
+                print(f"White boxes detected: {len(white_info)}")
 
                 # Get disparity frame
                 in_disparity = q.get()
