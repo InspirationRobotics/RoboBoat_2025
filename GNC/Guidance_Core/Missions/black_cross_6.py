@@ -233,8 +233,8 @@ try:
                     
                     if valid_depths.size > 0:
                             black_dist_m = np.nanmean(valid_depths) / 1000.0
-                            cv2.putText(frame, f'{black_dist_m:.2f}m', (x + 10, y),
-                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (245, 66, 230), 5)
+                            cv2.putText(frame, f'{black_dist_m:.2f}m', (x + 10, y+10),
+                                       cv2.FONT_HERSHEY_SIMPLEX, 1, (245, 66, 230), 3)
                     
                     # === Estimate and Display Depth for White Squares ===
                     for ((wc_x, wc_y), w, h) in white_info:
@@ -259,7 +259,7 @@ try:
                         if white_valid.size > 0:
                             white_dist_m = np.nanmean(white_valid) / 1000.0
                             cv2.putText(frame, f'{white_dist_m:.2f}m', (wc_x + 10, wc_y),
-                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 5)
+                                       cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
 
 
                 #The return value in the disparity map doesn't make sense, when you hover over the disparity map window, the disparity is 
