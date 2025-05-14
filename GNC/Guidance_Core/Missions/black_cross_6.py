@@ -56,7 +56,7 @@ stereo.depth.link(xout.input)
 
 # Link nodes for individual camera 
 left_cam.isp.link(xout_left.input)
-right_cam.isp.link(xout_right.input)
+#right_cam.isp.link(xout_right.input)
 
 # Mouse callback function to display depth at hovered pixel
 def on_mouse(event, x, y, flags, param):
@@ -78,7 +78,7 @@ try:
         print("Cam B focal length in pixels:", focal_lengthA)
         print("Cam C focal length in pixels:", focal_lengthA)
         left_q = device.getOutputQueue(name="left", maxSize=4, blocking=False)
-        right_q = device.getOutputQueue(name="right", maxSize=4, blocking=False)
+        #right_q = device.getOutputQueue(name="right", maxSize=4, blocking=False)
         q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
 
         cv2.namedWindow("raw disparity")
@@ -88,7 +88,7 @@ try:
             try:
                 # display original image of two cameras
                 cv2.imshow("Left Camera", left_q.get().getCvFrame())
-                cv2.imshow("Right Camera", right_q.get().getCvFrame())
+                #cv2.imshow("Right Camera", right_q.get().getCvFrame())
 
                 # Get disparity frame
                 in_disparity = q.get()
