@@ -191,14 +191,73 @@ try:
                 black_centroids, black_info = find_contours(mask_black, frame, 'black')
                 white_centroids, white_info = find_contours(mask_white, frame, 'white')
                 print(f"White boxes detected: {len(white_info)}")
-
+                
                 # Get disparity frame
                 in_disparity = q.get()
+                depth_frame = q.get().getFrame().astype(np.float32)
+
                 disparity_map = in_disparity.getCvFrame()
                 #The return value in the disparity map doesn't make sense, when you hover over the disparity map window, the disparity is 
                 # too large(2000 as the return), while the real camera disparity of that object is only 50
                 # TODO: Find the meaning of the disparity map return, and concert it to what we need, in pixel
                 max_disparity = stereo.initialConfig.getMaxDisparity()
+                
+                # Target matching
+                match = find_closest_match(black_info, white_centroids)
+                
+                if match:
+                    closest_black, closest_w, closest_h = match
+                    x, y = closest_black
+                    
+                    # estimating destance for black detections
+                    # === Compute scale ratios from frame to depth_frame ===
+                    h_ratio = depth_frame.shape[0] / frame.shape[0]
+                    w_ratio = depth_frame.shape[1] / frame.shape[1]
+
+                    # === Mask for black cross region ===
+                    x1 = int((x - closest_w // 2) * w_ratio)
+                    y1 = int((y - closest_h // 2) * h_ratio)
+                    x2 = int((x + closest_w // 2) * w_ratio)
+                    y2 = int((y + closest_h // 2) * h_ratio)
+
+                    # Clamp to bounds
+                    x1 = max(0, min(depth_frame.shape[1] - 1, x1))
+                    y1 = max(0, min(depth_frame.shape[0] - 1, y1))
+                    x2 = max(0, min(depth_frame.shape[1] - 1, x2))
+                    y2 = max(0, min(depth_frame.shape[0] - 1, y2))
+
+                    # Create mask and compute average depth
+                    mask_shape = np.zeros(depth_frame.shape, dtype=np.uint8)
+                    cv2.rectangle(mask_shape, (x1, y1), (x2, y2), 255, -1)
+                    masked_depth = np.where(mask_shape == 255, depth_frame, np.nan)
+                    valid_depths = masked_depth[~np.isnan(masked_depth)]
+                    
+                    # === Estimate and Display Depth for White Squares ===
+                    for ((wc_x, wc_y), w, h) in white_info:
+                        # Scale coordinates
+                        x1 = int((wc_x - w // 2) * w_ratio)
+                        y1 = int((wc_y - h // 2) * h_ratio)
+                        x2 = int((wc_x + w // 2) * w_ratio)
+                        y2 = int((wc_y + h // 2) * h_ratio)
+            
+                        # Clamp to bounds
+                        x1 = max(0, min(depth_frame.shape[1] - 1, x1))
+                        y1 = max(0, min(depth_frame.shape[0] - 1, y1))
+                        x2 = max(0, min(depth_frame.shape[1] - 1, x2))
+                        y2 = max(0, min(depth_frame.shape[0] - 1, y2))
+            
+                        # Create mask and apply depth averaging
+                        mask_white_region = np.zeros(depth_frame.shape, dtype=np.uint8)
+                        cv2.rectangle(mask_white_region, (x1, y1), (x2, y2), 255, -1)
+                        white_masked_depth = np.where(mask_white_region == 255, depth_frame, np.nan)
+                        white_valid = white_masked_depth[~np.isnan(white_masked_depth)]
+            
+                        if white_valid.size > 0:
+                            white_dist_m = np.nanmean(white_valid) / 1000.0
+                            cv2.putText(frame, f'{white_dist_m:.2f}m', (wc_x + 10, wc_y),
+                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 5)
+
+
 
                 normalized_disparity = (disparity_map * (255 / max_disparity)).astype(np.uint8)
                 #disparity_map = cv2.applyColorMap(depth_normalized, cv2.COLORMAP_JET)
