@@ -199,10 +199,7 @@ try:
                 depth_frame = q.get().getFrame().astype(np.float32)
 
                 disparity_map = in_disparity.getCvFrame()
-                #The return value in the disparity map doesn't make sense, when you hover over the disparity map window, the disparity is 
-                # too large(2000 as the return), while the real camera disparity of that object is only 50
-                # TODO: Find the meaning of the disparity map return, and concert it to what we need, in pixel
-                max_disparity = stereo.initialConfig.getMaxDisparity()
+
                 
                 # Target matching
                 match = find_closest_match(black_info, white_centroids)
@@ -260,11 +257,38 @@ try:
                                        cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 5)
 
 
-
+                #The return value in the disparity map doesn't make sense, when you hover over the disparity map window, the disparity is 
+                # too large(2000 as the return), while the real camera disparity of that object is only 50
+                # TODO: Find the meaning of the disparity map return, and concert it to what we need, in pixel
+                max_disparity = stereo.initialConfig.getMaxDisparity()
                 normalized_disparity = (disparity_map * (255 / max_disparity)).astype(np.uint8)
                 #disparity_map = cv2.applyColorMap(depth_normalized, cv2.COLORMAP_JET)
+                disp_bgr = cv2.cvtColor(normalized_disparity, cv2.COLOR_GRAY2BGR)
 
-                cv2.imshow("raw disparity", normalized_disparity)
+                # Draw bounding boxes from white square detections
+                # Get scaling factors from original frame to disparity map
+                h_ratio = disp_bgr.shape[0] / frame.shape[0]
+                w_ratio = disp_bgr.shape[1] / frame.shape[1]
+
+                for ((wc_x, wc_y), w, h) in white_info:
+                    x1 = int((wc_x - w // 2) * w_ratio)
+                    y1 = int((wc_y - h // 2) * h_ratio)
+                    x2 = int((wc_x + w // 2) * w_ratio)
+                    y2 = int((wc_y + h // 2) * h_ratio)
+
+                    # Clamp to image bounds
+                    x1 = max(0, min(disp_bgr.shape[1] - 1, x1))
+                    y1 = max(0, min(disp_bgr.shape[0] - 1, y1))
+                    x2 = max(0, min(disp_bgr.shape[1] - 1, x2))
+                    y2 = max(0, min(disp_bgr.shape[0] - 1, y2))
+
+                    cv2.rectangle(disp_bgr, (x1, y1), (x2, y2), (0, 255, 255), 2)
+
+                cv2.imshow("raw disparity", disp_bgr)
+                cv2.imshow("w bounding boxes", frame)
+
+                #cv2.imshow("Detected Shapes", preview_frame)
+                #cv2.imshow("raw disparity", normalized_disparity)
                 
                 # Compute depth map
                 depth_map = (focal_lengthA * 15) / np.maximum(disparity_map, 0.001) 
