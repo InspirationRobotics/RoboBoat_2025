@@ -5,6 +5,97 @@ import depthai as dai
 import numpy as np
 import sys
 
+
+# === Calibration Constants ===
+TIME_DELAY = 5
+LAUNCH_DISTANCE_THRESHOLD = 1.0  # in meters
+
+# HSV Ranges for Black and White Object Detection
+LOWER_BLACK = np.array([0, 0, 0])
+UPPER_BLACK = np.array([80, 255, 76])
+LOWER_WHITE = np.array([0, 0, 170])
+UPPER_WHITE = np.array([105, 17, 210])
+KERNEL = np.ones((5, 5), np.uint8)
+
+# === Image Processing ===
+
+def process_frame(frame):
+    """Convert BGR frame to HSV and apply color masks for black and white regions."""
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    mask_black = cv2.inRange(hsv, LOWER_BLACK, UPPER_BLACK)
+    mask_white = cv2.inRange(hsv, LOWER_WHITE, UPPER_WHITE)
+
+    # Noise reduction
+    mask_black = cv2.morphologyEx(mask_black, cv2.MORPH_CLOSE, KERNEL)
+    mask_black = cv2.morphologyEx(mask_black, cv2.MORPH_OPEN, KERNEL)
+    mask_white = cv2.morphologyEx(mask_white, cv2.MORPH_CLOSE, KERNEL)
+    mask_white = cv2.morphologyEx(mask_white, cv2.MORPH_OPEN, KERNEL)
+
+    return mask_black, mask_white
+
+def find_contours(mask, frame, shape_name='black'):
+    """Find black crosses or white squares in the mask image."""
+    centroids = []
+    info = []
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+        if area > 1000:
+            approx = cv2.approxPolyDP(cnt, 0.02 * cv2.arcLength(cnt, True), True)
+            M = cv2.moments(cnt)
+
+            if M['m00'] == 0:
+                continue
+
+            c_x = int(M['m10'] / M['m00'])
+            c_y = int(M['m01'] / M['m00'])
+            x, y, w, h = cv2.boundingRect(cnt)
+
+            if shape_name == 'black' and len(approx) == 12:
+                # Draw and annotate black cross
+                cv2.drawContours(frame, [cnt], -1, (0, 255, 0), 2)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                cv2.putText(frame, 'Black Cross', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                cv2.circle(frame, (c_x, c_y), 8, (0, 128, 0), -1)
+
+                centroids.append((c_x, c_y))
+                info.append(((c_x, c_y), w, h))
+
+            elif shape_name == 'white' and len(approx) >= 4:
+                # Draw and annotate white square
+                cv2.drawContours(frame, [cnt], -1, (0, 255, 255), 2)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 87, 51), 2)
+                cv2.putText(frame, 'White Square', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2)
+                cv2.circle(frame, (c_x, c_y), 8, (191, 64, 191), -1)
+
+                centroids.append((c_x, c_y))
+                info.append(((c_x, c_y), w, h))
+
+
+    return (centroids, info)
+
+def find_closest_match(black_info, white_centroids):
+    """Find the closest white centroid to a black cross."""
+    min_distance = float('inf')
+    closest = None
+    for (bc, bw, bh) in black_info:
+        for wc in white_centroids:
+            dist = math.hypot(bc[0] - wc[0], bc[1] - wc[1])
+            if dist < min_distance:
+                min_distance = dist
+                closest = (bc, bw, bh)
+    return closest
+
+def launch_ardiuno(ardiuno_compound):
+    """Trigger the Arduino launch sequence."""
+    ardiuno_compound.send_command("g")
+    time.sleep(0.5)
+    ardiuno_compound.send_command("A")
+    time.sleep(10)
+
+
 # Stereo depth settings
 EXTENDED_DISPARITY = False  # Doubles disparity range
 SUBPIXEL = True  # Improves accuracy
