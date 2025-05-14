@@ -150,12 +150,12 @@ left_cam.isp.link(xout_left.input)
 #right_cam.isp.link(xout_right.input)
 
 # Mouse callback function to display depth at hovered pixel
-def on_mouse(event, x, y, flags, param):
-    if event == cv2.EVENT_MOUSEMOVE:
-        depth_value = depth_map[y, x] if 0 <= y < depth_map.shape[0] and 0 <= x < depth_map.shape[1] else None
-        disparity_value = disparity_map[y, x] if 0 <= y < disparity_map.shape[0] and 0 <= x < disparity_map.shape[1] else None
-        if depth_value is not None:
-            print(f"Disparity at ({x}, {y}): {disparity_value/1000:.2f} meter | Depth: {depth_value:.2f} cm", end="\r")
+#def on_mouse(event, x, y, flags, param):
+#    if event == cv2.EVENT_MOUSEMOVE:
+#        depth_value = depth_map[y, x] if 0 <= y < depth_map.shape[0] and 0 <= x < depth_map.shape[1] else None
+#        disparity_value = disparity_map[y, x] if 0 <= y < disparity_map.shape[0] and 0 <= x < disparity_map.shape[1] else None
+#        if depth_value is not None:
+#            print(f"Disparity at ({x}, {y}): {disparity_value/1000:.2f} meter | Depth: {depth_value:.2f} cm", end="\r")
 
 
 try:
@@ -173,7 +173,7 @@ try:
         q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
 
         cv2.namedWindow("raw disparity")
-        cv2.setMouseCallback("raw disparity", on_mouse)
+        #cv2.setMouseCallback("raw disparity", on_mouse)
 
         while True:
             try:
