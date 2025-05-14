@@ -234,7 +234,7 @@ try:
                     if valid_depths.size > 0:
                             black_dist_m = np.nanmean(valid_depths) / 1000.0
                             cv2.putText(frame, f'{black_dist_m:.2f}m', (x + 10, y),
-                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 5)
+                                       cv2.FONT_HERSHEY_SIMPLEX, 2, (245, 66, 230), 5)
                     
                     # === Estimate and Display Depth for White Squares ===
                     for ((wc_x, wc_y), w, h) in white_info:
