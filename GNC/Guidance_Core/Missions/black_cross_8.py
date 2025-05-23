@@ -31,13 +31,13 @@ xout_left.setStreamName("left")
 xout_depth.setStreamName("disparity")
 
 # Configure mono cameras
-for cam, socket in [(left, dai.CameraBoardSocket.LEFT), (right, dai.CameraBoardSocket.RIGHT)]:
+for cam, socket in [(left, dai.CameraBoardSocket.CAM_B), (right, dai.CameraBoardSocket.CAM_C)]:
     cam.setBoardSocket(socket)
-    cam.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
+    cam.setResolution(dai.MonoCameraProperties.SensorResolution.THE_1200_P)
     cam.setFps(30)
 
 # Configure stereo node
-stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.HIGH_DENSITY)
+stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
 stereo.initialConfig.setMedianFilter(dai.MedianFilter.KERNEL_7x7)
 stereo.setLeftRightCheck(LR_CHECK)
 stereo.setExtendedDisparity(EXTENDED_DISPARITY)
