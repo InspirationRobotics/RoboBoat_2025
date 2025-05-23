@@ -31,17 +31,10 @@ xout_left.setStreamName("left")
 xout_depth.setStreamName("disparity")
 
 # Configure mono cameras
-# Configure mono cameras
 for cam, socket in [(left, dai.CameraBoardSocket.CAM_B), (right, dai.CameraBoardSocket.CAM_C)]:
     cam.setBoardSocket(socket)
     cam.setResolution(dai.MonoCameraProperties.SensorResolution.THE_1200_P)
-    cam.setImageOrientation(dai.CameraImageOrientation.NORMAL)  # Optional: correct flipped images
-
-# Set input resolution for StereoDepth
-stereo.setInputResolution(1280, 720)
-
-# Calibration fix
-intrinsics = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_B)
+    cam.setImageOrientation(dai.CameraImageOrientation.NORMAL)
 
 # Configure stereo node
 stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
@@ -49,6 +42,7 @@ stereo.initialConfig.setMedianFilter(dai.MedianFilter.KERNEL_7x7)
 stereo.setLeftRightCheck(LR_CHECK)
 stereo.setExtendedDisparity(EXTENDED_DISPARITY)
 stereo.setSubpixel(SUBPIXEL)
+stereo.setInputResolution(1280, 720)
 
 # Link nodes
 left.out.link(stereo.left)
@@ -59,7 +53,8 @@ stereo.depth.link(xout_depth.input)
 # === Run pipeline ===
 try:
     with dai.Device(pipeline) as device:
-        intrinsics = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.LEFT)
+        # Now it's safe to use the device object
+        intrinsics = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_B)
         focal_length_px = intrinsics[0][0]
         print("Focal length (pixels):", focal_length_px)
 
@@ -86,10 +81,9 @@ try:
 
             for det in results.boxes.data:
                 x1, y1, x2, y2, conf, cls = det.tolist()
-                if conf < 0.4:  # Optional: confidence threshold
+                if conf < 0.4:
                     continue
                 label = results.names[int(cls)]
-
                 if label.lower() == "cross":
                     x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])
                     c_x, c_y = (x1 + x2) // 2, (y1 + y2) // 2
@@ -119,7 +113,6 @@ try:
             norm_disp = (disparity_map * (255.0 / max_disp)).astype(np.uint8)
             disp_bgr = cv2.cvtColor(norm_disp, cv2.COLOR_GRAY2BGR)
 
-            # Overlay boxes on disparity view
             for ((x, y), w, h) in cross_info:
                 x1 = max(0, min(w_disp - 1, int((x - w // 2) * w_ratio)))
                 y1 = max(0, min(h_disp - 1, int((y - h // 2) * h_ratio)))
