@@ -42,8 +42,21 @@ stereo.setExtendedDisparity(EXTENDED_DISPARITY)
 stereo.setSubpixel(SUBPIXEL)
 
 # Link nodes
-left.out.link(stereo.left)
-right.out.link(stereo.right)
+left_manip = pipeline.create(dai.node.ImageManip)
+right_manip = pipeline.create(dai.node.ImageManip)
+
+# Resize to 1280x720
+left_manip.initialConfig.setResize(1280, 720)
+right_manip.initialConfig.setResize(1280, 720)
+
+# Link mono camera outputs to manipulators
+left.out.link(left_manip.inputImage)
+right.out.link(right_manip.inputImage)
+
+# Link resized output to StereoDepth
+left_manip.out.link(stereo.left)
+right_manip.out.link(stereo.right)
+
 left.out.link(xout_left.input)
 stereo.depth.link(xout_depth.input)
 
