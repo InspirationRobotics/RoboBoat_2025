@@ -8,7 +8,7 @@ import time
 from ultralytics import YOLO
 
 # === Load YOLOv8 model ===
-model = YOLO("best_try2.pt")  # Ensure the model is in the correct path
+model = YOLO("best (2).pt")  # Ensure the model is in the correct path
 
 # === Stereo depth settings ===
 EXTENDED_DISPARITY = False
