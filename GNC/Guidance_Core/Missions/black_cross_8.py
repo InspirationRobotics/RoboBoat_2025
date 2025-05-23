@@ -31,10 +31,17 @@ xout_left.setStreamName("left")
 xout_depth.setStreamName("disparity")
 
 # Configure mono cameras
+# Configure mono cameras
 for cam, socket in [(left, dai.CameraBoardSocket.CAM_B), (right, dai.CameraBoardSocket.CAM_C)]:
     cam.setBoardSocket(socket)
     cam.setResolution(dai.MonoCameraProperties.SensorResolution.THE_1200_P)
-    cam.setFps(30)
+    cam.setImageOrientation(dai.CameraImageOrientation.NORMAL)  # Optional: correct flipped images
+
+# Set input resolution for StereoDepth
+stereo.setInputResolution(1280, 720)
+
+# Calibration fix
+intrinsics = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_B)
 
 # Configure stereo node
 stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
