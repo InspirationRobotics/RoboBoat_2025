@@ -36,6 +36,17 @@ right_manip.initialConfig.setResize(1280, 720)
 left_manip.initialConfig.setFrameType(dai.ImgFrame.Type.BGR888p)
 right_manip.initialConfig.setFrameType(dai.ImgFrame.Type.BGR888p)
 
+# ✅ Fix buffer size limit
+left_manip.setMaxOutputFrameSize(1280 * 720 * 3)
+right_manip.setMaxOutputFrameSize(1280 * 720 * 3)
+
+
+left_manip.initialConfig.setResize(1280, 720)
+right_manip.initialConfig.setResize(1280, 720)
+
+left_manip.initialConfig.setFrameType(dai.ImgFrame.Type.BGR888p)
+right_manip.initialConfig.setFrameType(dai.ImgFrame.Type.BGR888p)
+
 left.out.link(left_manip.inputImage)
 right.out.link(right_manip.inputImage)
 
