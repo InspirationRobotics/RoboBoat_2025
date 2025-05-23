@@ -6,75 +6,62 @@ import numpy as np
 import sys
 from ultralytics import YOLO
 
-# === Load YOLOv8 model ===
-model = YOLO("best (2).pt")  # Ensure the model path is correct
+model = YOLO("best (2).pt")
 
 # === Stereo depth settings ===
 EXTENDED_DISPARITY = False
 SUBPIXEL = True
 LR_CHECK = True
 
-# === Create pipeline ===
 pipeline = dai.Pipeline()
 
 # Create mono cameras
 left = pipeline.create(dai.node.MonoCamera)
 right = pipeline.create(dai.node.MonoCamera)
+left.setBoardSocket(dai.CameraBoardSocket.CAM_B)
+right.setBoardSocket(dai.CameraBoardSocket.CAM_C)
+left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_1200_P)
+right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_1200_P)
+
+# Resize using ImageManip to 1280x720
+left_manip = pipeline.create(dai.node.ImageManip)
+right_manip = pipeline.create(dai.node.ImageManip)
+left_manip.initialConfig.setResize(1280, 720)
+right_manip.initialConfig.setResize(1280, 720)
+left.out.link(left_manip.inputImage)
+right.out.link(right_manip.inputImage)
+
+# Stereo depth node
 stereo = pipeline.create(dai.node.StereoDepth)
-
-# Create output nodes
-xout_left = pipeline.create(dai.node.XLinkOut)
-xout_depth = pipeline.create(dai.node.XLinkOut)
-xout_left.setStreamName("left")
-xout_depth.setStreamName("disparity")
-
-# Configure mono cameras
-for cam, socket in [(left, dai.CameraBoardSocket.CAM_B), (right, dai.CameraBoardSocket.CAM_C)]:
-    cam.setBoardSocket(socket)
-    cam.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
-    cam.setImageOrientation(dai.CameraImageOrientation.NORMAL)
-
-# Configure stereo node
 stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
 stereo.initialConfig.setMedianFilter(dai.MedianFilter.KERNEL_7x7)
 stereo.setLeftRightCheck(LR_CHECK)
 stereo.setExtendedDisparity(EXTENDED_DISPARITY)
 stereo.setSubpixel(SUBPIXEL)
 
-# Link nodes
-left_manip = pipeline.create(dai.node.ImageManip)
-right_manip = pipeline.create(dai.node.ImageManip)
-
-# Resize to 1280x720
-left_manip.initialConfig.setResize(1280, 720)
-right_manip.initialConfig.setResize(1280, 720)
-
-# Link mono camera outputs to manipulators
-left.out.link(left_manip.inputImage)
-right.out.link(right_manip.inputImage)
-
-# Link resized output to StereoDepth
 left_manip.out.link(stereo.left)
 right_manip.out.link(stereo.right)
 
-left.out.link(xout_left.input)
+# Output streams
+xout_left = pipeline.create(dai.node.XLinkOut)
+xout_depth = pipeline.create(dai.node.XLinkOut)
+xout_left.setStreamName("left")
+xout_depth.setStreamName("disparity")
+left_manip.out.link(xout_left.input)
 stereo.depth.link(xout_depth.input)
 
-# === Run pipeline ===
 try:
     with dai.Device(pipeline) as device:
-        # Safe to access calibration now
         intrinsics = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_B)
         focal_length_px = intrinsics[0][0]
         print("Focal length (pixels):", focal_length_px)
 
-        left_q = device.getOutputQueue(name="left", maxSize=4, blocking=False)
-        disparity_q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
-
-        cv2.namedWindow("Disparity")
-        cv2.namedWindow("Detections")
+        left_q = device.getOutputQueue("left", maxSize=4, blocking=False)
+        disparity_q = device.getOutputQueue("disparity", maxSize=4, blocking=False)
 
         max_disp = stereo.initialConfig.getMaxDisparity()
+        cv2.namedWindow("Disparity")
+        cv2.namedWindow("Detections")
 
         while True:
             frame = left_q.get().getCvFrame()
@@ -85,7 +72,6 @@ try:
             h_disp, w_disp = depth_frame.shape[:2]
             h_ratio, w_ratio = h_disp / h_frame, w_disp / w_frame
 
-            # === YOLOv8 Inference ===
             results = model(frame)[0]
             cross_info = []
 
@@ -100,10 +86,10 @@ try:
                     w, h = x2 - x1, y2 - y1
                     cross_info.append(((c_x, c_y), w, h))
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                    cv2.putText(frame, 'Cross', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                    cv2.putText(frame, 'Cross', (x1, y1 - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                     cv2.circle(frame, (c_x, c_y), 5, (0, 255, 0), -1)
 
-            # === Depth Estimation ===
             for ((x, y), w, h) in cross_info:
                 x1 = max(0, min(w_disp - 1, int((x - w // 2) * w_ratio)))
                 y1 = max(0, min(h_disp - 1, int((y - h // 2) * h_ratio)))
@@ -118,7 +104,6 @@ try:
                     cv2.putText(frame, f'{depth_m:.2f}m', (x + 10, y + 10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3)
 
-            # === Disparity visualization ===
             norm_disp = (disparity_map * (255.0 / max_disp)).astype(np.uint8)
             disp_bgr = cv2.cvtColor(norm_disp, cv2.COLOR_GRAY2BGR)
 
