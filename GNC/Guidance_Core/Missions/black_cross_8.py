@@ -4,7 +4,6 @@ import cv2
 import depthai as dai
 import numpy as np
 import sys
-import time
 from ultralytics import YOLO
 
 # === Load YOLOv8 model ===
@@ -18,7 +17,7 @@ LR_CHECK = True
 # === Create pipeline ===
 pipeline = dai.Pipeline()
 
-# Create mono cameras (better for stereo)
+# Create mono cameras
 left = pipeline.create(dai.node.MonoCamera)
 right = pipeline.create(dai.node.MonoCamera)
 stereo = pipeline.create(dai.node.StereoDepth)
@@ -26,7 +25,6 @@ stereo = pipeline.create(dai.node.StereoDepth)
 # Create output nodes
 xout_left = pipeline.create(dai.node.XLinkOut)
 xout_depth = pipeline.create(dai.node.XLinkOut)
-
 xout_left.setStreamName("left")
 xout_depth.setStreamName("disparity")
 
@@ -35,8 +33,6 @@ for cam, socket in [(left, dai.CameraBoardSocket.CAM_B), (right, dai.CameraBoard
     cam.setBoardSocket(socket)
     cam.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
     cam.setImageOrientation(dai.CameraImageOrientation.NORMAL)
-    print("Mono camera output size:", left.getResolution())
-
 
 # Configure stereo node
 stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
@@ -44,7 +40,6 @@ stereo.initialConfig.setMedianFilter(dai.MedianFilter.KERNEL_7x7)
 stereo.setLeftRightCheck(LR_CHECK)
 stereo.setExtendedDisparity(EXTENDED_DISPARITY)
 stereo.setSubpixel(SUBPIXEL)
-stereo.setInputResolution(1280, 720)
 
 # Link nodes
 left.out.link(stereo.left)
@@ -55,7 +50,7 @@ stereo.depth.link(xout_depth.input)
 # === Run pipeline ===
 try:
     with dai.Device(pipeline) as device:
-        # Now it's safe to use the device object
+        # Safe to access calibration now
         intrinsics = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_B)
         focal_length_px = intrinsics[0][0]
         print("Focal length (pixels):", focal_length_px)
@@ -67,8 +62,6 @@ try:
         cv2.namedWindow("Detections")
 
         max_disp = stereo.initialConfig.getMaxDisparity()
-        print("Mono camera output size:", left.getResolution())
-
 
         while True:
             frame = left_q.get().getCvFrame()
@@ -79,10 +72,10 @@ try:
             h_disp, w_disp = depth_frame.shape[:2]
             h_ratio, w_ratio = h_disp / h_frame, w_disp / w_frame
 
-            # === Run YOLOv8 inference ===
+            # === YOLOv8 Inference ===
             results = model(frame)[0]
             cross_info = []
-            
+
             for det in results.boxes.data:
                 x1, y1, x2, y2, conf, cls = det.tolist()
                 if conf < 0.4:
@@ -93,7 +86,6 @@ try:
                     c_x, c_y = (x1 + x2) // 2, (y1 + y2) // 2
                     w, h = x2 - x1, y2 - y1
                     cross_info.append(((c_x, c_y), w, h))
-
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                     cv2.putText(frame, 'Cross', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                     cv2.circle(frame, (c_x, c_y), 5, (0, 255, 0), -1)
@@ -124,7 +116,6 @@ try:
                 y2 = max(0, min(h_disp - 1, int((y + h // 2) * h_ratio)))
                 cv2.rectangle(disp_bgr, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-            # === Show results ===
             cv2.imshow("Disparity", disp_bgr)
             cv2.imshow("Detections", frame)
 
