@@ -6,96 +6,82 @@ import numpy as np
 import sys
 from ultralytics import YOLO
 
-# === Load YOLOv8 model ===
-model = YOLO("best (2).pt")  # Ensure the model path is correct
+model = YOLO("best (2).pt")
 
-# === Stereo depth settings ===
 EXTENDED_DISPARITY = False
 SUBPIXEL = True
 LR_CHECK = True
 
-# === Create pipeline ===
 pipeline = dai.Pipeline()
 
-# === Create mono cameras ===
-left = pipeline.create(dai.node.MonoCamera)
-right = pipeline.create(dai.node.MonoCamera)
+# === Color camera for RGB ===
+color_cam = pipeline.create(dai.node.ColorCamera)
+color_cam.setBoardSocket(dai.CameraBoardSocket.CAM_A)
+color_cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
+color_cam.setIspScale(2, 3)  # Downscale to 1280x720
+color_cam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
+color_cam.setInterleaved(False)
 
-left.setBoardSocket(dai.CameraBoardSocket.CAM_B)
-right.setBoardSocket(dai.CameraBoardSocket.CAM_C)
-left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_1200_P)
-right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_1200_P)
+# === Mono cameras for depth ===
+mono_left = pipeline.create(dai.node.MonoCamera)
+mono_right = pipeline.create(dai.node.MonoCamera)
 
-# === Create ImageManip nodes to resize to 1280x720 ===
-left_manip = pipeline.create(dai.node.ImageManip)
-right_manip = pipeline.create(dai.node.ImageManip)
+mono_left.setBoardSocket(dai.CameraBoardSocket.CAM_B)
+mono_right.setBoardSocket(dai.CameraBoardSocket.CAM_C)
+mono_left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
+mono_right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
 
-left_manip.initialConfig.setResize(1280, 720)
-right_manip.initialConfig.setResize(1280, 720)
-
-left_manip.initialConfig.setFrameType(dai.ImgFrame.Type.BGR888p)
-right_manip.initialConfig.setFrameType(dai.ImgFrame.Type.BGR888p)
-
-# ✅ Fix buffer size limit
-left_manip.setMaxOutputFrameSize(1280 * 720 * 3)
-right_manip.setMaxOutputFrameSize(1280 * 720 * 3)
-
-
-left_manip.initialConfig.setResize(1280, 720)
-right_manip.initialConfig.setResize(1280, 720)
-
-left_manip.initialConfig.setFrameType(dai.ImgFrame.Type.BGR888p)
-right_manip.initialConfig.setFrameType(dai.ImgFrame.Type.BGR888p)
-
-left.out.link(left_manip.inputImage)
-right.out.link(right_manip.inputImage)
-
-# === Create StereoDepth node ===
+# === Stereo depth ===
 stereo = pipeline.create(dai.node.StereoDepth)
-stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
-stereo.initialConfig.setMedianFilter(dai.MedianFilter.KERNEL_7x7)
+stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.HIGH_ACCURACY)
 stereo.setLeftRightCheck(LR_CHECK)
 stereo.setExtendedDisparity(EXTENDED_DISPARITY)
 stereo.setSubpixel(SUBPIXEL)
+stereo.setDepthAlign(dai.CameraBoardSocket.CAM_A)  # Align depth to RGB camera
 
-left_manip.out.link(stereo.left)
-right_manip.out.link(stereo.right)
+# === Link cameras ===
+mono_left.out.link(stereo.left)
+mono_right.out.link(stereo.right)
+color_cam.isp.link(stereo.colorCameraInput)
 
-# === Output streams ===
-xout_left = pipeline.create(dai.node.XLinkOut)
+# === Outputs ===
+xout_rgb = pipeline.create(dai.node.XLinkOut)
 xout_depth = pipeline.create(dai.node.XLinkOut)
-xout_left.setStreamName("left")
-xout_depth.setStreamName("disparity")
+xout_rgb.setStreamName("rgb")
+xout_depth.setStreamName("depth")
 
-left_manip.out.link(xout_left.input)
+color_cam.video.link(xout_rgb.input)
 stereo.depth.link(xout_depth.input)
 
 # === Run pipeline ===
 try:
     with dai.Device(pipeline) as device:
-        intrinsics = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_B)
+        rgb_q = device.getOutputQueue("rgb", maxSize=4, blocking=False)
+        depth_q = device.getOutputQueue("depth", maxSize=4, blocking=False)
+
+        calib = device.readCalibration()
+        intrinsics = calib.getCameraIntrinsics(dai.CameraBoardSocket.CAM_A)
         focal_length_px = intrinsics[0][0]
         print("Focal length (pixels):", focal_length_px)
 
-        left_q = device.getOutputQueue("left", maxSize=4, blocking=False)
-        disparity_q = device.getOutputQueue("disparity", maxSize=4, blocking=False)
-
         max_disp = stereo.initialConfig.getMaxDisparity()
-        cv2.namedWindow("Disparity")
-        cv2.namedWindow("Detections")
+
+        cv2.namedWindow("RGB")
+        cv2.namedWindow("Depth")
 
         while True:
-            frame = left_q.get().getCvFrame()  # 1280x720 BGR
-            disparity_map = disparity_q.get().getCvFrame().astype(np.float32)
-            depth_frame = disparity_map.copy()
+            frame = rgb_q.get().getCvFrame()
+            depth_map = depth_q.get().getFrame().astype(np.float32)
 
-            h_disp, w_disp = depth_frame.shape[:2]
+            h_frame, w_frame = frame.shape[:2]
+            h_depth, w_depth = depth_map.shape[:2]
 
-            # Resize frame to match depth map exactly
-            frame_resized = cv2.resize(frame, (w_disp, h_disp))
+            # Ensure shape match
+            if (h_frame, w_frame) != (h_depth, w_depth):
+                depth_map = cv2.resize(depth_map, (w_frame, h_frame))
 
-            # === YOLO inference ===
-            results = model(frame_resized)[0]
+            # === YOLO detection on RGB ===
+            results = model(frame)[0]
             cross_info = []
 
             for det in results.boxes.data:
@@ -109,39 +95,32 @@ try:
                     w, h = x2 - x1, y2 - y1
                     cross_info.append(((c_x, c_y), w, h))
 
-                    cv2.rectangle(frame_resized, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                    cv2.putText(frame_resized, 'Cross', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-                    cv2.circle(frame_resized, (c_x, c_y), 5, (0, 255, 0), -1)
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.putText(frame, 'Cross', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                    cv2.circle(frame, (c_x, c_y), 5, (0, 255, 0), -1)
 
             # === Depth estimation ===
             for ((x, y), w, h) in cross_info:
-                x1 = max(0, min(w_disp - 1, int(x - w / 2)))
-                y1 = max(0, min(h_disp - 1, int(y - h / 2)))
-                x2 = max(0, min(w_disp - 1, int(x + w / 2)))
-                y2 = max(0, min(h_disp - 1, int(y + h / 2)))
+                x1 = max(0, min(w_frame - 1, int(x - w / 2)))
+                y1 = max(0, min(h_frame - 1, int(y - h / 2)))
+                x2 = max(0, min(w_frame - 1, int(x + w / 2)))
+                y2 = max(0, min(h_frame - 1, int(y + h / 2)))
 
-                roi = depth_frame[y1:y2, x1:x2]
+                roi = depth_map[y1:y2, x1:x2]
                 valid_depths = roi[roi > 0]
 
                 if valid_depths.size > 0:
                     depth_m = np.mean(valid_depths) / 1000.0
-                    cv2.putText(frame_resized, f'{depth_m:.2f}m', (x + 10, y + 10),
+                    cv2.putText(frame, f'{depth_m:.2f}m', (x + 10, y + 10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3)
 
-            # === Disparity visualization ===
-            norm_disp = (disparity_map * (255.0 / max_disp)).astype(np.uint8)
-            disp_bgr = cv2.cvtColor(norm_disp, cv2.COLOR_GRAY2BGR)
-
-            for ((x, y), w, h) in cross_info:
-                x1 = max(0, min(w_disp - 1, int(x - w / 2)))
-                y1 = max(0, min(h_disp - 1, int(y - h / 2)))
-                x2 = max(0, min(w_disp - 1, int(x + w / 2)))
-                y2 = max(0, min(h_disp - 1, int(y + h / 2)))
-                cv2.rectangle(disp_bgr, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            # Normalize depth for display
+            norm_depth = (depth_map * (255.0 / max_disp)).astype(np.uint8)
+            depth_vis = cv2.applyColorMap(norm_depth, cv2.COLORMAP_JET)
 
             # === Show frames ===
-            cv2.imshow("Disparity", disp_bgr)
-            cv2.imshow("Detections", frame_resized)
+            cv2.imshow("RGB", frame)
+            cv2.imshow("Depth", depth_vis)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
