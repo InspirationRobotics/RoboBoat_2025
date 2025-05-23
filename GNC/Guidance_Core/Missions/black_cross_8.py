@@ -35,6 +35,8 @@ for cam, socket in [(left, dai.CameraBoardSocket.CAM_B), (right, dai.CameraBoard
     cam.setBoardSocket(socket)
     cam.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
     cam.setImageOrientation(dai.CameraImageOrientation.NORMAL)
+    print("Mono camera output size:", left.getResolution())
+
 
 # Configure stereo node
 stereo.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.DEFAULT)
@@ -65,6 +67,8 @@ try:
         cv2.namedWindow("Detections")
 
         max_disp = stereo.initialConfig.getMaxDisparity()
+        print("Mono camera output size:", left.getResolution())
+
 
         while True:
             frame = left_q.get().getCvFrame()
@@ -78,7 +82,7 @@ try:
             # === Run YOLOv8 inference ===
             results = model(frame)[0]
             cross_info = []
-
+            
             for det in results.boxes.data:
                 x1, y1, x2, y2, conf, cls = det.tolist()
                 if conf < 0.4:
