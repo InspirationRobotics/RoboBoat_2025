@@ -33,12 +33,12 @@ xout.setStreamName("disparity")
 
 # Configure left camera
 left_cam.setBoardSocket(dai.CameraBoardSocket.CAM_A)
-left_cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1200_P)
+left_cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_720_P)
 left_cam.setIspScale(2, 3)
 
 # Configure right camera
 right_cam.setBoardSocket(dai.CameraBoardSocket.CAM_B)
-right_cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1200_P)
+right_cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_720_P)
 right_cam.setIspScale(2, 3)
 
 # Stereo depth configuration
