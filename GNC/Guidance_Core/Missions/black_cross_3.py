@@ -136,7 +136,7 @@ def main():
     cap = init_camera()
     last_shot_time = time.time()
     ball_launched = False # this is to only allow one ball launch / chooses if we launch a ball
-    motor      = motor_core.MotorCore("/dev/ttyACM0") # load with default port "/dev/ttyACM0"
+    #motor      = motor_core.MotorCore("/dev/ttyACM0") # load with default port "/dev/ttyACM0"
     motor_move = True # to control if we move with motors
     
     while True:
