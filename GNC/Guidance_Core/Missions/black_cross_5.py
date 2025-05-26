@@ -16,7 +16,7 @@ LAUNCH_DISTANCE_THRESHOLD = 1.0  # in meters
 LOWER_BLACK = np.array([0, 0, 0])
 UPPER_BLACK = np.array([80, 255, 76])
 LOWER_WHITE = np.array([0, 0, 170])
-UPPER_WHITE = np.array([105, 17, 210])
+UPPER_WHITE = np.array([120,  17,  89])
 KERNEL = np.ones((5, 5), np.uint8)
 
 # === Image Processing ===
