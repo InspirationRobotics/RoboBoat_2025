@@ -275,7 +275,7 @@ try:
                 # Get disparity frame
                 in_disparity = q.get()
                 depth_in_meters = in_disparity.getFrame().astype(np.float32) / 1000.0
-
+                depth_frame = depth_in_meters
                 #depth_in_meters = in_disparity.getCvFrame()
 
                 
