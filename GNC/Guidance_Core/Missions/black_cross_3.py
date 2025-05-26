@@ -127,14 +127,17 @@ def launch_ardiuno(ardiuno_compound):
 
 def main():
         # Change port based on your system (e.g., "COM3" on Windows, "/dev/ttyUSB0" on Linux/Mac)
-    ardiuno_compound = ArdiunoCompound(port="/dev/ttyACM2")
-
-    maestro = MiniMaestro(port="/dev/ttyACM0")
+    #ardiuno_compound = ArdiunoCompound(port="/dev/ttyACM2")
+    #
+    #maestro = MiniMaestro(port="/dev/ttyACM0")
+    
+    ardiuno_compound = ArdiunoCompound(port="/dev/ttyACM3")
+    motor = motor_core.MotorCore("/dev/ttyACM2")
     cap = init_camera()
     last_shot_time = time.time()
     ball_launched = False # this is to only allow one ball launch / chooses if we launch a ball
     motor      = motor_core.MotorCore("/dev/ttyACM0") # load with default port "/dev/ttyACM0"
-    motor_move = False # to control if we move with motors
+    motor_move = True # to control if we move with motors
     
     while True:
         ret, frame = cap.read()
