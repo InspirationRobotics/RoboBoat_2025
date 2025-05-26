@@ -205,8 +205,7 @@ try:
                 print(f"White boxes detected: {len(white_info)}")
                 
                 # Get disparity frame
-                in_disparity = q.get()
-                depth_frame = q.get().getFrame().astype(np.float32)
+                depth_in_meters = in_disparity.getFrame().astype(np.float32) / 1000.0
 
                 disparity_map = in_disparity.getCvFrame()
 
@@ -248,7 +247,7 @@ try:
                                        
                     if black_dist_m > 1: 
                         if motor_move: 
-                            surge(0.5)
+                            motor.surge(0.5)
                             
                     if black_dist_m < 1:
                         if ball_launched: 
