@@ -9,6 +9,7 @@ import time
 
 
 from GNC.Control_Core import motor_core
+from API.Servos.ardiuno_compound import ArdiunoCompound
 
 
 # === Calibration Constants ===
@@ -108,6 +109,9 @@ LAUNCH_DISTANCE_THRESHOLD = 1.0  # in meters
 EXTENDED_DISPARITY = False  # Doubles disparity range
 SUBPIXEL = True  # Improves accuracy
 LR_CHECK = True  # Handles occlusions better
+
+ardiuno_compound = ArdiunoCompound(port="/dev/ttyACM3")
+motor = motor_core.MotorCore("/dev/ttyACM2")
 
 # Create pipeline
 pipeline = dai.Pipeline()
