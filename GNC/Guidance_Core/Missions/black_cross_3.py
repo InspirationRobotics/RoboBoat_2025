@@ -189,6 +189,15 @@ def main():
                     ball_launched = False  # break the while loop
                     break
                     
+        # Show HSV white mask
+        cv2.imshow("HSV White Mask", mask_white)
+
+        # Draw HSV max-color square in top-left of main window
+        hsv_color = np.uint8([[[UPPER_WHITE[0], UPPER_WHITE[1], UPPER_WHITE[2]]]])
+        bgr_color = cv2.cvtColor(hsv_color, cv2.COLOR_HSV2BGR)[0][0].tolist()
+        cv2.rectangle(frame, (0, 0), (50, 50), bgr_color, -1)
+
+                    
         # Draw vertical dividing lines (left 1/3 and right 2/3)
         line_color = (255, 255, 0)  # Cyan
         line_thickness = 2
