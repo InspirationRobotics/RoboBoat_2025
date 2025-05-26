@@ -101,6 +101,74 @@ def launch_ardiuno(ardiuno_compound):
     ardiuno_compound.send_command("A")
     time.sleep(10)
 
+def handle_distance_action(black_dist_m, x, y, frame):
+    global ball_launched, motor_move, motor, ardiuno_compound
+
+    if black_dist_m > 1.0:
+        if motor_move:
+            motor.surge(0.5)
+    elif black_dist_m <= 1.0 and ball_launched:
+        print("ball launched")
+        launch_ardiuno(ardiuno_compound)
+        ball_launched = False
+        return True  # Indicates launch occurred
+    return False
+
+def process_target_match(match, frame, depth_frame, w_ratio, h_ratio):
+    closest_black, closest_w, closest_h = match
+    x, y = closest_black
+
+    x1 = int((x - closest_w // 2) * w_ratio)
+    y1 = int((y - closest_h // 2) * h_ratio)
+    x2 = int((x + closest_w // 2) * w_ratio)
+    y2 = int((y + closest_h // 2) * h_ratio)
+
+    x1 = max(0, min(depth_frame.shape[1] - 1, x1))
+    y1 = max(0, min(depth_frame.shape[0] - 1, y1))
+    x2 = max(0, min(depth_frame.shape[1] - 1, x2))
+    y2 = max(0, min(depth_frame.shape[0] - 1, y2))
+
+    mask_shape = np.zeros(depth_frame.shape, dtype=np.uint8)
+    cv2.rectangle(mask_shape, (x1, y1), (x2, y2), 255, -1)
+    masked_depth = np.where(mask_shape == 255, depth_frame, np.nan)
+    valid_depths = masked_depth[~np.isnan(masked_depth)]
+
+    if valid_depths.size > 0:
+        black_dist_m = np.nanmean(valid_depths) / 1000.0
+        cv2.putText(frame, f'{black_dist_m:.2f}m', (x + 10, y + 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (245, 66, 230), 3)
+        return handle_distance_action(black_dist_m, x, y, frame)
+    return False
+    
+def process_fallback_black_targets(black_info, frame, depth_frame, w_ratio, h_ratio):
+    for (c_black, w, h) in black_info:
+        x, y = c_black
+
+        x1 = int((x - w // 2) * w_ratio)
+        y1 = int((y - h // 2) * h_ratio)
+        x2 = int((x + w // 2) * w_ratio)
+        y2 = int((y + h // 2) * h_ratio)
+
+        x1 = max(0, min(depth_frame.shape[1] - 1, x1))
+        y1 = max(0, min(depth_frame.shape[0] - 1, y1))
+        x2 = max(0, min(depth_frame.shape[1] - 1, x2))
+        y2 = max(0, min(depth_frame.shape[0] - 1, y2))
+
+        mask_shape = np.zeros(depth_frame.shape, dtype=np.uint8)
+        cv2.rectangle(mask_shape, (x1, y1), (x2, y2), 255, -1)
+        masked_depth = np.where(mask_shape == 255, depth_frame, np.nan)
+        valid_depths = masked_depth[~np.isnan(masked_depth)]
+
+        if valid_depths.size > 0:
+            black_dist_m = np.nanmean(valid_depths) / 1000.0
+            cv2.putText(frame, f'{black_dist_m:.2f}m', (x + 10, y + 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (245, 66, 230), 3)
+            if handle_distance_action(black_dist_m, x, y, frame):
+                return True
+    return False
+
+
+
 ball_launched = True
 motor_move = False
 LAUNCH_DISTANCE_THRESHOLD = 1.0  # in meters
@@ -211,76 +279,23 @@ try:
                 #depth_in_meters = in_disparity.getCvFrame()
 
                 
-                # Target matching
-                match = find_closest_match(black_info, white_centroids)
-                
-                if match:
-                    closest_black, closest_w, closest_h = match
-                    x, y = closest_black
-                    
-                    # estimating destance for black detections
-                    # === Compute scale ratios from frame to depth_frame ===
-                    h_ratio = depth_frame.shape[0] / frame.shape[0]
-                    w_ratio = depth_frame.shape[1] / frame.shape[1]
+                # === Compute scale ratios from frame to depth_frame ===
+                h_ratio = depth_frame.shape[0] / frame.shape[0]
+                w_ratio = depth_frame.shape[1] / frame.shape[1]
 
-                    # === Mask for black cross region ===
-                    x1 = int((x - closest_w // 2) * w_ratio)
-                    y1 = int((y - closest_h // 2) * h_ratio)
-                    x2 = int((x + closest_w // 2) * w_ratio)
-                    y2 = int((y + closest_h // 2) * h_ratio)
+                # Always annotate white squares
+                annotate_white_squares(frame, white_info, depth_frame, w_ratio, h_ratio)
 
-                    # Clamp to bounds
-                    x1 = max(0, min(depth_frame.shape[1] - 1, x1))
-                    y1 = max(0, min(depth_frame.shape[0] - 1, y1))
-                    x2 = max(0, min(depth_frame.shape[1] - 1, x2))
-                    y2 = max(0, min(depth_frame.shape[0] - 1, y2))
-
-                    # Create mask and compute average depth
-                    mask_shape = np.zeros(depth_frame.shape, dtype=np.uint8)
-                    cv2.rectangle(mask_shape, (x1, y1), (x2, y2), 255, -1)
-                    masked_depth = np.where(mask_shape == 255, depth_frame, np.nan)
-                    valid_depths = masked_depth[~np.isnan(masked_depth)]
-                    
-                    if valid_depths.size > 0:
-                            black_dist_m = np.nanmean(valid_depths) / 1000.0
-                            cv2.putText(frame, f'{black_dist_m:.2f}m', (x + 10, y+10),
-                                       cv2.FONT_HERSHEY_SIMPLEX, 1, (245, 66, 230), 3)
-                                       
-                    if black_dist_m > 1: 
-                        if motor_move: 
-                            motor.surge(0.5)
-                            
-                    if black_dist_m < 1:
-                        if ball_launched: 
-                            print("ball launched")
-                            launch_ardiuno(ardiuno_compound)
+                # Main logic: match if white exists, fallback if not
+                if white_info:
+                    match = find_closest_match(black_info, white_centroids)
+                    if match:
+                        if process_target_match(match, frame, depth_frame, w_ratio, h_ratio):
                             break
-                        
-                    
-                    # === Estimate and Display Depth for White Squares ===
-                    for ((wc_x, wc_y), w, h) in white_info:
-                        # Scale coordinates
-                        x1 = int((wc_x - w // 2) * w_ratio)
-                        y1 = int((wc_y - h // 2) * h_ratio)
-                        x2 = int((wc_x + w // 2) * w_ratio)
-                        y2 = int((wc_y + h // 2) * h_ratio)
-            
-                        # Clamp to bounds
-                        x1 = max(0, min(depth_frame.shape[1] - 1, x1))
-                        y1 = max(0, min(depth_frame.shape[0] - 1, y1))
-                        x2 = max(0, min(depth_frame.shape[1] - 1, x2))
-                        y2 = max(0, min(depth_frame.shape[0] - 1, y2))
-            
-                        # Create mask and apply depth averaging
-                        mask_white_region = np.zeros(depth_frame.shape, dtype=np.uint8)
-                        cv2.rectangle(mask_white_region, (x1, y1), (x2, y2), 255, -1)
-                        white_masked_depth = np.where(mask_white_region == 255, depth_frame, np.nan)
-                        white_valid = white_masked_depth[~np.isnan(white_masked_depth)]
-            
-                        if white_valid.size > 0:
-                            white_dist_m = np.nanmean(white_valid) / 1000.0
-                            cv2.putText(frame, f'{white_dist_m:.2f}m', (wc_x + 10, wc_y),
-                                       cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
+                else:
+                    if process_fallback_black_targets(black_info, frame, depth_frame, w_ratio, h_ratio):
+                        break
+
 
 
                 #The return value in the disparity map doesn't make sense, when you hover over the disparity map window, the disparity is 
