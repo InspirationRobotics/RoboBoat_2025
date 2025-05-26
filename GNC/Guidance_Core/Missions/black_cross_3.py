@@ -155,10 +155,10 @@ def main():
             x, y = closest_black
             # if can see the cross move forward
             if motor_move:
-                if x < frame_width / 3:
+                if x < frame_width / 5:
                     print("Turning RIGHT to center target...")
                     motor.rotate(0.2)  # Positive = clockwise (right)
-                elif x > 2 * frame_width / 3:
+                elif x > 4 * frame_width / 5:
                     print("Turning LEFT to center target...")
                     motor.rotate(-0.2)  # Negative = counterclockwise (left)
                 else:
