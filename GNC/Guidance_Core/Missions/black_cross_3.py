@@ -19,7 +19,7 @@ LAUNCH_DISTANCE_THRESHOLD = 40
 #LOWER_WHITE = np.array([0, 0, 170])
 #UPPER_WHITE = np.array([105, 17, 210])
 
-# night time
+# night time hello
 LOWER_BLACK = np.array([0, 0, 0])
 UPPER_BLACK = np.array([120, 255,   2])
 LOWER_WHITE = np.array([0, 0, 0])
