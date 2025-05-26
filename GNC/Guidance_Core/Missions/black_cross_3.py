@@ -157,13 +157,13 @@ def main():
             if motor_move:
                 if x < frame_width / 3:
                     print("Turning RIGHT to center target...")
-                    motor.rotate(0.3)  # Positive = clockwise (right)
+                    motor.rotate(0.1)  # Positive = clockwise (right)
                 elif x > 2 * frame_width / 3:
                     print("Turning LEFT to center target...")
-                    motor.rotate(-0.3)  # Negative = counterclockwise (left)
+                    motor.rotate(-0.1)  # Negative = counterclockwise (left)
                 else:
                     print("Target centered — moving forward...")
-                    motor.surge(0.5)
+                    motor.surge(0.1)
                 
             # estimating distance
             closest_black, closest_w, closest_h = match
