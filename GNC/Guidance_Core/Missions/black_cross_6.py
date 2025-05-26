@@ -246,10 +246,11 @@ try:
                         if motor_move: 
                             surge(0.5)
                             
-                        if black_dist_m < 1:
-                            if ball_launched: 
-                                launch_ardiuno()
-                                break
+                    if black_dist_m < 1:
+                        if ball_launched: 
+                            print("ball launched")
+                            launch_ardiuno()
+                            break
                         
                     
                     # === Estimate and Display Depth for White Squares ===
