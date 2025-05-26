@@ -23,7 +23,7 @@ LAUNCH_DISTANCE_THRESHOLD = 40
 LOWER_BLACK = np.array([0, 0, 0])
 UPPER_BLACK = np.array([120, 255,   2])
 LOWER_WHITE = np.array([0, 0, 0])
-UPPER_WHITE = np.array([50, 0, 105]) #100  10 234
+UPPER_WHITE = np.array([50, 255, 105]) #100  10 234
 KERNEL = np.ones((5, 5), np.uint8)
 
 
