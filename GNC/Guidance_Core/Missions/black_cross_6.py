@@ -14,9 +14,9 @@ LAUNCH_DISTANCE_THRESHOLD = 1.0  # in meters
 
 # HSV Ranges for Black and White Object Detection
 LOWER_BLACK = np.array([0, 0, 0])
-UPPER_BLACK = np.array([0, 255,   5])
-LOWER_WHITE = np.array([172-20,  64-20, 143-20])
-UPPER_WHITE = np.array([175,  79, 171]) #100  10 234
+UPPER_BLACK = np.array([120, 255,   2])
+LOWER_WHITE = np.array([94  0  21])
+UPPER_WHITE = np.array([135,  31,  59]) #100  10 234
 KERNEL = np.ones((5, 5), np.uint8)
 
 # === Image Processing ===
