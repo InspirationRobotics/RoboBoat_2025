@@ -13,10 +13,17 @@ FOCAL_LENGTH = 588.3843844
 TIME_DELAY = 5
 LAUNCH_DISTANCE_THRESHOLD = 40
 
+# day time
+#LOWER_BLACK = np.array([0, 0, 0])
+#UPPER_BLACK = np.array([80, 255, 76])
+#LOWER_WHITE = np.array([0, 0, 170])
+#UPPER_WHITE = np.array([105, 17, 210])
+
+# night time
 LOWER_BLACK = np.array([0, 0, 0])
-UPPER_BLACK = np.array([80, 255, 76])
-LOWER_WHITE = np.array([0, 0, 170])
-UPPER_WHITE = np.array([105, 17, 210])
+UPPER_BLACK = np.array([120, 255,   2])
+LOWER_WHITE = np.array([0, 0, 0])
+UPPER_WHITE = np.array([50, 0, 105]) #100  10 234
 KERNEL = np.ones((5, 5), np.uint8)
 
 
