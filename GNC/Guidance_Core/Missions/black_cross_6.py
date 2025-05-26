@@ -167,6 +167,27 @@ def process_fallback_black_targets(black_info, frame, depth_frame, w_ratio, h_ra
                 return True
     return False
 
+def annotate_white_squares(frame, white_info, depth_frame, w_ratio, h_ratio):
+    for ((wc_x, wc_y), w, h) in white_info:
+        x1 = int((wc_x - w // 2) * w_ratio)
+        y1 = int((wc_y - h // 2) * h_ratio)
+        x2 = int((wc_x + w // 2) * w_ratio)
+        y2 = int((wc_y + h // 2) * h_ratio)
+
+        x1 = max(0, min(depth_frame.shape[1] - 1, x1))
+        y1 = max(0, min(depth_frame.shape[0] - 1, y1))
+        x2 = max(0, min(depth_frame.shape[1] - 1, x2))
+        y2 = max(0, min(depth_frame.shape[0] - 1, y2))
+
+        mask_white_region = np.zeros(depth_frame.shape, dtype=np.uint8)
+        cv2.rectangle(mask_white_region, (x1, y1), (x2, y2), 255, -1)
+        white_masked_depth = np.where(mask_white_region == 255, depth_frame, np.nan)
+        white_valid = white_masked_depth[~np.isnan(white_masked_depth)]
+
+        if white_valid.size > 0:
+            white_dist_m = np.nanmean(white_valid) / 1000.0
+            cv2.putText(frame, f'{white_dist_m:.2f}m', (wc_x + 10, wc_y),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
 
 
 ball_launched = True
