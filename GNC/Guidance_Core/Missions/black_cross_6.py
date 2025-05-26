@@ -253,7 +253,7 @@ try:
                     if black_dist_m < 1:
                         if ball_launched: 
                             print("ball launched")
-                            launch_ardiuno()
+                            launch_ardiuno(ardiuno_compound)
                             break
                         
                     
