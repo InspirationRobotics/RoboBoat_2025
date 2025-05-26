@@ -246,7 +246,7 @@ try:
                         if motor_move: 
                             surge(0.5)
                             
-                        if black_dist < 1:
+                        if black_dist_m < 1:
                             if ball_launched: 
                                 launch_ardiuno()
                                 break
