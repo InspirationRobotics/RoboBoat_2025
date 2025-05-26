@@ -190,8 +190,8 @@ def annotate_white_squares(frame, white_info, depth_frame, w_ratio, h_ratio):
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
 
 
-ball_launched = True
-motor_move = False
+ball_launched = False
+motor_move = True
 LAUNCH_DISTANCE_THRESHOLD = 1.0  # in meters
 
 # Stereo depth settings
