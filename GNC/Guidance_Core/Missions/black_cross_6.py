@@ -205,6 +205,7 @@ try:
                 print(f"White boxes detected: {len(white_info)}")
                 
                 # Get disparity frame
+                in_disparity = q.get()
                 depth_in_meters = in_disparity.getFrame().astype(np.float32) / 1000.0
 
                 #depth_in_meters = in_disparity.getCvFrame()
