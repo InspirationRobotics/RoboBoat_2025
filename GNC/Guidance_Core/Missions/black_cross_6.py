@@ -347,4 +347,5 @@ except Exception as e:
     sys.exit(1)
 
 finally:
+    ardiuno_compound.close()
     cv2.destroyAllWindows()
