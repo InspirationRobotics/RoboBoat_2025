@@ -147,9 +147,20 @@ def main():
 
         match = find_closest_match(black_info, white_centroids)
         if match:
+            frame_height, frame_width = frame.shape[:2]
+            closest_black, closest_w, closest_h = match
+            x, y = closest_black
             # if can see the cross move forward
-            if motor_move: # moving forward
-                motor.surge(0.5)
+            if motor_move:
+                if x < frame_width / 3:
+                    print("Turning RIGHT to center target...")
+                    motor.rotate(0.3)  # Positive = clockwise (right)
+                elif x > 2 * frame_width / 3:
+                    print("Turning LEFT to center target...")
+                    motor.rotate(-0.3)  # Negative = counterclockwise (left)
+                else:
+                    print("Target centered — moving forward...")
+                    motor.surge(0.5)
                 
             # estimating distance
             closest_black, closest_w, closest_h = match
