@@ -8,6 +8,9 @@ import math
 import time
 
 
+from GNC.Control_Core import motor_core
+
+
 # === Calibration Constants ===
 TIME_DELAY = 5
 LAUNCH_DISTANCE_THRESHOLD = 1.0  # in meters
@@ -97,6 +100,9 @@ def launch_ardiuno(ardiuno_compound):
     ardiuno_compound.send_command("A")
     time.sleep(10)
 
+ball_launched = True
+motor_move = False
+LAUNCH_DISTANCE_THRESHOLD = 1.0  # in meters
 
 # Stereo depth settings
 EXTENDED_DISPARITY = False  # Doubles disparity range
@@ -235,6 +241,16 @@ try:
                             black_dist_m = np.nanmean(valid_depths) / 1000.0
                             cv2.putText(frame, f'{black_dist_m:.2f}m', (x + 10, y+10),
                                        cv2.FONT_HERSHEY_SIMPLEX, 1, (245, 66, 230), 3)
+                                       
+                    if black_dist_m > 1: 
+                        if motor_move: 
+                            surge(0.5)
+                            
+                        if black_dist < 1:
+                            if ball_launched: 
+                                launch_ardiuno()
+                                break
+                        
                     
                     # === Estimate and Display Depth for White Squares ===
                     for ((wc_x, wc_y), w, h) in white_info:
