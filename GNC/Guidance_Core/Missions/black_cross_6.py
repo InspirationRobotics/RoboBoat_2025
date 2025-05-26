@@ -207,7 +207,7 @@ try:
                 # Get disparity frame
                 depth_in_meters = in_disparity.getFrame().astype(np.float32) / 1000.0
 
-                disparity_map = in_disparity.getCvFrame()
+                #depth_in_meters = in_disparity.getCvFrame()
 
                 
                 # Target matching
@@ -286,8 +286,8 @@ try:
                 # too large(2000 as the return), while the real camera disparity of that object is only 50
                 # TODO: Find the meaning of the disparity map return, and concert it to what we need, in pixel
                 max_disparity = stereo.initialConfig.getMaxDisparity()
-                normalized_disparity = (disparity_map * (255 / max_disparity)).astype(np.uint8)
-                #disparity_map = cv2.applyColorMap(depth_normalized, cv2.COLORMAP_JET)
+                normalized_disparity = (depth_in_meters * (255 / max_disparity)).astype(np.uint8)
+                #depth_in_meters = cv2.applyColorMap(depth_normalized, cv2.COLORMAP_JET)
                 disp_bgr = cv2.cvtColor(normalized_disparity, cv2.COLOR_GRAY2BGR)
 
                 # Draw bounding boxes from white square detections
@@ -332,7 +332,7 @@ try:
                 #cv2.imshow("raw disparity", normalized_disparity)
                 
                 # Compute depth map
-                depth_map = (focal_lengthA * 15) / np.maximum(disparity_map, 0.001) 
+                depth_map = depth_in_meters  #(focal_lengthA * 15) / np.maximum(depth_in_meters, 0.001) 
                 depth_map = np.clip(depth_map, 0, 3000)  # Limit depth to 30m
                 
                 if cv2.waitKey(1) == ord('q'):
