@@ -188,6 +188,15 @@ def main():
                     last_shot_time = time.time()
                     ball_launched = False  # break the while loop
                     break
+                    
+        # Draw vertical dividing lines (left 1/3 and right 2/3)
+        line_color = (255, 255, 0)  # Cyan
+        line_thickness = 2
+        frame_height, frame_width = frame.shape[:2]
+
+        cv2.line(frame, (frame_width // 3, 0), (frame_width // 3, frame_height), line_color, line_thickness)
+        cv2.line(frame, (2 * frame_width // 3, 0), (2 * frame_width // 3, frame_height), line_color, line_thickness)
+
         cv2.imshow("Detected Shapes", frame)
         if cv2.waitKey(25) & 0xFF == ord('q'):
             break
