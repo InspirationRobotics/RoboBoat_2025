@@ -40,6 +40,7 @@ class AStarPathfinder:
     
     def get_move_cost(self, from_pos: Tuple[int, int], to_pos: Tuple[int, int]) -> float:
         """Calculate movement cost considering terrain cost and diagonal movement"""
+        # we can add some robotcs kinematics here, like awarding forward/yaw motion, and give less to sway and backward
         dr = abs(to_pos[0] - from_pos[0])
         dc = abs(to_pos[1] - from_pos[1])
         base_cost = 1.414 if (dr + dc) == 2 else 1.0
